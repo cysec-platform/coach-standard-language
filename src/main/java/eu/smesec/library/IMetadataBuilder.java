@@ -8,7 +8,6 @@ import eu.smesec.bridge.generated.Metadata;
  * which define how to serialize objects to metadata.
  * Checkout {@link eu.smesec.library.parser.CommandAddBadge#execute CommandAddBadge} for
  * a list of supported fields.
- * @see eu.smesec.bridge.utils.MetadataUtils
  */
 public interface IMetadataBuilder {
 

@@ -57,7 +57,7 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
     /**
      * Resolves the fully-qualified-coach-name to a given length.
      *
-     * <p>Assume a coach as follows : lib-company.lib-backup.lib-subcoach.A</p></p>
+     * <p>Assume a coach as follows : lib-company.lib-backup.lib-subcoach.A</p>
      * <p>E.g: resolveFQCN(1) = lib-company.lib-backup.lib-subcoach.A
      * <p>E.g: resolveFQCN(2) = lib-company.lib-backup
      * @param trimLength Determines how many levels should be taken from the left
@@ -104,7 +104,7 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
         return fqcnLoop();
     }
 
-    /**
+    /*
      * Helper method to create metadata. Reduce code in init() method
      *
      * @param coachId the id of the coach where the metadata should be saved
@@ -207,6 +207,8 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
 
     /**
      * Helper method for saving Skills of coach
+     *
+     * @param fqcn The fqcn of coach
      */
     public void saveSkills(FQCN fqcn) {
         // persist Skills to XML
@@ -230,6 +232,8 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
 
     /**
      * Helper method for saving rating of coach
+     *
+     * @param fqcn The fqcn of coach
      */
     public void saveRating(FQCN fqcn) {
         // Score/micro_score equals the UU score

@@ -354,8 +354,8 @@ public class TestLibFramework {
     @Test
     @Ignore(value = "Read below javadoc")
     /**
-     * Mockitor throws the below error even though the mocked method is not void. In addition, this code line is similarly
-     * used in another test {@link TestCommands#setup()}
+     * <p>Mockitor throws the below error even though the mocked method is not void. In addition, this code line is similarly
+     * used in another test {@link TestCommands#setup()}.</p>
      *
      * org.mockito.exceptions.misusing.CannotStubVoidMethodWithReturnValue:
      * 'registerResources' is a *void method* and it *cannot* be stubbed with a *return value*!
@@ -364,7 +364,7 @@ public class TestLibFramework {
      * If you need to set the void method to do nothing you can use:
      *     doNothing().when(mock).someVoidMethod();
      * For more information, check out the javadocs for Mockito.doNothing().
-     * ***
+     *
      * If you're unsure why you're getting above error read on.
      * Due to the nature of the syntax above problem might occur because:
      * 1. The method you are trying to stub is *overloaded*. Make sure you are calling the right overloaded version.

@@ -38,7 +38,10 @@ public abstract class LibQuestion implements Observer, INavigateable {
     private AbstractLib lib;
 
     /**
-     * Version 2 constructor for reflection loading
+     * <p>Version 2 constructor for reflection loading.</p>
+     *
+     * @param question the question
+     * @param lib the library object
      */
     public LibQuestion(Question question, AbstractLib lib) {
         this.id = question.getId();
@@ -126,11 +129,11 @@ public abstract class LibQuestion implements Observer, INavigateable {
     }
 
     /**
-     * Hook method used to modify the questions state, that's to say, mark options as selected/deselected
+     * <p>Hook method used to modify the questions state, that's to say, mark options as selected/deselected.</p>
      *
      * @param data the selected option
      * @param qid  the selected question
-     * @return
+     * @return the resulting modifier object
      */
     protected abstract Modifier updateState(String data, String qid);
 

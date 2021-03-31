@@ -6,11 +6,11 @@
 
     <groupId>eu.smesec.library</groupId>
     <artifactId>lib_coach_standard_language</artifactId>
-    <version>1.0</version>
+    <version>0.9.0</version>
     <packaging>jar</packaging>
 
     <name>CySeC Standard Coach language</name>
-    <description>The CySeC Standard Coach Language provedes a simple description language for coaches.</description>
+    <description>The CySeC Standard Coach Language provides a simple description language for coaches.</description>
     <url>http://cysec.cyberlab.fhnw.ch/</url>
 
     <distributionManagement>

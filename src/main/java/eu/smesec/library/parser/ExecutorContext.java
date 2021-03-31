@@ -14,7 +14,7 @@ public interface ExecutorContext {
   /***
    * <p>gets a Score object from the current context.</p>
    *
-   * <p>If a score does not exist a new Score object will be created<./p>
+   * <p>If a score does not exist a new Score object will be created.</p>
    *
    * @param scoreId the score ID to be returned
    * @return the requested score
@@ -80,6 +80,7 @@ public interface ExecutorContext {
   /***
    * <p>Set the parent executor context</p>
    *
+   * @param context the context of the variable may be null
    * @return the previously set context
    */
   ExecutorContext setParent(ExecutorContext context);

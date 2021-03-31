@@ -433,8 +433,11 @@ public abstract class AbstractLib implements Library {
     }
 
     /**
-     * Calculates the gpa with the current score and return appropriate grade letter.
+     * <p>Calculates the gpa with the current score and return appropriate grade letter.</p>
+     *
      * The formula is copied from the swiss grading system.
+     *
+     * @return the current grade
      */
     public String getGrade() {
         // scores are saved as integers but doubles are required to calculate the grade point average

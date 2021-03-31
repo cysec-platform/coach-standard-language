@@ -86,6 +86,7 @@ public class LogicRunner {
      * <p>Logic doesn't run if it is a blank line, otherwise ParserError occurs</p>
      *
      * @param question The question object
+     * @param logic the logic
      * @param fqcn The fqcn of the coach
      * @throws ParserException   If the composed logic line is malformed
      * @throws ExecutorException If there is an error running the logic

@@ -11,9 +11,6 @@ public class ParserLine {
 
   /***
    * <p>A micro parser/scanner.</p>
-   *
-   * @author Martin Gwerder
-   *
    */
   /* specifies the context range which is given when an exception arises during scanning */
   private static final int MAX_CONTEXT = 30;
@@ -23,28 +20,28 @@ public class ParserLine {
   private static final String ABNF_ATOM_SPECIALS = charlistBuilder(0, 31);
   private static final String ABNF_QUOTED_SPECIALS = "\"\\";
   private static final String ABNF_ATOM_CHAR = charlistDifferencer(
-          charlistBuilder(1, 127),
-          ABNF_ATOM_SPECIALS
+      charlistBuilder(1, 127),
+      ABNF_ATOM_SPECIALS
   );
   private static final String ABNF_TEXT_CHAR = charlistDifferencer(
-          charlistBuilder(1, 127),
-          "\r\n"
+      charlistBuilder(1, 127),
+      "\r\n"
   );
   private static final String ABNF_QUOTED_CHAR = charlistDifferencer(
-          ABNF_TEXT_CHAR,
-          ABNF_QUOTED_SPECIALS
+      ABNF_TEXT_CHAR,
+      ABNF_QUOTED_SPECIALS
   );
   private static final String ABNF_TAG = charlistDifferencer(charlistDifferencer(charlistDifferencer(charlistBuilder(48, 122), charlistBuilder(58, 64)), charlistBuilder(91, 94)), charlistBuilder(96, 96));
 
   /* a Logger  for logging purposes */
   private static final Logger LOGGER = Logger.getLogger(
-          (new Throwable()).getStackTrace()[0].getClassName());
+      (new Throwable()).getStackTrace()[0].getClassName());
 
   /* this holds the past context for the case that an exception is risen */
   private String context = "";
 
   /* this is the buffer of read but unprocessed characters */
-  private String buffer = "";
+  private String buffer;
 
   /***
    * <p>Creates a parser line object with a parser for a command.</p>
@@ -120,7 +117,7 @@ public class ParserLine {
   }
 
   private void prepareStorage(String line)
-          throws ParserException {
+      throws ParserException {
     // make sure that a line is never null when reaching the parsing section
     if (buffer == null) {
       buffer = "";
@@ -148,8 +145,8 @@ public class ParserLine {
    */
   public boolean snoopEscQuotes() {
     return "\\".contains(snoopBytes(1))
-            && snoopBytes(2).length() == 2
-            && ABNF_QUOTED_SPECIALS.contains(snoopBytes(2).substring(1, 2));
+        && snoopBytes(2).length() == 2
+        && ABNF_QUOTED_SPECIALS.contains(snoopBytes(2).substring(1, 2));
   }
 
   private boolean readBuffer(long num) {
@@ -353,9 +350,9 @@ public class ParserLine {
     skipBytes(1);
     StringBuilder ret = new StringBuilder();
     while (snoopBytes(1) != null && (ABNF_QUOTED_CHAR.contains(snoopBytes(1))
-            || snoopEscQuotes())) {
+        || snoopEscQuotes())) {
       if ("\\".contains(snoopBytes(1))) {
-        ret.append(skipBytes(2).substring(1, 2));
+        ret.append(skipBytes(2).charAt(1));
       } else {
         ret.append(skipBytes(1));
       }
@@ -374,7 +371,6 @@ public class ParserLine {
    */
   public String getString() {
     String start = snoopBytes(1);
-    String ret = null;
 
     if ("\"".equals(start)) {
 
@@ -382,7 +378,7 @@ public class ParserLine {
 
     }
 
-    return ret;
+    return null;
   }
 
   /***
@@ -391,19 +387,14 @@ public class ParserLine {
    * @return The String or null if no string at the current position
    */
   public String getAtomName() {
-
-    String start = snoopBytes(1);
-    String ret = null;
+    StringBuilder ret = new StringBuilder();
 
     // get a sequence of atom chars
     while (snoopBytes(1) != null && ABNF_TAG.contains(snoopBytes(1))) {
-      if (ret == null) {
-        ret = "";
-      }
-      ret += skipBytes(1);
+      ret.append(skipBytes(1));
     }
 
-    return ret;
+    return ret.toString();
   }
 
   /***
@@ -412,22 +403,19 @@ public class ParserLine {
    * @return the tag or null if no valid is found
    */
   public String getATag() {
-    String ret = null;
+    StringBuilder ret = new StringBuilder();
 
     // get a sequence of atom chars
     while (snoopBytes(1) != null && ABNF_TAG.contains(snoopBytes(1))) {
-      if (ret == null) {
-        ret = "";
-      }
-      ret += skipBytes(1);
+      ret.append(skipBytes(1));
     }
 
-    if ("".equals(ret)) {
+    if ("".equals(ret.toString())) {
       // empty tags are not allowed. At least one char is required
       return null;
     }
 
-    return ret;
+    return ret.toString();
   }
 
   public Atom getNumericalAtom() throws ParserException {
@@ -450,7 +438,7 @@ public class ParserLine {
 
   public Atom getAtom() throws ParserException {
     skipNoFunc();
-    Atom ret = null;
+    Atom ret;
     if ("\"".equals(snoopBytes(1))) {
       // get string
       String s = getQuotedString();
@@ -464,11 +452,11 @@ public class ParserLine {
       ret = getNumericalAtom();
     } else if (ABNF_TAG.contains(snoopBytes(1))) {
       int parentPointer = 0;
-      if("root.".equals(snoopBytes(5))) {
+      if ("root.".equals(snoopBytes(5))) {
         skipBytes(5);
         parentPointer = -1;
       } else {
-        while("parent.".equals(snoopBytes(7))) {
+        while ("parent.".equals(snoopBytes(7))) {
           skipBytes(7);
           parentPointer++;
         }
@@ -569,7 +557,7 @@ public class ParserLine {
       skipBytes(1);
       skipNoFunc();
 
-      return new CySeCLineAtom(cond, name, l.toArray(new Atom[l.size()]));
+      return new CySeCLineAtom(cond, name, l.toArray(new Atom[0]));
     } else {
       Atom statement = getAtom();
 

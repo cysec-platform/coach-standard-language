@@ -18,7 +18,10 @@ import java.util.stream.Collectors;
 public class AstarexclQuestion extends AstarQuestion {
 
     /**
-     * Default constructor for new version of object instantiation
+     * <p>Default constructor for new version of object instantiation.</p>
+     *
+     * @param question the question id
+     * @param lib th library
      */
     public AstarexclQuestion(Question question, AbstractLib lib) {
         super(question, lib);

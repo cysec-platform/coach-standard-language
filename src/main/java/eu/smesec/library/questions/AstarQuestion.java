@@ -23,7 +23,10 @@ public class AstarQuestion extends LibQuestion {
     private Map<String, LibSelectOption> options = new HashMap<>();
 
     /**
-     * Default constructor for builder
+     * <p>Constructor for builder.</p>
+     *
+     * @param question the question id
+     * @param lib th library
      */
     public AstarQuestion(Question question, AbstractLib lib) {
         super(question, lib);
@@ -37,11 +40,27 @@ public class AstarQuestion extends LibQuestion {
         }
     }
 
+    /**
+     * <p>Constructor for builder.</p>
+     *
+     * @param id the question id the
+     * @param nextQid next question id th library
+     * @param hide denotes f the question is hidden
+     * @param options the current options file
+     */
     public AstarQuestion(String id, String nextQid, boolean hide, Collection<LibSelectOption> options) {
         super(id, nextQid, hide);
         this.options = options.stream().collect(Collectors.toMap(LibSelectOption::getId, o -> o));
     }
 
+    /**
+     * <p>Constructor for builder.</p>
+     *
+     *
+     * @param id the question id the
+     * @param nextQid next question id th library
+     * @param options the current options file
+     */
     public AstarQuestion(String id, String nextQid, Collection<LibSelectOption> options) {
         this(id, nextQid, false, options);
     }
@@ -96,7 +115,8 @@ public class AstarQuestion extends LibQuestion {
     /**
      * Utility method to access the nextQid value of an a question
      *
-     * @return
+     * @param id the id of th question
+     * @return the next question id or null if none
      */
     public String getOptionNext(String id) {
         MetadataUtils.SimpleMvalue scoreOptional = searchMvalue("nextQid." + id);

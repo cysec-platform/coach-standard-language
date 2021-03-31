@@ -72,6 +72,8 @@ public class Endurance extends Skill {
 
     /**
      * Updates the value with the most recent values as defined in maxValue.
+     *
+     * @return the new value
      */
     public int refresh() {
         int value = 0;
@@ -94,9 +96,10 @@ public class Endurance extends Skill {
     }
 
     /**
-     * Override behaviour of subclass. get should return the accumulated values of
-     * all entries limited by the provided maxValue (maximum number of days back).
-     * @return the value of all entries at lest >= 0
+     * <p>Override behaviour of subclass. get should return the accumulated values of
+     * all entries limited by the provided maxValue (maximum number of days back).</p>
+     *
+     * @return the value of all entries at lest &gt;= 0
      */
     @Override
     public int get() {

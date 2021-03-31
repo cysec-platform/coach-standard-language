@@ -29,6 +29,9 @@ public interface Observer {
     /**
      * Init method for Version two of the framework. This method is intended to be used for questions created
      * using reflection. It takes no lib parameter as this is passed via constructor of the question
+     *
+     * @param action The action to perform upon update()
+     * @param questions The observed object
      */
     void init(BiConsumer<Modifier, String> action, Collection<String> questions);
 }
