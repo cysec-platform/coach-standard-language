@@ -6,7 +6,7 @@
 
     <groupId>eu.smesec.library</groupId>
     <artifactId>lib_coach_standard_language</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>CySeC Standard Coach language</name>
