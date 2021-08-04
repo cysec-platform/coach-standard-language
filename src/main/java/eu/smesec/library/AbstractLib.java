@@ -310,14 +310,15 @@ public abstract class AbstractLib implements Library {
 
         // find block that contains the passed questionId
         String blockId = "b1";
-        for (Block blockCandidate : questionnaire.getBlocks().getBlock()) {
-            Optional<Question> optional = blockCandidate.getQidList().stream()
-                    .map(o -> (Question) o)
-                    .filter(question -> question.getId().equals(questionId))
-                    .findFirst();
-            if (optional.isPresent()) blockId = blockCandidate.getId();
+        if (questionnaire.getBlocks() != null) {
+            for (Block blockCandidate : questionnaire.getBlocks().getBlock()) {
+                Optional<Question> optional = blockCandidate.getQidList().stream()
+                        .map(Question.class::cast)
+                        .filter(question -> question.getId().equals(questionId))
+                        .findFirst();
+                if (optional.isPresent()) blockId = blockCandidate.getId();
+            }
         }
-
         Command updateActiveQuestions = new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(),
                 activeQuestions.toArray(new String[0]));
         commands.add(updateActiveQuestions);
