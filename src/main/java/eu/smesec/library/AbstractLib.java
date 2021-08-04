@@ -23,21 +23,18 @@ import eu.smesec.library.skills.Endurance;
 import eu.smesec.library.skills.ScoreFactory;
 import eu.smesec.library.utils.Utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static eu.smesec.bridge.md.MetadataUtils.MV_KNOW_HOW;
-import static eu.smesec.bridge.md.MetadataUtils.MV_KNOW_HOW_MAX;
-import static eu.smesec.bridge.md.MetadataUtils.MV_STRENGTH;
-import static eu.smesec.bridge.md.MetadataUtils.MV_STRENGTH_MAX;
 import static eu.smesec.bridge.md.MetadataUtils.parseMvalues;
 
 public abstract class AbstractLib implements Library {
