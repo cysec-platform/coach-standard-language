@@ -11,7 +11,7 @@
 
     <name>CySeC Standard Coach language</name>
     <description>The CySeC Standard Coach Language provides a simple description language for coaches.</description>
-    <url>http://cysec.cyberlab.fhnw.ch/</url>
+    <url>https://cysec.cyberlab.fhnw.ch/</url>
 
     <distributionManagement>
         <snapshotRepository>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>eu.smesec.platform</groupId>
             <artifactId>cysec_bridge</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
