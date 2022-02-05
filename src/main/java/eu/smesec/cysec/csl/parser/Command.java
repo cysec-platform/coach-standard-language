@@ -55,6 +55,7 @@ public abstract class Command {
     registerCommand("revokeRecommendation", new CommandRevokeRecommendation());
     registerCommand("createSubcoach", new CommandCreateSubcoach());
     registerCommand("print", new CommandPrint());
+    registerCommand("tn", new CommandDictionaryLookup());
   }
 
   public static void registerCommand(String commandName, Command command) {

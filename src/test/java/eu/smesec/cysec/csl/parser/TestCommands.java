@@ -24,6 +24,8 @@ import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Answer;
+import eu.smesec.cysec.platform.bridge.generated.Dictionary;
+import eu.smesec.cysec.platform.bridge.generated.DictionaryEntry;
 import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
 import eu.smesec.cysec.platform.bridge.generated.Questions;
@@ -48,6 +50,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -73,8 +76,14 @@ public class TestCommands {
     question.setId("user-q20");
     Questions questions = new Questions();
     questions.getQuestion().add(question);
+    Dictionary dictionary = new Dictionary();
+    final DictionaryEntry dictionaryEntry = new DictionaryEntry();
+    dictionaryEntry.setKey("key-abc");
+    dictionaryEntry.setValue("Value ABC");
+    dictionary.getEntry().add(dictionaryEntry);
     coach = Mockito.mock(Questionnaire.class);
     when(coach.getQuestions()).thenReturn(questions);
+    when(coach.getDictionary()).thenReturn(dictionary);
     coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answer), coach, fqcn);
     // pass global logger
     coachContext.setLogger(Logger.getGlobal());
@@ -478,6 +487,23 @@ public class TestCommands {
     } catch (ParserException | ExecutorException pe) {
       assertEquals("Coach id my-subcoach-fail does not exist", pe.getMessage());
     }
+  }
 
+  @Test
+  public void testCommandDictionaryLookup() throws ExecutorException, ParserException {
+    Command.registerCommand("tn", new CommandDictionaryLookup());
+
+    Atom existent = new ParserLine("tn(\"key-abc\");").getAtom().execute(coachContext);
+    assertEquals(Atom.AtomType.STRING, existent.getType());
+    assertEquals("Value ABC", existent.getId());
+
+    Atom nonExistent = new ParserLine("tn(\"key-non-existent\");").getAtom().execute(coachContext);
+    assertEquals(Atom.AtomType.NULL, nonExistent.getType());
+
+    assertThrows(ExecutorException.class, () -> new ParserLine("tn();").getAtom().execute(coachContext));
+
+    when(coach.getDictionary()).thenReturn(null);
+    Atom noDictionary = new ParserLine("tn(\"any-key\");").getAtom().execute(coachContext);
+    assertEquals(Atom.AtomType.NULL, noDictionary.getType());
   }
 }
