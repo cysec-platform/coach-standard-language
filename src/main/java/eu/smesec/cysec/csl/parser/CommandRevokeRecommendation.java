@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,22 +34,16 @@ import java.util.List;
  */
 public class CommandRevokeRecommendation extends Command {
   @Override
-  public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    if (list.size() != 1) {
-      throw new ExecutorException("Invalid number of arguments. Expected 1 parameters.");
-    }
+  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    checkNumParams(aList, 1);
 
     // evaluate parameters
-    Atom recommendationName = list.get(0).execute(coachContext);
-
-    if (recommendationName.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Recommendation name must be of type STRING");
-    }
+    Atom recommendationName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "recommendationName" );
 
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     RecommendationFactory.Recommendation recommendation = c.getRecommendation(recommendationName.getId());
     if (recommendation == null) {
-        // no operation
+      // no operation
       //throw new ExecutorException("Recommendation id "+ recommendationName.getId()+" doesn't exist");
     } else {
         c.removeRecommendation(recommendationName.getId());

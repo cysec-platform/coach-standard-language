@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package eu.smesec.cysec.csl.parser;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Answer;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -32,21 +33,14 @@ public class CommandIsSelected extends Command {
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
     // expects 3 parameters: name, context of var and value
-    if (aList.size() != 1) {
-      throw new ExecutorException("Invalid number of arguments. Expected 1 parameter.");
-    }
+    checkNumParams(aList, 1);
 
     // evaluate parameters
-    Atom varContent = aList.get(0).execute(coachContext);
-
-    // assert type of parameters
-    if (varContent.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Invalid types for parameters: Provide [0] String");
-    }
+    Atom varContent = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varContent");
 
     Answer answer = null;
     try {
-//            v
+      //            v
       //q110oNone
       // split id of "company-q10o4" to "q10o4"
       //Problem: question id might contain "o" thus splitting into more than 2 parts!

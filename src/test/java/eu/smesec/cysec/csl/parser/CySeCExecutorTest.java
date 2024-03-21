@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,26 @@ public class CySeCExecutorTest {
       assertTrue("never has been executed", tcontext.getVariable("never",null)==NULL_ATOM);
       assertTrue("always2 has not been executed", "is set".equals(icontext.getVariable("always2",null).getId()));
       assertTrue("the next id is not set properly", "qid2".equals(context.getVariable("_coach.nextPage",null).getId()));
+    } catch(Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception");
+    }
+  }
+
+  @Test
+  public void variableStackTest() {
+    try {
+      StringBuilder sb = new StringBuilder();
+      sb.append("TRUE : always1 : root.set(\"always1\",\"a\"); // this line is always executed"+System.lineSeparator());
+      sb.append("TRUE : always2 : root.set(\"always1\",\"b\"); // this line is as well executed"+System.lineSeparator());
+      List<CySeCLineAtom> lines = new ParserLine(sb.toString()).getCySeCListing();
+      ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("testCoach");
+      context.executeQuestion(lines, coachContext);
+
+      ExecutorContext tcontext = CySeCExecutorContextFactory.getExecutorContext("rootCoach");
+      ExecutorContext icontext = CySeCExecutorContextFactory.getExecutorContext("intermediateCoach");
+
+      assertTrue( "always1 has not correct cintent (is: "+tcontext.getVariable("always1",null).getId()+")", "b".equals(tcontext.getVariable("always1",null).getId()));
     } catch(Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception");

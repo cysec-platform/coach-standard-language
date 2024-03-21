@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.BadgeFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,22 +37,12 @@ import java.util.List;
  */
 public class CommandAwardBadge extends Command {
   @Override
-  public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    if (list.size() != 2) {
-      throw new ExecutorException("Invalid number of arguments. Expected 2 parameters.");
-    }
+  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom badgeName = list.get(0).execute(coachContext);
-    Atom badgeClassName = list.get(1).execute(coachContext);
-
-    // verify type of parameters
-    if (badgeName.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Badge name must be of type STRING");
-    }
-    if (badgeClassName.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Badge class name must be of type STRING");
-    }
+    Atom badgeName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName");
+    Atom badgeClass = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeClass");
 
     // execute command
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
@@ -59,7 +50,7 @@ public class CommandAwardBadge extends Command {
     if (b == null) {
       throw new ExecutorException("Badge id "+badgeName.getId()+" doesn't exist");
     }
-    b.awardBadgeClass(badgeClassName.getId());
+    b.awardBadgeClass(badgeClass.getId());
 
     return Atom.NULL_ATOM;
   }

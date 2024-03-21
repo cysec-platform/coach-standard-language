@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,46 +34,20 @@ import java.util.List;
  */
 public class CommandAddRecommendation extends Command {
   @Override
-  public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    if (list.size() != 8) {
-      throw new ExecutorException("Invalid number of arguments. Expected 8 parameters.");
-    }
+  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    checkNumParams(aList, 8);
 
     // evaluate parameters
-    Atom recommendationName = list.get(0).execute(coachContext);
-    Atom order = list.get(1).execute(coachContext);
-    Atom urlImg = list.get(2).execute(coachContext);
-    Atom altImg = list.get(3).execute(coachContext);
-    Atom title = list.get(4).execute(coachContext);
-    Atom description = list.get(5).execute(coachContext);
-    Atom textLink = list.get(6).execute(coachContext);
-    Atom urlLink = list.get(7).execute(coachContext);
+    Atom recommendationName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "recommendationName");
+    Atom order = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.INTEGER), true, coachContext, "order");
+    Atom urlImg = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "urlImg");
+    Atom altImg = checkAtomType(aList.get(3), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "altImg");
+    Atom title = checkAtomType(aList.get(4), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "title");
+    Atom description = checkAtomType(aList.get(5), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "description");
+    Atom textLink = checkAtomType(aList.get(6), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "textLink");
+    Atom urlLink = checkAtomType(aList.get(7), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "urlLink");
 
-    if (recommendationName.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Recommendation name must be of type STRING");
-    }
-    if (order.getType() != Atom.AtomType.INTEGER) {
-      throw new ExecutorException("Recommendation class name must be of type STRING");
-    }
-    if (urlImg.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Image url must be of type STRING");
-    }
-    if (altImg.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Image alternate description must be of type STRING");
-    }
-    if (title.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Title description must be of type STRING");
-    }
-    if (description.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Description must be of type STRING");
-    }
-    if (urlLink.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Link must be of type STRING");
-    }
-    if (textLink.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Link text must be of type STRING");
-    }
-
+    // execute command
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     c.addRecommendation(new RecommendationFactory.Recommendation(recommendationName.getId(), Integer.valueOf(order.getId()), urlImg.getId(), altImg.getId(), title.getId(), description.getId(), textLink.getId(), urlLink.getId()));
 

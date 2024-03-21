@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,28 +28,29 @@ public class CommandIf extends Command {
     numberOfNormalizedParams = 1;
   }
 
-
   @Override
-  public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    /*
-     At this point both the if and else branch are already evaluated. Reproduce by running the test case
-     TestCommands#testIfCommand()
-     Also: the if and else branch content must be swapped. Otherwise the reverse of the intended behaviour happens.
-      */
-    if (list.size() != 2 && list.size() != 3) {
-      throw new ExecutorException("An \"if\" command always requires two or three patarmeters");
-    }
+  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    checkNumParams(aList, 2, 3);
 
-    Atom cond = list.get(0);
-    if (cond.isTrue(coachContext)) {
-      return list.get(1).execute(coachContext);
+    Atom cond = aList.get(0);
+
+    Atom ret = null;
+
+    boolean isTrue;
+    try {
+      isTrue = cond.isTrue(coachContext);
+    } catch(ExecutorException e) {
+      throw new ExecutorException("Error while executing if condition "+aList.get(0) ,e);
+    }
+    if (isTrue) {
+      ret = aList.get(1).execute(coachContext);
     } else {
-      Atom ret = list.get(2).execute(coachContext);
-      if (ret != null) {
-        return ret;
-      } else {
-        return new Atom(Atom.AtomType.BOOL, "FALSE", null);
-      }
+      ret = aList.get(2).execute(coachContext);
+    }
+    if (ret != null) {
+      return ret;
+    } else {
+      return new Atom(Atom.AtomType.BOOL, "FALSE", null);
     }
   }
 }

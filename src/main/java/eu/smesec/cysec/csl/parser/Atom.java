@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import java.util.Vector;
 
 public class Atom {
 
-  public static Atom NULL_ATOM = new Atom(AtomType.NULL, null, null);
+  public static final Atom NULL_ATOM = new Atom(AtomType.NULL, null, null);
+  public static final Atom TRUE = new Atom(AtomType.BOOL, "TRUE", null);
+  public static final Atom FALSE = new Atom(AtomType.BOOL, "FALSE", null);
 
   public enum AtomType {METHODE, INTEGER, FLOAT, BOOL, STRING, NULL;}
 
@@ -141,7 +143,7 @@ public class Atom {
       eval = execute(coachContext);
     }
     if (eval.getType() != AtomType.BOOL) {
-      throw new ExecutorException("condition \"" + toString() + "\" does not evaluate to BOOL (is:" + eval + ")");
+      throw new ExecutorException("condition \"" + this.toString() + "\" does not evaluate to BOOL (is:" + eval + ")");
     }
     if ("TRUE".equals(eval.getId())) {
       return true;

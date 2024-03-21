@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import eu.smesec.cysec.csl.parser.Atom.AtomType;
+import java.util.Arrays;
 import java.util.List;
 
 import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
@@ -27,19 +29,12 @@ public class CommandGetVar extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 3 parameters: origin question id, score name and value
-    if (aList.size() != 1) {
-      throw new ExecutorException("Invalid number of arguments. Expected 2 parameters.");
-    }
+    // expects 1 parameter
+    checkNumParams(aList, 1,2);
 
     // evaluate parameters
-    Atom varName = aList.get(0).execute(coachContext);
-    Atom varContext = aList.get(1).execute(coachContext);
-
-    // assert type of parameters
-    if (varName.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Invalid types for parameters: Provide [0] String, [1] String and [2] Numeric value");
-    }
+    Atom varName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName");
+    Atom varContext = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext, "varContext");
 
     // set the score
     coachContext.getContext().getVariable(varName.getId(), varContext == NULL_ATOM ? null : varContext.toString());

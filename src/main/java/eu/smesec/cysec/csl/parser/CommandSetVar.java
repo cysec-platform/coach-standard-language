@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@ public class CommandSetVar extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 3 parameters: name, context of var and value
-    if (aList.size() != 3 && aList.size() != 2) {
-      throw new ExecutorException("Invalid number of arguments. Expected 2 or 3 parameters.");
-    }
+    // expects 2 or 3 parameters
+    checkNumParams(aList, 2,3);
 
     // evaluate parameters
     Atom varName = aList.get(0).execute(coachContext);

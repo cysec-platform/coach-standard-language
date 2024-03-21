@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@ import java.util.Vector;
 
 public abstract class CommandAbstractBoolOp extends Command {
 
+  private final static Atom TRUE = new Atom(Atom.AtomType.BOOL, "TRUE", null);
+  private final static Atom FALSE = new Atom(Atom.AtomType.BOOL, "FALSE", null);
+
   @Override
   public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
     if (list == null || list.size() < 1) {
@@ -31,15 +34,20 @@ public abstract class CommandAbstractBoolOp extends Command {
     }
     List<Boolean> blist = new Vector<>();
     for (Atom a : list) {
-      if (a.getType() == Atom.AtomType.METHODE) {
-        a = a.execute(coachContext);
+      String old = a.toString();
+      try{
+        if (a.getType() == Atom.AtomType.METHODE) {
+          a = a.execute(coachContext);
+        }
+        blist.add(a.isTrue(coachContext));
+      } catch(ExecutorException e) {
+        throw new ExecutorException("Exception while evaluating parameter "+old+"in boolean op "+getCommandName(),e);
       }
-      blist.add(a.isTrue(coachContext));
     }
     if (evaluate(blist, coachContext.getContext())) {
-      return new Atom(Atom.AtomType.BOOL, "TRUE", null);
+      return TRUE;
     } else {
-      return new Atom(Atom.AtomType.BOOL, "FALSE", null);
+      return FALSE;
     }
   }
 

@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
@@ -38,13 +39,11 @@ public class CommandNext extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 3 parameters: name, context of var and value
-    if (aList.size() != 1 && aList.size() != 2) {
-      throw new ExecutorException("Invalid number of arguments. Expected 1 parameter.");
-    }
+    // expects 2 parameters: name, context of var and value
+    checkNumParams(aList, 1, 2);
 
     // evaluate parameters
-    Atom varContent = aList.get(0).execute(coachContext);
+    Atom varContent = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varContent");
 
     // assert type of parameters
     if (varContent.getType() != Atom.AtomType.STRING) {

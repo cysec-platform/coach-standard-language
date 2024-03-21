@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,24 +41,17 @@ import java.util.logging.Level;
 public class CommandCreateSubcoach extends Command {
 
   @Override
-  public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    if (list.size() != 2) {
-      throw new ExecutorException("Invalid number of arguments. Expected 2 parameters.");
-    }
-    // evaluate parameters
-    Atom coachId = list.get(0).execute(coachContext);
-    Atom fileIdentifier = list.get(1).execute(coachContext);
+  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    checkNumParams(aList, 2);
 
-    if (coachId.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Coach ID must be of type STRING");
-    }
-    if (fileIdentifier.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Subcoach segment must be of type STRING");
-    }
+    // evaluate parameters
+    Atom coachID = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "coachID");
+    Atom fileIdentifier = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
+
     try {
-      Questionnaire subcoach = coachContext.getCal().getCoach(coachId.getId());
+      Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
       if (subcoach == null) {
-        throw new ExecutorException("Coach id " + coachId.getId() +" does not exist");
+        throw new ExecutorException("Coach id " + coachID.getId() +" does not exist");
       }
       // Append current coach id to segment: e.g lib-company.lib-subcoach-backup
       Set<String> segment = new HashSet<>();
@@ -75,7 +69,7 @@ public class CommandCreateSubcoach extends Command {
       coachContext.getLogger().log(Level.SEVERE, "Couldn't create subcoach via CAL", e);
       // setup coach relation for already existing coaches
       try {
-        Questionnaire subcoach = coachContext.getCal().getCoach(coachId.getId());
+        Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
         CoachLibrary subcoachLibrary = coachContext.getCal().getLibraries(subcoach.getId()).get(0);
         subcoachLibrary.setParent(coachContext.getContext());
       } catch (CacheException ex) {

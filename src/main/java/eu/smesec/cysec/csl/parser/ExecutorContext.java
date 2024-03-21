@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,8 @@ public interface ExecutorContext {
    * @return the number of executed lines
    * @throws ExecutorException if an exception happens
    */
-  int executeQuestion(List<CySeCLineAtom> atomList, CoachContext coachContext) throws ExecutorException;
+  int executeQuestion(List<CySeCLineAtom> atomList, CoachContext coachContext)
+      throws ExecutorException;
 
   /***
    * <p>Get the parent executor context</p>
@@ -104,11 +105,11 @@ public interface ExecutorContext {
    */
   ExecutorContext setParent(ExecutorContext context);
 
-    /***
-     * <p>Exposes the id of the executor context which equals the library id</p>
-     *
-     * @return the id of the library tied to this context
-     */
-    String getContextId();
+  /***
+   * <p>Exposes the id of the executor context which equals the library id</p>
+   *
+   * @return the id of the library tied to this context
+   */
+  String getContextId();
 
 }

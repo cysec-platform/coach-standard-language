@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,7 +203,7 @@ public abstract class AbstractLib implements CoachLibrary {
         }
         Question next = Utils.findById(questionnaire, nextId);
 
-        logger.info("Next is " + next.getId());
+        logger.info("Next is " + (next==null?"NULL":next.getId())+" (questionID: "+nextId+")");
         return next;
     }
 

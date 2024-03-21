@@ -20,27 +20,44 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
+import eu.smesec.cysec.platform.bridge.generated.Question;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class CommandAbstractScore extends Command {
+/**
+ * This command checks if two atoms are equivalent in type and content.
+ *
+ * <p>Syntax: equals(atom1, atom2);</p>
+ * <p>Example: setMHidden("q20", "q40"); // returns FALSE</p>
+ */
+public class CommandEquals extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 3 parameters: origin question id, score name and value
+    // Three parameters expected: Lower name (inclusive), higher value (exclusive) and hiding value
     checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom scoreName = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "scoreName");
-    Atom scoreValue = checkAtomType(aList.get(1), Arrays.asList(new AtomType[]{AtomType.INTEGER, AtomType.FLOAT}), true, coachContext, "scoreValue");
+    Atom atom1 = aList.get(0).execute(coachContext);
+    Atom atom2 = aList.get(1).execute(coachContext);
 
-    // set the score
-    score(scoreName.getId(), coachContext.getQuestionContext().getId(), Double.valueOf(scoreValue.getId()), coachContext.getContext());
-    coachContext.getLogger().info( String.format("Adding %s to score %s in context %s", scoreValue.getId(), scoreName.getId(), coachContext.getContext()));
-
-    return Atom.NULL_ATOM;
+    // Check equivalence
+    if(atom1.getType().equals(atom2.getType())) {
+      if(AtomType.NULL==atom1.getType()) {
+        return Atom.TRUE;
+      } else if( atom1.getType()!=AtomType.METHODE ) {
+        if(atom1.getId().equals(atom2.getId())) {
+          return Atom.TRUE;
+        } else {
+          return Atom.FALSE;
+        }
+      } else {
+        return Atom.FALSE;
+      }
+    } else {
+      // types are inequal
+      return Atom.TRUE;
+    }
   }
-
-  abstract void score(String scoreId, String questionId, double value, ExecutorContext context);
 
 }

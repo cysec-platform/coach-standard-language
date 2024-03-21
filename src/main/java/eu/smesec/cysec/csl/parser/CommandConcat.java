@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ import java.util.List;
 public class CommandConcat extends Command {
 
   @Override
-  public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    if (list == null || list.size() < 1) {
-      throw new ExecutorException("concat operations require at least one argument");
-    }
+  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    checkNumParams(aList, 1, Integer.MAX_VALUE);
+
     StringBuilder sb = new StringBuilder();
-    for (Atom a : list) {
+    for (Atom a : aList) {
       if (a.getType() == Atom.AtomType.METHODE) {
         a = a.execute(coachContext);
       }

@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import eu.smesec.cysec.csl.parser.Atom.AtomType;
+import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +41,15 @@ public abstract class Command {
     registerCommand("or", new CommandOr());
     registerCommand("not", new CommandNot());
     registerCommand("xor", new CommandXor());
+    registerCommand("equals", new CommandEquals());
     registerCommand("if", new CommandIf());
     registerCommand("concat", new CommandConcat());
     registerCommand("set", new CommandSetVar());
     registerCommand("get", new CommandGetVar());
     registerCommand("setHidden", new CommandSetHidden());
+    registerCommand("setMHidden", new CommandSetMHidden());
     registerCommand("setNext", new CommandNext());
+    registerCommand("setAnswer", new CommandSetAnswer());
     registerCommand("isSelected", new CommandIsSelected());
     registerCommand("isAnswered", new CommandIsAnswered());
     registerCommand("addBadge", new CommandAddBadge());
@@ -60,6 +65,17 @@ public abstract class Command {
 
   public static void registerCommand(String commandName, Command command) {
     commands.put(commandName, command);
+    command.setCommandName(commandName);
+  }
+
+  private String commandName="UNKNOWN";
+
+  private void setCommandName(String commandName) {
+    this.commandName=commandName;
+  }
+
+  public String getCommandName() {
+    return this.commandName;
   }
 
   public static Command getCommand(String commandName) {
@@ -72,10 +88,65 @@ public abstract class Command {
     return numberOfNormalizedParams;
   }
 
-  public Atom execute(List<Atom> list, CoachContext coachContext, ExecutorContext eContext) throws ExecutorException {
+  public Atom execute(List<Atom> list, CoachContext coachContext, ExecutorContext eContext)
+      throws ExecutorException {
     CoachContext cc = coachContext.copy();
     cc.setContext(eContext);
     return execute(list, cc);
+  }
+
+  public Atom checkAtomType(Atom atom, List<AtomType> type, boolean evaluate, CoachContext context, String parameterName)
+      throws ExecutorException {
+    // evaluate once if required and allowed
+    if (atom.getType() == AtomType.METHODE && evaluate) {
+      atom = atom.execute(context);
+    }
+
+    // check for appropriate type
+    if(!type.contains(atom.getType())) {
+
+      // concatenate allowed types
+      StringBuffer typeString= new StringBuffer();
+      for(int i=0;i<type.size();i++) {
+        if(i>0 && i<type.size()-1) {
+          typeString.append(", ");
+        } else if(i==type.size()-1) {
+          typeString.append(", or ");
+        }
+        typeString.append(type.get(i).name());
+      }
+
+      // build exception message
+      String msg;
+      if (parameterName != null && !"".equals(parameterName)) {
+        msg = "Illegal type for Parameter " + parameterName + " (should: " + typeString + "; was: " + atom.getType()+")";
+      } else {
+        msg = "Illegal type for parameter (should:" + typeString + "; was: " + atom.getType()+")";
+      }
+
+      // throw exception
+      throw new ExecutorException(msg );
+    }
+    return atom;
+  }
+
+  public void checkNumParams(List<Atom> aList, int num) throws ExecutorException {
+    checkNumParams(aList, num, num);
+  }
+
+  public void checkNumParams(List<Atom> aList, int lowNum, int highNum) throws ExecutorException {
+    if (aList.size() > highNum || aList.size() < lowNum) {
+      if (highNum == lowNum) {
+        throw new ExecutorException(
+            "Invalid number of arguments. Expected " + lowNum + " parameters but got "
+                + aList.size() + " parameters in command "+getCommandName()+".");
+      } else {
+        throw new ExecutorException(
+            "Invalid number of arguments. Expected between " + lowNum + " and " + highNum
+                + " parameters but got "
+                + aList.size() + " parameters in command "+getCommandName()+".");
+      }
+    }
   }
 
   public abstract Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException;

@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.BadgeFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,42 +37,18 @@ import java.util.List;
 public class CommandAddBadgeClass extends Command {
 
   @Override
-  public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    // expects 3 parameters: origin question id, score name and value
-    if (list.size() != 7) {
-      throw new ExecutorException("Invalid number of arguments. Expected 7 parameters.");
-    }
+  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    // expects 7 parameters
+    checkNumParams(aList,7);
 
     // evaluate parameters
-    Atom badgeName = list.get(0).execute(coachContext);
-    Atom badgeClassName = list.get(1).execute(coachContext);
-    Atom order = list.get(2).execute(coachContext);
-    Atom urlImg = list.get(3).execute(coachContext);
-    Atom altImg = list.get(4).execute(coachContext);
-    Atom description = list.get(5).execute(coachContext);
-    Atom urlLink = list.get(6).execute(coachContext);
-
-    if (badgeName.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Badge name must be of type STRING");
-    }
-    if (badgeClassName.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Badge class name must be of type STRING");
-    }
-    if (order.getType() != Atom.AtomType.INTEGER) {
-      throw new ExecutorException("Badge class name must be of type STRING");
-    }
-    if (urlImg.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Image url must be of type STRING");
-    }
-    if (altImg.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Image alternate description must be of type STRING");
-    }
-    if (description.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Description must be of type STRING");
-    }
-    if (urlLink.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Link must be of type STRING");
-    }
+    Atom badgeName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName");
+    Atom badgeClassName = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeClass");
+    Atom order = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.INTEGER), true, coachContext,"BadgeOrder");
+    Atom urlImg = checkAtomType(aList.get(3), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "ImageURL");
+    Atom altImg = checkAtomType(aList.get(4), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"ImageAlternate" );
+    Atom description = checkAtomType(aList.get(5), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"Description");
+    Atom urlLink = checkAtomType(aList.get(6), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"LinkURL");
 
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     BadgeFactory.Badge b = c.getBadge(badgeName.getId());

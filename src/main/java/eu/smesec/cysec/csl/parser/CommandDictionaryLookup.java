@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.platform.bridge.generated.Dictionary;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,19 +30,13 @@ import java.util.List;
 public class CommandDictionaryLookup extends Command {
 
     @Override
-    public Atom execute(List<Atom> args, CoachContext coachContext) throws ExecutorException {
-        if (args == null || args.size() != 1) {
-            throw new ExecutorException("The identity command requires exactly one argument");
-        }
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        checkNumParams(aList,1);
 
-        // determine key of the entry to be found in the dictionary
-        Atom a = args.get(0);
-        if (a.getType() == Atom.AtomType.METHODE) {
-            a = a.execute(coachContext);
-        }
-        if (a.getType() != Atom.AtomType.STRING) {
-            throw new ExecutorException("Argument must be a STRING or evaluate to a STRING but was " + a.getType());
-        }
+        // determine key of the entry to search in the dictionary
+        Atom a = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext,null) ;
+
+        // handle empty id (return null)
         final String key = a.getId();
         if (key == null || key.isEmpty()) {
             return Atom.NULL_ATOM;

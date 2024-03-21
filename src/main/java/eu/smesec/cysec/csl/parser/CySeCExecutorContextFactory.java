@@ -2,7 +2,7 @@
  * #%L
  * CYSEC Standard Coach Language
  * %%
- * Copyright (C) 2020 - 2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+ * Copyright (C) 2020 - 2024 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,7 +247,7 @@ public class CySeCExecutorContextFactory {
               executedNames.add(la.getName());
             }
           } catch (ExecutorException ee) {
-            logger.log(Level.WARNING, "Exception during execution", ee);
+            logger.log(Level.WARNING, "Exception during execution of "+la.getCond(), ee);
             retException = new ExecutorException(ee.getReason(), retException);
           }
         }
