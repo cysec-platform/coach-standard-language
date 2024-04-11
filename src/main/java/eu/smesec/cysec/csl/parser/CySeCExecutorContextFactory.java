@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
 
@@ -177,6 +178,17 @@ public class CySeCExecutorContextFactory {
     public Atom getVariable(String name, String context) {
       synchronized (variables) {
         return variables.get(name) == null ? NULL_ATOM : variables.get(name).getVariable(context);
+      }
+    }
+
+    @Override
+    public Map<String, Atom> getVariables(String context) {
+      synchronized (variables) {
+        return variables.entrySet().stream()
+          .filter(kv -> kv.getValue().getVariable(context) != null)
+          .collect(Collectors.toMap(
+            kv -> kv.getKey(),
+            kv -> kv.getValue().getVariable(context)));
       }
     }
 
