@@ -43,7 +43,7 @@ public class ParserLine {
       ABNF_ATOM_SPECIALS
   );
   private static final String ABNF_TEXT_CHAR = charlistDifferencer(
-      charlistBuilder(1, 127),
+      charlistBuilder(1, 255),
       "\r\n"
   );
   private static final String ABNF_QUOTED_CHAR = charlistDifferencer(

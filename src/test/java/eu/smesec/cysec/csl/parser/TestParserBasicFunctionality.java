@@ -343,4 +343,14 @@ public class TestParserBasicFunctionality {
     }
   }
 
+  @Test
+  public void testSpecialCharString() {
+    try {
+      Atom a = new ParserLine("set(\"bl\",\"AäöüÄÖÜéèà[]§{}$£\")").getAtom();
+    } catch (ParserException pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception");
+    }
+  }
+
 }
