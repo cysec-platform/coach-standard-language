@@ -133,6 +133,53 @@ public class TestCommands {
   }
 
   @Test
+  public void testSetVariable() throws Exception {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("set", new CommandSetVar());
+    Command.registerCommand("get", new CommandGetVar());
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 set(\"myVar\",100);" + System.lineSeparator());
+      s.append("                 addScore(\"myScore\",get(\"myVar\"));" + System.lineSeparator());
+      s.append("              }; // This is a silly comment");
+      System.out.println("testing " + s);
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+
+      context.executeQuestion(l, coachContext);
+      //Atom result = l.get(0).execute(coachContext);
+      assertTrue(context.getScore("myScore").getValue() == 100);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+  }
+
+  @Test
+  public void testGetVariableDefault() throws Exception {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("set", new CommandSetVar());
+    Command.registerCommand("get", new CommandGetVar());
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 addScore(\"myScore\",get(\"myVar\", 100 )); // the variable is unset... should return default value" + System.lineSeparator());
+      s.append("              };");
+      System.out.println("testing " + s);
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+
+      context.executeQuestion(l, coachContext);
+      //Atom result = l.get(0).execute(coachContext);
+      assertTrue(context.getScore("myScore").getValue() == 100);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+  }
+
+  @Test
   public void test() {
     String content = "company-q10oNone";
     String content2 = "company-q10o1";

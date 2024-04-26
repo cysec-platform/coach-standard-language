@@ -30,16 +30,28 @@ public class CommandGetVar extends Command {
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
     // expects 1 parameter
-    checkNumParams(aList, 1,2);
+    checkNumParams(aList, 1,3);
 
     // evaluate parameters
-    Atom varName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName");
-    Atom varContext = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext, "varContext");
+    Atom varName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varName");
+    Atom varDefault = null;
+    if(aList.size()>1) {
+      varDefault=checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING, AtomType.INTEGER, AtomType.BOOL,
+          AtomType.FLOAT), true, coachContext, "varDefault");
+    }
+    Atom varContext = NULL_ATOM;
+    if(aList.size()>2) {
+      varContext=checkAtomType(aList.get(2), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext, "varContext");
+    }
 
     // set the score
-    coachContext.getContext().getVariable(varName.getId(), varContext == NULL_ATOM ? null : varContext.toString());
+    Atom ret = coachContext.getContext().getVariable(varName.getId(), varContext == NULL_ATOM ? null : varContext.toString());
 
-    return NULL_ATOM;
+    if(ret==NULL_ATOM || ret==null) {
+      ret=varDefault;
+    }
+
+    return ret;
   }
 
 }
