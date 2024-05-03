@@ -22,6 +22,7 @@ package eu.smesec.cysec.csl.parser;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ExecutorContext {
 
@@ -70,6 +71,13 @@ public interface ExecutorContext {
    */
   Atom getVariable(String name, String context);
 
+  /**
+   * <p>get all variables.</p>
+   * @param context a context for the variable
+   * @return the variable contents mapped to the variable names
+   */
+  Map<String, Atom> getVariables(String context); 
+  
   /***
    * <p>Set a variable content.</p>
    * @param name the name of the variable
