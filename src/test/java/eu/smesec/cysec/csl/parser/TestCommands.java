@@ -19,6 +19,7 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory.CySeCExecutorContext;
 import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.CoachLibrary;
@@ -131,6 +132,67 @@ public class TestCommands {
       fail("got unexpected exception " + pe);
     }
   }
+
+  @Test
+  public void testEqualsEmptyStrings() throws Exception {
+    //For testSelectedFalse
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("equals", new CommandEquals());
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("equals(\"\",\"\") : bla :  {" + System.lineSeparator());
+      s.append("                 addScore(\"myScore\",100);" + System.lineSeparator());
+      s.append("              };");
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+      context.executeQuestion(l, coachContext);
+      assertTrue(context.getScore("myScore").getValue() == 100);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+  }
+
+  @Test
+  public void testEqualsInequalStrings() throws Exception {
+    //For testSelectedFalse
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("testInequalStrings");
+    context.reset();
+    Command.registerCommand("equals", new CommandEquals());
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("equals(\"\",\"test\") : bla :  {" + System.lineSeparator());
+      s.append("                 addScore(\"myScore\",100);" + System.lineSeparator());
+      s.append("              };");
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+      context.executeQuestion(l, coachContext);
+      assertTrue(context.getScore("myScore").getValue() == 0);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+  }
+
+  @Test
+  public void testEqualsNull() throws Exception {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("equals", new CommandEquals());
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("equals(NULL,NULL) : bla :  {" + System.lineSeparator());
+      s.append("                 addScore(\"myScore\",100);" + System.lineSeparator());
+      s.append("              };");
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+      context.executeQuestion(l, coachContext);
+      assertEquals(100, context.getScore("myScore").getValue(),0.1);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+  }
+
+  // FIXME: equals tests are incomplete!
 
   @Test
   public void testSetVariable() throws Exception {
@@ -415,28 +477,31 @@ public class TestCommands {
         }
     }
 
-    @Test(expected = ExecutorException.class)
-    @Ignore(value = "Pending change to remove this behavior")
-    public void testRevokeNonExistingBadge() throws ExecutorException{
+    @Test
+    // @Ignore(value = "Pending change to remove this behavior")
+    public void testRevokeNonExistingBadge() {
+      CySeCExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("badgeTest");
+      try {
+          // try to revoke class from non-existing badge
+          StringBuilder s = new StringBuilder();
+          s.append("TRUE : bla :  {" + System.lineSeparator());
+          s.append("                 revokeBadge(\"Badge1\");" + System.lineSeparator());
+          s.append("              };");
+          List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+          context.executeQuestion(l, coachContext);
 
-        try {
-            // try to revoke class from non-existing badge
-            StringBuilder s = new StringBuilder();
-            s.append("TRUE : bla :  {" + System.lineSeparator());
-            s.append("                 revokeBadge(\"Badge1\");" + System.lineSeparator());
-            s.append("              };");
-            List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
-            context.executeQuestion(l, coachContext);
-
-            // Satify constructor call from ParserLine and executeQuestion()
-        } catch (ParserException e) {
-            e.printStackTrace();
-        } catch (ExecutorException e) {
-            // expect badge list to be empty
-            assertTrue("Badge list is bad! (is:"+context.getBadgeList().length+")",
-                    context.getBadgeList().length==0);
-            throw e;
-        }
+          // Satify constructor call from ParserLine and executeQuestion()
+      } catch (ParserException e) {
+          e.printStackTrace();
+          fail("got unexpected parser exception");
+      } catch (ExecutorException e) {
+          // expect badge list to be empty
+          e.printStackTrace();
+          assertTrue("Badge list is bad! (is:"+context.getBadgeList().length+")",
+                  context.getBadgeList().length==0);
+          return;
+      }
+      fail("no exception when revoking nonexistent badge");
     }
 
   @Test

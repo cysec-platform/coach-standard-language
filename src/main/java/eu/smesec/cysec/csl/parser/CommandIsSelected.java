@@ -62,29 +62,20 @@ public class CommandIsSelected extends Command {
 
     // determine provided option is selected
     String boolResult;
-
+    String ans=null;
     if(answer != null) {
-      if(answer.getAidList() == null) {
-        if(answer.getText().equals(varContent.getId())) {
-          boolResult = "TRUE";
-        } else {
-          boolResult = "FALSE";
-        }
-        coachContext.getLogger().info(String.format("isSelected(%s) == %s is: %s", varContent.getId(), answer.getText(), boolResult));
+      String vc=varContent.getId();
+      ans=" "+(answer.getAidList() == null?answer.getText():answer.getAidList())+" ";
+      if(ans.contains(vc)) {
+        boolResult = "TRUE";
       } else {
-        // Attention: Order matters
-        if(answer.getAidList().contains(varContent.getId())) {
-          boolResult = "TRUE";
-        } else {
-          boolResult = "FALSE";
-        }
-        coachContext.getLogger().info(String.format("isSelected(%s) == %s is: %s", varContent.getId(), answer.getAidList(), boolResult));
+        boolResult = "FALSE";
       }
     } else {
+      ans="<UNSET>";
       boolResult = "FALSE";
-      coachContext.getLogger().info(String.format("isSelected(%s) == null is: %s", varContent.getId(), boolResult));
-
     }
+    coachContext.getLogger().info(String.format("isSelected(%s) == currently:%s ==> %s", varContent.getId(), ans, boolResult));
 
     return new Atom(Atom.AtomType.BOOL, boolResult, null);
   }

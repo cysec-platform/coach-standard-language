@@ -34,21 +34,24 @@ public class CommandEquals extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // Three parameters expected: Lower name (inclusive), higher value (exclusive) and hiding value
+    // Two parameters expected: Two atoms of any type meant to compare
     checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom atom1 = aList.get(0).execute(coachContext);
-    Atom atom2 = aList.get(1).execute(coachContext);
+    Atom atom1 = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING,AtomType.INTEGER,AtomType.FLOAT,AtomType.BOOL,AtomType.NULL), true, coachContext, "leftValue" );
+    Atom atom2 = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING,AtomType.INTEGER,AtomType.FLOAT,AtomType.BOOL,AtomType.NULL), true, coachContext, "rightValue" );
 
     // Check equivalence
     if(atom1.getType().equals(atom2.getType())) {
-      if(AtomType.NULL==atom1.getType()) {
+      if(AtomType.NULL.equals(atom1.getType())) {
+        // Return TRUE if both atoms are of a NULL type
         return Atom.TRUE;
       } else if( atom1.getType()!=AtomType.METHODE ) {
         if(atom1.getId().equals(atom2.getId())) {
+          // Both atoms are of same type and value
           return Atom.TRUE;
         } else {
+          // The atoms are of the same type but contain different values
           return Atom.FALSE;
         }
       } else {
@@ -56,7 +59,7 @@ public class CommandEquals extends Command {
       }
     } else {
       // types are inequal
-      return Atom.TRUE;
+      return Atom.FALSE;
     }
   }
 

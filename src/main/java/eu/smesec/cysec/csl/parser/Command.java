@@ -68,10 +68,10 @@ public abstract class Command {
     command.setCommandName(commandName);
   }
 
-  private String commandName="UNKNOWN";
+  private String commandName = "UNKNOWN";
 
   private void setCommandName(String commandName) {
-    this.commandName=commandName;
+    this.commandName = commandName;
   }
 
   public String getCommandName() {
@@ -95,22 +95,26 @@ public abstract class Command {
     return execute(list, cc);
   }
 
-  public Atom checkAtomType(Atom atom, List<AtomType> type, boolean evaluate, CoachContext context, String parameterName)
+  public Atom checkAtomType(Atom atom, List<AtomType> type, boolean evaluate, CoachContext context,
+      String parameterName)
       throws ExecutorException {
+    if (atom == null) {
+      throw new RuntimeException("SEVERE ERROR: ATOM was passed as null when checking atom type... please check calling function");
+    }
     // evaluate once if required and allowed
     if (atom.getType() == AtomType.METHODE && evaluate) {
       atom = atom.execute(context);
     }
 
     // check for appropriate type
-    if(!type.contains(atom.getType())) {
+    if (!type.contains(atom.getType())) {
 
       // concatenate allowed types
-      StringBuffer typeString= new StringBuffer();
-      for(int i=0;i<type.size();i++) {
-        if(i>0 && i<type.size()-1) {
+      StringBuffer typeString = new StringBuffer();
+      for (int i = 0; i < type.size(); i++) {
+        if (i > 0 && i < type.size() - 1) {
           typeString.append(", ");
-        } else if(i==type.size()-1) {
+        } else if (i == type.size() - 1) {
           typeString.append(", or ");
         }
         typeString.append(type.get(i).name());
@@ -119,13 +123,14 @@ public abstract class Command {
       // build exception message
       String msg;
       if (parameterName != null && !"".equals(parameterName)) {
-        msg = "Illegal type for Parameter " + parameterName + " (should: " + typeString + "; was: " + atom.getType()+")";
+        msg = "Illegal type for Parameter " + parameterName + " (should: " + typeString + "; was: "
+            + atom.getType() + ")";
       } else {
-        msg = "Illegal type for parameter (should:" + typeString + "; was: " + atom.getType()+")";
+        msg = "Illegal type for parameter (should:" + typeString + "; was: " + atom.getType() + ")";
       }
 
       // throw exception
-      throw new ExecutorException(msg );
+      throw new ExecutorException(msg);
     }
     return atom;
   }
@@ -139,12 +144,12 @@ public abstract class Command {
       if (highNum == lowNum) {
         throw new ExecutorException(
             "Invalid number of arguments. Expected " + lowNum + " parameters but got "
-                + aList.size() + " parameters in command "+getCommandName()+".");
+                + aList.size() + " parameters in command " + getCommandName() + ".");
       } else {
         throw new ExecutorException(
             "Invalid number of arguments. Expected between " + lowNum + " and " + highNum
                 + " parameters but got "
-                + aList.size() + " parameters in command "+getCommandName()+".");
+                + aList.size() + " parameters in command " + getCommandName() + ".");
       }
     }
   }

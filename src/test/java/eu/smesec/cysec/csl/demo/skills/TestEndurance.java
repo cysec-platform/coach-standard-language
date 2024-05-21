@@ -56,7 +56,6 @@ public class TestEndurance {
 
     @Test
     // Relies on correct refresh method to restore state
-    @Ignore
     // TODO: Order doesnt match but this isnt important
     public void testToString() {
         Mvalue mv = MetadataUtils.createMvalueStr("endurance", array);

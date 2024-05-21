@@ -48,7 +48,7 @@ public class CommandRevokeBadge extends Command {
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     BadgeFactory.Badge badge = c.getBadge(badgeName.getId());
     if (badge == null) {
-      //throw new ExecutorException("Badge id "+badgeName.getId()+" doesn't exist");
+      throw new ExecutorException("Badge id "+badgeName.getId()+" doesn't exist");
     } else {
       badge.revokeAwardedBadge();
     }

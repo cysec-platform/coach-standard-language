@@ -46,18 +46,19 @@ public class CommandSetMHidden extends Command {
     // evaluate parameters
     Atom varLowId = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "lowID");
     Atom varHighId = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "highID");
-    Atom varContentBool = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.BOOL), true, coachContext,"hideState");
-    coachContext.getLogger().info(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), varContentBool.getId()));
+    boolean varContentBool = Boolean.valueOf(checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.BOOL), true, coachContext,"hideState").getId());
+    coachContext.getLogger().info(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), varContentBool));
 
     // Update question hidden status
     int cnt = 0;
     for (Question question : coachContext.getCoach().getQuestions().getQuestion()) {
-      coachContext.getLogger().info(String.format("    low:  %s?=%s=%s", varLowId.getId(),question.getId(), varLowId.getId().compareTo(question.getId())));
-      coachContext.getLogger().info(String.format("    high: %s?=%s=%s", varHighId.getId(),question.getId(), varHighId.getId().compareTo(question.getId())));
-      if (varLowId.toString().compareTo(question.getId()) <= 0
-          && varHighId.getId().compareTo(question.getId()) > 0) {
-        question.setHidden(Boolean.valueOf(varContentBool.getId()));
-        coachContext.getLogger().info(String.format("  Set question %s to hidden=%s", question.getId(), varContentBool.getId()));
+      //coachContext.getLogger().info(String.format("    low:  %s?=%s=%s", varLowId.getId(),question.getId(), varLowId.getId().compareTo(question.getId())));
+      //coachContext.getLogger().info(String.format("    high: %s?=%s=%s", varHighId.getId(),question.getId(), varHighId.getId().compareTo(question.getId())));
+      if (varLowId.getId().compareTo(question.getId()) <= 0
+          && varHighId.getId().compareTo(question.getId()) > 0
+          && question.isHidden()!=varContentBool) {
+        question.setHidden(varContentBool);
+        coachContext.getLogger().info(String.format("  question %s is new set to hidden=%s (%d/%d)", question.getId(), varContentBool?"HIDDEN":"VISIBLE",varLowId.getId().compareTo(question.getId()),varHighId.getId().compareTo(question.getId())));
         cnt++;
       }
     }
