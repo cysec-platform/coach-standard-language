@@ -51,6 +51,10 @@ public class CommandGetVar extends Command {
       ret=varDefault;
     }
 
+    if(ret==null) {
+      ret=NULL_ATOM;
+    }
+
     return ret;
   }
 

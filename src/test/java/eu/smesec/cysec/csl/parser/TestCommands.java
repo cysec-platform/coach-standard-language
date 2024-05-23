@@ -192,6 +192,45 @@ public class TestCommands {
     }
   }
 
+  @Test
+  public void testEqualsAgainstNull() throws Exception {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("equals", new CommandEquals());
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("equals(NULL,TRUE) : bla :  {" + System.lineSeparator());
+      s.append("                 addScore(\"myScore\",100);" + System.lineSeparator());
+      s.append("              };");
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+      context.executeQuestion(l, coachContext);
+      assertEquals(0, context.getScore("myScore").getValue(),0.1);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+  }
+
+  @Test
+  public void testEqualsNullAgainstFunction() throws Exception {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("equals", new CommandEquals());
+    Command.registerCommand("get", new CommandGetVar());
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("equals(NULL,get(\"inexistent\")) : bla :  {" + System.lineSeparator());
+      s.append("                 addScore(\"myScore\",100);" + System.lineSeparator());
+      s.append("              };");
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+      context.executeQuestion(l, coachContext);
+      assertEquals(100, context.getScore("myScore").getValue(),0.1);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+  }
+
   // FIXME: equals tests are incomplete!
 
   @Test
