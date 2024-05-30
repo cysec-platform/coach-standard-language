@@ -453,6 +453,30 @@ public class TestCommands {
   }
 
   @Test
+  public void testIfCommandSingle() {
+    Command.registerCommand("if", new CommandIf());
+    try {
+      StringBuilder s = new StringBuilder();
+            /*
+               Syntax:
+               if(<condition>, <true>, <false>)
+             */
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 if(FALSE, addScore(\"myScore\",100));" + System.lineSeparator());
+      s.append("              };");
+      System.out.println("testing " + s);
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+
+      context.executeQuestion(l, coachContext);
+      assertTrue(context.getScore("myScore").getValue() == 0);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+
+  }
+
+  @Test
   public void testBadgeCommands() {
     try {
       StringBuilder s = new StringBuilder();

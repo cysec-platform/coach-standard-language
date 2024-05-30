@@ -45,10 +45,10 @@ public class CommandIf extends Command {
     if (isTrue) {
       ret = aList.get(1).execute(coachContext);
     } else {
-      if(aList.get(2)!=null) {
+      if(aList.size()==3) {
         ret = aList.get(2).execute(coachContext);
       } else {
-        ret=Atom.NULL_ATOM;
+        ret=null;
       }
     }
     if (ret != null) {
