@@ -24,6 +24,7 @@ import eu.smesec.cysec.platform.bridge.generated.Answer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,12 +66,16 @@ public class CommandIsSelected extends Command {
     String ans=null;
     if(answer != null) {
       String vc=varContent.getId();
-      ans=" "+(answer.getAidList() == null?answer.getText():answer.getAidList())+" ";
-      if(ans.contains(vc)) {
-        boolResult = "TRUE";
-      } else {
-        boolResult = "FALSE";
-      }
+
+      // Answer equals aid list if it exists, otherwise it equals the answer text and if that does not exist just use an empty string
+      ans = answer.getAidList() == null
+              ? (answer.getText() == null
+                ? ""
+                : answer.getText())
+              : answer.getAidList();
+
+      // This contains check makes it so that HTTP matches even when HTTPS is selected because HTTP is contained in HTTPS
+      boolResult = ans.equals(vc) ? "TRUE" : "FALSE";
     } else {
       ans="<UNSET>";
       boolResult = "FALSE";

@@ -184,6 +184,8 @@ public abstract class AbstractLib implements CoachLibrary {
             logger.log(Level.SEVERE, "Error querying next question", e);
         }
 
+        // If the next questions was overridden by the usage of "setNext()" the variable "_coach.nextPage" will be
+        // set. Otherwise, this variable is usually not set
         Atom nextVar = executorContext.getVariable("_coach.nextPage", question.getId());
         String nextId;
         ((CySeCExecutorContextFactory.CySeCExecutorContext) executorContext).printVariables(logger);
