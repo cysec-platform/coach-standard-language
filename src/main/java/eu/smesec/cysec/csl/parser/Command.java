@@ -42,6 +42,10 @@ public abstract class Command {
     registerCommand("not", new CommandNot());
     registerCommand("xor", new CommandXor());
     registerCommand("equals", new CommandEquals());
+    registerCommand("greaterThan", new CommandGreaterThan());
+    registerCommand("greaterThanOrEq", new CommandGreaterThanOrEquals());
+    registerCommand("lowerThan", new CommandLowerThan());
+    registerCommand("lowerThanOrEq", new CommandLowerThanOrEquals());
     registerCommand("if", new CommandIf());
     registerCommand("concat", new CommandConcat());
     registerCommand("set", new CommandSetVar());
