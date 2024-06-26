@@ -454,7 +454,6 @@ public class TestCommands {
 
   @Test
   public void testIfCommandSingle() {
-    Command.registerCommand("if", new CommandIf());
     try {
       StringBuilder s = new StringBuilder();
             /*
@@ -469,6 +468,48 @@ public class TestCommands {
 
       context.executeQuestion(l, coachContext);
       assertTrue(context.getScore("myScore").getValue() == 0);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+
+  }
+
+  @Test
+  public void testAppend() {
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 set(\"hello\",\"you\");" + System.lineSeparator());
+      s.append("                 append(\"hello\",\"There\");" + System.lineSeparator());
+      s.append("              };");
+      System.out.println("testing " + s);
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+
+      context.executeQuestion(l, coachContext);
+      assertEquals("youThere",context.getVariable("hello",null).getId());
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+
+  }
+
+  @Test
+  public void testContains() {
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 set(\"hello\",\"you\");" + System.lineSeparator());
+      s.append("              };");
+      s.append("contains(get(\"hello\"),\"ou\") : bla2 :  {" + System.lineSeparator());
+      s.append("                 set(\"hello\",\"me\");" + System.lineSeparator());
+      s.append("              };");
+      System.out.println("testing " + s);
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+
+      context.executeQuestion(l, coachContext);
+      assertEquals("me",context.getVariable("hello",null).getId());
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
