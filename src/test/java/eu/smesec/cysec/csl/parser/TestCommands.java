@@ -454,7 +454,6 @@ public class TestCommands {
 
   @Test
   public void testIfCommandSingle() {
-    Command.registerCommand("if", new CommandIf());
     try {
       StringBuilder s = new StringBuilder();
             /*
@@ -469,6 +468,48 @@ public class TestCommands {
 
       context.executeQuestion(l, coachContext);
       assertTrue(context.getScore("myScore").getValue() == 0);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+
+  }
+
+  @Test
+  public void testAppend() {
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 set(\"hello\",\"you\");" + System.lineSeparator());
+      s.append("                 append(\"hello\",\"There\");" + System.lineSeparator());
+      s.append("              };");
+      System.out.println("testing " + s);
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+
+      context.executeQuestion(l, coachContext);
+      assertEquals("youThere",context.getVariable("hello",null).getId());
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+
+  }
+
+  @Test
+  public void testContains() {
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 set(\"hello\",\"you\");" + System.lineSeparator());
+      s.append("              };");
+      s.append("contains(get(\"hello\"),\"ou\") : bla2 :  {" + System.lineSeparator());
+      s.append("                 set(\"hello\",\"me\");" + System.lineSeparator());
+      s.append("              };");
+      System.out.println("testing " + s);
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+
+      context.executeQuestion(l, coachContext);
+      assertEquals("me",context.getVariable("hello",null).getId());
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -681,4 +722,181 @@ public class TestCommands {
     Atom noDictionary = new ParserLine("tn(\"any-key\");").getAtom().execute(coachContext);
     assertEquals(Atom.AtomType.NULL, noDictionary.getType());
   }
+
+  @Test
+  public void testCommandGreaterThanInt() throws ExecutorException, ParserException {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("greaterThan", new CommandGreaterThan());
+
+    String code = "greaterThan(10, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+
+    code = "greaterThan(5, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+
+    code = "greaterThan(-5, 2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+  }
+
+  @Test
+  public void testCommandGreaterThanFloat() throws ExecutorException, ParserException {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("greaterThan", new CommandGreaterThan());
+
+    String code = "greaterThan(10.5, 10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+
+    code = "greaterThan(10.5, 10.5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+
+    code = "greaterThan(-10.5, -10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+  }
+
+  @Test
+  public void testCommandGreaterThanOrEqualsInt() throws ExecutorException, ParserException {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("greaterThanOrEq", new CommandGreaterThanOrEquals());
+
+    String code = "greaterThanOrEq(10, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+
+    code = "greaterThanOrEq(5, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+
+    code = "greaterThanOrEq(-5, 2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+  }
+
+  @Test
+  public void testCommandGreaterThanOrEqualsFloat() throws ExecutorException, ParserException {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("greaterThanOrEq", new CommandGreaterThanOrEquals());
+
+    String code = "greaterThanOrEq(10.5, 10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+
+    code = "greaterThanOrEq(10.5, 10.5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+
+    code = "greaterThanOrEq(-10.5, -10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+  }
+
+  @Test
+  public void testCommandLowerThanInt() throws ExecutorException, ParserException {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("lowerThan", new CommandLowerThan());
+
+    String code = "lowerThan(10, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+
+    code = "lowerThan(5, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+
+    code = "lowerThan(-5, 2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+  }
+
+  @Test
+  public void testCommandLowerThanFloat() throws ExecutorException, ParserException {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("lowerThan", new CommandLowerThan());
+
+    String code = "lowerThan(10.5, 10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+
+    code = "lowerThan(10.5, 10.5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+
+    code = "lowerThan(-10.5, -10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+  }
+
+  @Test
+  public void testCommandLowerThanOrEqualsInt() throws ExecutorException, ParserException {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("lowerThanOrEq", new CommandLowerThanOrEquals());
+
+    String code = "lowerThanOrEq(10, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+
+    code = "lowerThanOrEq(5, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+
+    code = "lowerThanOrEq(-5, 2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+  }
+
+  @Test
+  public void testCommandLowerThanOrEqualsFloat() throws ExecutorException, ParserException {
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("lowerThanOrEq", new CommandLowerThanOrEquals());
+
+    String code = "lowerThanOrEq(10.5, 10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(0, context.getScore("s").getValue(), 1e-6);
+
+    code = "lowerThanOrEq(10.5, 10.5) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+
+    code = "lowerThanOrEq(-10.5, -10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
+    l = new ParserLine(code).getCySeCListing();
+    context.executeQuestion(l, coachContext);
+    assertEquals(5, context.getScore("s").getValue(), 1e-6);
+  }
+
 }
