@@ -308,7 +308,8 @@ public abstract class AbstractLib implements CoachLibrary {
                 // restore Score and Skills
 
                 Metadata skills = cal.getMetadataOnCompany(MetadataUtils.MD_SKILLS);
-                Map<String, MetadataUtils.SimpleMvalue> skillsMap = parseMvalues(skills.getMvalue());
+                Map<String, MetadataUtils.SimpleMvalue> skillsMap =
+                    skills != null ? parseMvalues(skills.getMvalue()) : Map.of();
 
                 String strengthScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strength")).getValue());
                 String knowhowScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.knowhow")).getValue());

@@ -39,8 +39,8 @@ public class CommandNext extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 2 parameters: name, context of var and value
-    checkNumParams(aList, 1, 2);
+    // expects 1 parameter: next page string
+    checkNumParams(aList, 1);
 
     // evaluate parameters
     Atom varContent = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varContent");
@@ -50,7 +50,7 @@ public class CommandNext extends Command {
       throw new ExecutorException("Invalid types for parameters: Provide [0] String");
     }
 
-    // set the score
+    // set the next page
     coachContext.getContext().setVariable("_coach.nextPage", varContent, coachContext.getQuestionContext().getId());
 
     return NULL_ATOM;

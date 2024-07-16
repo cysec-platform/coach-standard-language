@@ -54,7 +54,7 @@ public class CommandIsSelected extends Command {
         // disassemble option into question and option by splitting with "o": q10o1
         answer = coachContext.getCal().getAnswer(coachContext.getFqcn().toString(), questionId);
 
-      } else throw new ExecutorException("question id doesn't match pattern [^0-9]*[q]\\d+");
+      } else throw new ExecutorException("question id doesn't match pattern [^0-9]*[q]\\d+: " + varContent.getId());
 
     } catch (CacheException e) {
       coachContext.getLogger().log(Level.SEVERE, String.format("Error loading answer %s", varContent.getId()));
@@ -66,6 +66,7 @@ public class CommandIsSelected extends Command {
     if(answer != null) {
       String vc=varContent.getId();
       ans=" "+(answer.getAidList() == null?answer.getText():answer.getAidList())+" ";
+      // TODO This allows an answer ID of isSelected(q8100oHTTP) when chosen answer was q8100oHTTPS
       if(ans.contains(vc)) {
         boolResult = "TRUE";
       } else {
