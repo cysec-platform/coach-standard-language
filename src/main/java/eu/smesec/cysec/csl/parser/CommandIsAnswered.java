@@ -22,6 +22,7 @@ package eu.smesec.cysec.csl.parser;
 import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Answer;
+import eu.smesec.cysec.platform.bridge.generated.Question;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +36,15 @@ public class CommandIsAnswered extends Command {
 
     // evaluate parameters
     Atom varContent = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varContent");
+
+    // Check if the question is even visible. If the question is hidden there's no way that it can be answered
+    if (coachContext.getCoach().getQuestions().getQuestion().stream()
+            .filter(q -> q.getId().equals(varContent.getId()))
+            .findFirst()
+            .map(Question::isHidden)
+            .orElseThrow(() -> new ExecutorException("Question id " + varContent.getId() + " doesn't exist"))) {
+      return new Atom(Atom.AtomType.BOOL, "FALSE", null);
+    }
 
     // determine provided option is selected
     ILibCal cal = coachContext.getCal();
