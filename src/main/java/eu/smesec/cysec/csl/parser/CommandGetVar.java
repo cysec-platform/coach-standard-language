@@ -45,7 +45,7 @@ public class CommandGetVar extends Command {
     }
 
     // set the score
-    Atom ret = coachContext.getContext().getVariable(varName.getId(), varContext == NULL_ATOM ? null : varContext.toString());
+    Atom ret = coachContext.getContext().getVariable(varName.getId(), varContext == NULL_ATOM ? null : varContext.getId());
 
     if(ret==NULL_ATOM || ret==null) {
       ret=varDefault;
