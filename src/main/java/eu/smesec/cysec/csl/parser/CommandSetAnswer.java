@@ -24,15 +24,23 @@ import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Answer;
 import eu.smesec.cysec.platform.bridge.generated.Question;
-
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Set an answer for another question by passing the question id as first parameter and the decired value
+ * as second parameter.
+ * <br><br>
+ * <b>Astar questions:</b>
+ * <br><br>
+ * To select multiple values pass the option ids space seperated. Note that the answer value will
+ * <b>overwrite</b> any existing values (so already selected options are not respected).
+ */
 public class CommandSetAnswer extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 3 parameters: name, context of var and value
+    // expects 2 parameters: name and value of an answer
     checkNumParams(aList, 2);
 
     // evaluate parameters
@@ -41,7 +49,8 @@ public class CommandSetAnswer extends Command {
         "answerValue");
 
     if (answerValue.getType() != AtomType.STRING || questionId.getType() != AtomType.STRING) {
-      // TODO probably thorw an exception?
+      // TODO is type string really enogh for answer values?
+      throw new ExecutorException("Invalid types for parameters: Provide [0] String and [1] String");
     }
 
     String value = answerValue.getId(); // use getId over toString since toString adds unnecessary " around the value
@@ -51,13 +60,22 @@ public class CommandSetAnswer extends Command {
     ILibCal cal = coachContext.getCal();
 
     try {
+      cal.getCoach().getQuestions();
       Answer answer = cal.getAnswer(coachContext.getFqcn().toString(), qid);
+      Question question = coachContext.getCoach().getQuestions().getQuestion().stream()
+          .filter(q -> q.getId().equals(qid))
+          .findAny()
+          .orElseThrow(() -> new ExecutorException(String.format("question with id %s does not exist.", qid)));
 
       if (answer != null) {
         // update existing
-        // TODO handle Astar
+        if (question.getType().startsWith("Astar")) {
+          answer.setAidList(value);
+          answer.setText(value.split(" ")[0]);
+        } else {
+          answer.setText(value);
+        }
 
-        answer.setText(value);
         cal.updateAnswer(coachContext.getFqcn().getCoachId(), answer);
       } else {
         // create new answer
@@ -65,10 +83,9 @@ public class CommandSetAnswer extends Command {
         answer.setQid(qid);
         answer.setText(value);
 
-        // TODO handle Astar
-        // if (question.getType().startsWith("Astar")) {
-        // answer.setAidList(value);
-        // }
+        if (question.getType().startsWith("Astar")) {
+          answer.setAidList(value);
+        }
 
         cal.createAnswer(coachContext.getFqcn().getCoachId(), answer);
       }
