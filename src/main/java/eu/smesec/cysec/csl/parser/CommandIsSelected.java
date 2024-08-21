@@ -19,15 +19,15 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-import eu.smesec.cysec.platform.bridge.generated.Answer;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import eu.smesec.cysec.platform.bridge.execptions.CacheException;
+import eu.smesec.cysec.platform.bridge.generated.Answer;
+import eu.smesec.cysec.platform.bridge.generated.Question;
 
 public class CommandIsSelected extends Command {
 
@@ -76,8 +76,9 @@ public class CommandIsSelected extends Command {
     if(answer != null) {
       String vc=varContent.getId();
       ans=" "+(answer.getAidList() == null?answer.getText():answer.getAidList())+" ";
-      // TODO This allows an answer ID of isSelected(q8100oHTTP) when chosen answer was q8100oHTTPS
-      if(ans.contains(vc)) {
+
+      // don't use ans.contains to avoid unintended matches (e.g. q10HTTP should not match when q10HTTPS is choosen)
+      if(Arrays.stream(ans.split(" ")).anyMatch(it -> it.equals(vc))) {
         boolResult = "TRUE";
       } else {
         boolResult = "FALSE";
