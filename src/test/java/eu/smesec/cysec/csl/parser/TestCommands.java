@@ -57,46 +57,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.anyString;
 
-public class TestCommands {
-  private CoachContext coachContext;
-  private CySeCExecutorContextFactory.CySeCExecutorContext context;
-  private Questionnaire coach;
-  private ILibCal cal;
-  private Question question;
-  private Answer answer;
-  private FQCN fqcn = FQCN.fromString("lib-user");
-
-  @Before
-  public void setup() throws Exception{
-    cal = Mockito.mock(ILibCal.class);
-    context = CySeCExecutorContextFactory.getExecutorContext("test");
-    answer = new Answer();
-    answer.setQid("user-q20");
-    answer.setText("user-q20o1");
-    question = new Question();
-    question.setId("user-q20");
-    Questions questions = new Questions();
-    questions.getQuestion().add(question);
-    Dictionary dictionary = new Dictionary();
-    final DictionaryEntry dictionaryEntry = new DictionaryEntry();
-    dictionaryEntry.setKey("key-abc");
-    dictionaryEntry.setValue("Value ABC");
-    dictionary.getEntry().add(dictionaryEntry);
-    coach = Mockito.mock(Questionnaire.class);
-    when(coach.getQuestions()).thenReturn(questions);
-    when(coach.getDictionary()).thenReturn(dictionary);
-    coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answer), coach, fqcn);
-    // pass global logger
-    coachContext.setLogger(Logger.getGlobal());
-  }
-
-  @After
-  public void tearDown() {
-    context.reset();
-    coachContext = null;
-
-  }
-
+public class TestCommands extends AbstractTestCommands {
   @Test
   public void testBasicAddCommand() throws Exception {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
@@ -115,11 +76,12 @@ public class TestCommands {
 
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("isSelected", new CommandIsSelected());
+    Command.registerCommand("arrayAdd", new CommandArrayAdd());
     try {
       StringBuilder s = new StringBuilder();
-      s.append("isSelected(\"company-q10o1\") : bla :  {" + System.lineSeparator());
-      s.append("                 addScore(\"myScore\",100);" + System.lineSeparator());
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 arrayAdd(\"myScore\",\"100\");" + System.lineSeparator());
+      s.append("                 arrayAdd(\"myScore\",\"100\");" + System.lineSeparator());
       s.append("              }; // This is a silly comment");
       System.out.println("testing " + s);
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
