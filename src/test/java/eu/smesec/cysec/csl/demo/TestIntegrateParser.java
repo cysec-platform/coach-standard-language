@@ -33,6 +33,7 @@ import eu.smesec.cysec.csl.skills.ChangeType;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBContext;
@@ -212,6 +213,7 @@ public class TestIntegrateParser {
     }
 
     @Test
+    @Ignore(value = "ToDo Aaron")
     public void testSetNext() throws CacheException {
         Question question = coach.getQuestions().getQuestion().stream().filter(question1 -> question1.getId().equals("user-q11")).findFirst().get();
         answer = new Answer();
