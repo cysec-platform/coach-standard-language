@@ -21,20 +21,18 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-public class CommandArrayContains extends CommandAbstractList {
+public class CommandArrayElements extends CommandAbstractList {
 
   @Override
   /**
-   * Checks if an array contains the element specified.
+   * Checks if an array has the specified size.
    *
    * <p>This command has two mandatory parameter:
    *   <ul>
    *     <li>(arrayList; String)The array to append to.</li>
-   *     <li>(arrayElement; String)The element to be appended.</li>
+   *     <li>(arrayLength; String)The element to be appended.</li>
    *   </ul>
    * </p>
    * @returns Always true
@@ -44,12 +42,12 @@ public class CommandArrayContains extends CommandAbstractList {
     checkNumParams(aList, 2,2);
 
     // evaluate parameters
-    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "ArrayList" );
-    Atom elem = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "arrayElement" );
+    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "arrayList" );
+    Atom noelem = checkAtomType(aList.get(1), Arrays.asList(AtomType.INTEGER), true, coachContext, "arrayLength" );
 
     List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
 
-    return tempList.contains(elem.getId())?Atom.TRUE:Atom.FALSE;
+    return tempList.size()==Integer.valueOf(noelem.getId())?Atom.TRUE:Atom.FALSE;
   }
 
 }

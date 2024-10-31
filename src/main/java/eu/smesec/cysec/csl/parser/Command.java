@@ -70,6 +70,8 @@ public abstract class Command {
     registerCommand("arrayAdd", new CommandArrayAdd());
     registerCommand("arrayRemove", new CommandArrayRemove());
     registerCommand("arrayContains", new CommandArrayContains());
+    registerCommand("arrayElements", new CommandArrayElements());
+    registerCommand("arrayLength", new CommandArrayLength());
   }
 
   public static void registerCommand(String commandName, Command command) {

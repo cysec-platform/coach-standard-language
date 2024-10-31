@@ -45,6 +45,7 @@ import eu.smesec.cysec.csl.utils.Utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -309,7 +310,7 @@ public abstract class AbstractLib implements CoachLibrary {
 
                 Metadata skills = cal.getMetadataOnCompany(MetadataUtils.MD_SKILLS);
                 Map<String, MetadataUtils.SimpleMvalue> skillsMap =
-                    skills != null ? parseMvalues(skills.getMvalue()) : Map.of();
+                    skills != null ? parseMvalues(skills.getMvalue()) : new HashMap<>();
 
                 String strengthScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strength")).getValue());
                 String knowhowScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.knowhow")).getValue());
