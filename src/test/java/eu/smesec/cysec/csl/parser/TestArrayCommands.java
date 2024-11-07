@@ -226,4 +226,43 @@ public class TestArrayCommands extends AbstractTestCommands {
     }
   }
 
+  @Test
+  public void testComplexArrayElements() throws Exception {
+    //For testSelectedFalse
+    when(coachContext.getCal().getAnswer(fqcn.toString(), coachContext.getQuestionContext())).thenReturn(null);
+
+    ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
+    context.reset();
+    Command.registerCommand("set", new CommandSetVar());
+    Command.registerCommand("arrayAdd", new CommandArrayAdd());
+    Command.registerCommand("arrayLength", new CommandArrayLength());
+    Command.registerCommand("greaterThanOrEq", new CommandGreaterThanOrEquals());
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 set(\"arr\",NULL); // clear an array" + System.lineSeparator());
+      s.append("                 arrayAdd(\"arr\",\"100\");" + System.lineSeparator());
+      s.append("                 arrayAdd(\"arr\",\"200\");" + System.lineSeparator());
+      s.append("                 arrayAdd(\"arr\",\"200\");" + System.lineSeparator());
+      s.append("              }; // This is a silly comment" + System.lineSeparator());
+      s.append("greaterThanOrEq(arrayLength(\"arr\"),3) : bla2 :  {" + System.lineSeparator());
+      s.append("                 set(\"to1\",TRUE);" + System.lineSeparator());
+      s.append("              }; " + System.lineSeparator());
+      s.append("greaterThanOrEq(arrayLength(\"arr\"),2) : bla3 :  {" + System.lineSeparator());
+      s.append("                 set(\"to2\",TRUE);" + System.lineSeparator());
+      s.append("              }; " + System.lineSeparator());
+      System.out.println("testing " + s);
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+
+      context.executeQuestion(l, coachContext);
+      //Atom result = l.get(0).execute(coachContext);
+      assertEquals("unexpected Value in Array", "100, 200, 200",context.getVariable("arr",null).getId());
+      assertEquals("Number of array elements missmatch (1)", "TRUE",context.getVariable("to1",null).getId());
+      assertEquals("Number of array elements missmatch (2)", "TRUE",context.getVariable("to2",null).getId());
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
+    }
+  }
+
 }
