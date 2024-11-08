@@ -212,6 +212,15 @@ public class TestArrayCommands extends AbstractTestCommands {
       s.append("arrayElements(\"arr\",1) : bla3 :  {" + System.lineSeparator());
       s.append("                 set(\"to2\",TRUE);" + System.lineSeparator());
       s.append("              }; " + System.lineSeparator());
+      s.append("arrayElements(\"arrNull\",1) : bla4 :  {" + System.lineSeparator());
+      s.append("                 set(\"to3\",TRUE);" + System.lineSeparator());
+      s.append("              }; " + System.lineSeparator());
+      s.append("arrayElements(\"arrNull\",0) : bla5 :  {" + System.lineSeparator());
+      s.append("                 set(\"to4\",TRUE);" + System.lineSeparator());
+      s.append("              }; " + System.lineSeparator());
+      s.append("arrayElements(\"\",0) : bla6 :  {" + System.lineSeparator());
+      s.append("                 set(\"to5\",TRUE);" + System.lineSeparator());
+      s.append("              }; " + System.lineSeparator());
       System.out.println("testing " + s);
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
@@ -220,6 +229,9 @@ public class TestArrayCommands extends AbstractTestCommands {
       assertEquals("unexpected Value in Array", "100, 200, 200",context.getVariable("arr",null).getId());
       assertEquals("Number of array elements missmatch (1)", "TRUE",context.getVariable("to1",null).getId());
       assertEquals("Number of array elements missmatch (2)", null,context.getVariable("to2",null).getId());
+      assertEquals("Number of array elements missmatch (3)", null,context.getVariable("to3",null).getId());
+      assertEquals("Number of array elements missmatch (4)", "TRUE",context.getVariable("to4",null).getId());
+      assertEquals("Number of array elements missmatch (5)", "TRUE",context.getVariable("to5",null).getId());
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -237,6 +249,7 @@ public class TestArrayCommands extends AbstractTestCommands {
     Command.registerCommand("arrayAdd", new CommandArrayAdd());
     Command.registerCommand("arrayLength", new CommandArrayLength());
     Command.registerCommand("greaterThanOrEq", new CommandGreaterThanOrEquals());
+    Command.registerCommand("equals", new CommandEquals());
     try {
       StringBuilder s = new StringBuilder();
       s.append("TRUE : bla :  {" + System.lineSeparator());
@@ -251,6 +264,12 @@ public class TestArrayCommands extends AbstractTestCommands {
       s.append("greaterThanOrEq(arrayLength(\"arr\"),2) : bla3 :  {" + System.lineSeparator());
       s.append("                 set(\"to2\",TRUE);" + System.lineSeparator());
       s.append("              }; " + System.lineSeparator());
+      s.append("greaterThanOrEq(arrayLength(\"arr2\"),2) : bla4 :  {" + System.lineSeparator());
+      s.append("                 set(\"to3\",TRUE);" + System.lineSeparator());
+      s.append("              }; " + System.lineSeparator());
+      s.append("equals(arrayLength(\"arrNone\"),0) : bla5 :  {" + System.lineSeparator());
+      s.append("                 set(\"to4\",TRUE);" + System.lineSeparator());
+      s.append("              }; " + System.lineSeparator());
       System.out.println("testing " + s);
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
@@ -259,6 +278,8 @@ public class TestArrayCommands extends AbstractTestCommands {
       assertEquals("unexpected Value in Array", "100, 200, 200",context.getVariable("arr",null).getId());
       assertEquals("Number of array elements missmatch (1)", "TRUE",context.getVariable("to1",null).getId());
       assertEquals("Number of array elements missmatch (2)", "TRUE",context.getVariable("to2",null).getId());
+      assertEquals("Number of array elements missmatch (3)", null,context.getVariable("to3",null).getId());
+      assertEquals("Number of array elements missmatch (4)", "TRUE",context.getVariable("to4",null).getId());
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
