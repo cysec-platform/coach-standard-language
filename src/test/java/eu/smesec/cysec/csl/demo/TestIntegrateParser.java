@@ -213,7 +213,6 @@ public class TestIntegrateParser {
     }
 
     @Test
-    @Ignore(value = "ToDo Aaron")
     public void testSetNext() throws CacheException {
         Question question = coach.getQuestions().getQuestion().stream().filter(question1 -> question1.getId().equals("user-q11")).findFirst().get();
         answer = new Answer();

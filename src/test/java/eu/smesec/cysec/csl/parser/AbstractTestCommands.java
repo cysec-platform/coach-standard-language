@@ -61,6 +61,7 @@ public class AbstractTestCommands {
     answer.setText("user-q20o1");
     question = new Question();
     question.setId("user-q20");
+    question.setHidden(false);
     Questions questions = new Questions();
     questions.getQuestion().add(question);
     Dictionary dictionary = new Dictionary();

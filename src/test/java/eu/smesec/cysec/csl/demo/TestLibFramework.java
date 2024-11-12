@@ -114,14 +114,14 @@ public class TestLibFramework {
     public void testInit() {
         library = new MockLibrary();
         library.init(libId, coach, libcal, logger);
-        int expectedCount = 7;
+        int expectedCount = 8;
         assertTrue(library.getQuestions().size() == expectedCount);
     }
 
     @Test
     public void testGetQuestions() {
         String[] activeQuestions = library.getQuestions().toArray(new String[0]);
-        String[] qids = new String[]{"user-q10", "user-q30", "user-q40", "user-q50", "user-q60", "user-q70", "user-q80"};
+        String[] qids = new String[]{"user-q10", "user-q11", "user-q30", "user-q40", "user-q50", "user-q60", "user-q70", "user-q80"};
 
         Assert.assertEquals("Size of arrays must be correct", activeQuestions.length, qids.length);
         Assert.assertArrayEquals("Elements should be in same order", activeQuestions, qids);
@@ -160,7 +160,7 @@ public class TestLibFramework {
 
         library.onResponseChange(question, answer, fqcn);
         List<String> qs = library.getQuestions();
-        Assert.assertTrue(qs.size() == 8);
+        Assert.assertTrue(qs.size() == 9);
     }
 
     @Test

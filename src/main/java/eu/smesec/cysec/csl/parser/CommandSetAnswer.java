@@ -60,7 +60,6 @@ public class CommandSetAnswer extends Command {
     ILibCal cal = coachContext.getCal();
 
     try {
-      cal.getCoach().getQuestions();
       Answer answer = cal.getAnswer(coachContext.getFqcn().toString(), qid);
       Question question = coachContext.getCoach().getQuestions().getQuestion().stream()
           .filter(q -> q.getId().equals(qid))
@@ -84,7 +83,7 @@ public class CommandSetAnswer extends Command {
         answer.setQid(qid);
         answer.setText(value);
 
-        if (question.getType().startsWith("Astar")) {
+        if (question.getType() != null && question.getType().startsWith("Astar")) {
           answer.setAidList(value);
         }
 

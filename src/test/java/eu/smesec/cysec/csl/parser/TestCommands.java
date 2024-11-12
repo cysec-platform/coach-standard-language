@@ -39,11 +39,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +71,6 @@ public class TestCommands extends AbstractTestCommands {
   }
 
   @Test
-  @Ignore(value = "ToDo Aaron")
   public void testIsSelectedFalseCommand() throws Exception {
     // For testSelectedFalse
     when(coachContext.getCal().getAnswer(fqcn.toString(), coachContext.getQuestionContext())).thenReturn(null);
@@ -267,7 +263,6 @@ public class TestCommands extends AbstractTestCommands {
   }
 
   @Test
-  @Ignore(value = "ToDo Aaron")
   public void testIsSelectedTrueCommand() throws Exception {
     Answer answerQ20 = new Answer();
     answerQ20.setText("user-q20o1");
@@ -297,10 +292,15 @@ public class TestCommands extends AbstractTestCommands {
   }
 
   @Test
-  @Ignore(value = "ToDo Aaron")
   public void testIsSelectedMultiOptionsCommand() throws Exception {
     Answer answerQ70 = new Answer();
     answerQ70.setAidList("user-q70o1 user-q70o2");
+    Question q70 = new Question();
+    q70.setId("user-q70");
+    q70.setHidden(false);
+    Questions questions = Mockito.mock(Questions.class);
+    when(questions.getQuestion()).thenReturn(Collections.singletonList(q70));
+    when(coachContext.getCoach().getQuestions()).thenReturn(questions);
     coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answerQ70), coach, fqcn);
     coachContext.setLogger(Logger.getGlobal());
     when(coachContext.getCal().getAnswer(fqcn.toString(), "user-q70")).thenReturn(answerQ70);
@@ -326,14 +326,24 @@ public class TestCommands extends AbstractTestCommands {
   }
 
   @Test
-  @Ignore(value = "ToDo Aaron")
   public void testIsAnsweredCommand() throws Exception {
     // Needs different coachcontext (answer == null)
     coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answer), coach, fqcn);
     coachContext.setLogger(Logger.getGlobal());
 
+    Question q10 = new Question();
+    q10.setId("user-q10");
+    q10.setHidden(false);
+
+    Question q50 = new Question();
+    q50.setId("user-q50");
+    q50.setHidden(false);
+    
     when(coachContext.getCal().getAnswer(fqcn.toString(), "user-q10")).thenReturn(new Answer());
     when(coachContext.getCal().getAnswer(fqcn.toString(), "user-q50")).thenReturn(null);
+    Questions questions = Mockito.mock(Questions.class);
+    when(questions.getQuestion()).thenReturn(Arrays.asList(q10, q50));
+    when(coachContext.getCoach().getQuestions()).thenReturn(questions);
 
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
@@ -881,10 +891,13 @@ public class TestCommands extends AbstractTestCommands {
   }
 
   @Test
-  @Ignore("todo Aaron")
   public void testSetAnswerCommand() {
     Command.registerCommand("setAnswer", new CommandSetAnswer());
     String targetQid = "user-q20";
+
+    Questions questions = Mockito.mock(Questions.class);
+    when(questions.getQuestion()).thenReturn(Collections.singletonList(question));
+    when(coachContext.getCoach().getQuestions()).thenReturn(questions);
 
     // create new answer
     String value = "test answer value";
