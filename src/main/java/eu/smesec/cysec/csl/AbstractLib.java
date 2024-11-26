@@ -83,7 +83,7 @@ public abstract class AbstractLib implements CoachLibrary {
         if(myContext.equals(parent)) throw new IllegalStateException();
         // only allow setting parent if current is null
         // Use semantic: root coach doesnt't have a parent (coach.getId() == null)
-        if(questionnaire.getParent() == null) throw new IllegalArgumentException();
+        if(questionnaire.getParent() != null) throw new IllegalArgumentException();
         if(myContext.getParent() == null) {
             logger.info(String.format("Setting parent context of %s to %s", myContext, parent));
             myContext.setParent(parent);
