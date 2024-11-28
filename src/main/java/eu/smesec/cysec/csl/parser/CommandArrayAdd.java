@@ -56,8 +56,11 @@ public class CommandArrayAdd extends CommandAbstractList {
       unique=checkAtomType(aList.get(2), Arrays.asList(AtomType.BOOL), true, coachContext, "unique");
     }
 
-    //
-    List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
+    Atom arrayVar = coachContext.getContext().getVariable(arr.getId(), null);
+    if (arrayVar == null) {
+      throw new ExecutorException(String.format("arrayAdd failed because the array '%s' couldn't be found. You cannot add an element too an array that does not exist!\n", arr.getId()));
+    }
+    List<String> tempList = stringToList(arrayVar.getId());
     tempList.add(elem.getId());
 
     // process unique modifier
