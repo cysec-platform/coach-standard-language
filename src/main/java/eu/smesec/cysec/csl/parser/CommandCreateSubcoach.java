@@ -19,8 +19,10 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import eu.smesec.cysec.csl.MetadataBuilder;
 import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
+import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
 
 import java.util.Arrays;
@@ -42,11 +44,17 @@ public class CommandCreateSubcoach extends Command {
 
   @Override
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    checkNumParams(aList, 2);
+    checkNumParams(aList, 2, 3);
 
     // evaluate parameters
     Atom coachID = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "coachID");
     Atom fileIdentifier = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
+    Atom parentArgument;
+    if (aList.size() == 3) {
+      parentArgument = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "parentArgument");
+    } else {
+      parentArgument = Atom.NULL_ATOM;
+    }
 
     try {
       Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
@@ -58,10 +66,14 @@ public class CommandCreateSubcoach extends Command {
       segment.add(fileIdentifier.getId());
       coachContext.getLogger().info("Creating subcoach " + subcoach.getId() + "" + fileIdentifier.getId());
       // pass FQCN of parent. CoachContext contains the fqcn of the current coach, which is the parent.
-      coachContext.getCal().instantiateSubCoach(subcoach, segment);
+      CoachLibrary subcoachLibrary = coachContext.getCal().getLibraries(subcoach.getId()).get(0);
+      Metadata metadata = MetadataBuilder
+              .newInstance(subcoachLibrary)
+              .setMvalue("parent-argument", parentArgument.getId() == null ? "" : parentArgument.getId())
+              .buildCustom("subcoach-data");
+      coachContext.getCal().instantiateSubCoach(subcoach, segment, metadata);
 
       // set parent context of new subcoach
-      CoachLibrary subcoachLibrary = coachContext.getCal().getLibraries(subcoach.getId()).get(0);
       coachContext.getLogger().info("Setting " + coachContext.getCoach().getId() + " as parent for " + subcoach.getId());
 
       subcoachLibrary.setParent(coachContext.getContext());

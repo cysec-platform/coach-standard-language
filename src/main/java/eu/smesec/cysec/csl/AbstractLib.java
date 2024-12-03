@@ -44,13 +44,7 @@ import eu.smesec.cysec.csl.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -83,7 +77,7 @@ public abstract class AbstractLib implements CoachLibrary {
         if(myContext.equals(parent)) throw new IllegalStateException();
         // only allow setting parent if current is null
         // Use semantic: root coach doesnt't have a parent (coach.getId() == null)
-        if(questionnaire.getParent() != null) throw new IllegalArgumentException();
+        if(questionnaire.getParent() == null) throw new IllegalArgumentException();
         if(myContext.getParent() == null) {
             logger.info(String.format("Setting parent context of %s to %s", myContext, parent));
             myContext.setParent(parent);
@@ -267,6 +261,26 @@ public abstract class AbstractLib implements CoachLibrary {
             logger.log(Level.SEVERE, "Error running logic" ,e);
         }
 
+        // Instantiate all sub-coaches
+        questionnaire.getQuestions()
+                .getQuestion()
+                .stream()
+                .filter(q -> Objects.equals(q.getType(), "subcoach"))
+                .forEach(q -> {
+                    try {
+                        Questionnaire subcoach = cal.getCoach(q.getSubcoachId());
+                        CoachLibrary subcoachLibrary = cal.getLibraries(subcoach.getId()).get(0);
+                        Metadata parentArgument = MetadataBuilder
+                                .newInstance(subcoachLibrary)
+                                .setMvalue("parent-argument", q.getParentArgument())
+                                .buildCustom("subcoach-data");
+                        cal.instantiateSubCoach(subcoach, Set.of(q.getInstanceName()), parentArgument);
+                        updateActiveQuestions();
+                    } catch (CacheException e) {
+                        logger.severe("Error while instantiating sub-coaches: " + e.getMessage());
+                    }
+                });
+
         // Save max skill values
         String strengthScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strength")).getValue());
         String strengthMaxScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strengthMax")).getValue());
@@ -323,6 +337,8 @@ public abstract class AbstractLib implements CoachLibrary {
             }
             setColdStart(false);
         }
+        updateActiveQuestions();
+
         // Call library hook
         onResumeHook(questionId);
 
@@ -376,7 +392,8 @@ public abstract class AbstractLib implements CoachLibrary {
     /**
      * Clear active questions and readd all visible questions.
      */
-    private void updateActiveQuestions() {
+    @Override
+    public void updateActiveQuestions() {
         activeQuestions.clear();
         for(Question question : questionnaire.getQuestions().getQuestion()) {
             if(!question.isHidden()) {

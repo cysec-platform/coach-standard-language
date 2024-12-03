@@ -73,6 +73,7 @@ public abstract class Command {
     registerCommand("arrayElements", new CommandArrayElements());
     registerCommand("arrayLength", new CommandArrayLength());
     registerCommand("removeSubcoach", new CommandRemoveSubcoach());
+    registerCommand("getParentArgument", new CommandGetParentArgument());
   }
 
   public static void registerCommand(String commandName, Command command) {
