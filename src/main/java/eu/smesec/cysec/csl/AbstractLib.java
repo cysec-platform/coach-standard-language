@@ -87,7 +87,7 @@ public abstract class AbstractLib implements CoachLibrary {
     }
 
     @Override
-    public Object getParent() {
+    public ExecutorContext getParent() {
         return executorContext.getParent();
     }
 
@@ -162,6 +162,11 @@ public abstract class AbstractLib implements CoachLibrary {
 
         updateActiveQuestions();
 
+        // If this is a subcoach we have to update the variables cache in the parent coach
+        if (!fqcn.isTopLevel() && executorContext.getParent() != null) {
+            executorContext.getParent().updateSubcoachVariablesCache(fqcn.getCoachId(), fqcn.getName(), executorContext.getVariables(null));
+        }
+
         List<Command> commands = new ArrayList<>();
 
         commands.add(new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(), activeQuestions.toArray(new String[0])));
@@ -228,6 +233,8 @@ public abstract class AbstractLib implements CoachLibrary {
                 .collect(Collectors.toMap(
                         ScoreFactory.Score::getId,
                         ScoreFactory.Score::getValue));
+
+        values.put("subcoachVariables", executorContext.getSubcoachVariablesCache());
 
         values.put(prop.getProperty("library.skills.endurance"), endurance.get());
         return values;
@@ -443,6 +450,11 @@ public abstract class AbstractLib implements CoachLibrary {
     @Override
     public void setCal(ILibCal iLibCal) {
         this.cal = iLibCal;
+    }
+
+    @Override
+    public Object getContext() {
+        return executorContext;
     }
 
     public Logger getLogger() {

@@ -120,4 +120,21 @@ public interface ExecutorContext {
    */
   String getContextId();
 
+  /**
+   * This method can be used to update the subcoach variable cache of the executor context.
+   * The subcoach variable cache stores the executor variables of its subcoaches.
+   * This is really convenient because it allows us to read out the executor variables of a coach
+   * and it's subcoaches very easily when we need it at the end to render the summary page.
+   * @param coachId The ID of the subcoach
+   * @param instanceName The instance name of the subcoach
+   * @param variables The new variable state of the subcoach
+   */
+  void updateSubcoachVariablesCache(String coachId, String instanceName, Map<String, Atom> variables);
+
+  /**
+   * Returns the whole subcoach variables cache of the executor context.
+   * @return The entire subcoach variables cache
+   */
+  Map<String, Map<String, Atom>> getSubcoachVariablesCache();
+
 }

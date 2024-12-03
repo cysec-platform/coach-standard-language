@@ -86,6 +86,7 @@ public class CySeCExecutorContextFactory {
     private RecommendationFactory recommendations = new RecommendationFactory();
     private BadgeFactory badges = new BadgeFactory();
     private String contextId;
+    private Map<String, Map<String, Atom>> subcoachVariableCache = new HashMap<>();
 
     public CySeCExecutorContext(String contextId, Logger log) {
       if (log != null) {
@@ -268,6 +269,16 @@ public class CySeCExecutorContextFactory {
         }
         return ret;
       }
+    }
+
+    @Override
+    public void updateSubcoachVariablesCache(String coachId, String instanceName, Map<String, Atom> variables) {
+      subcoachVariableCache.put(coachId + "." + instanceName, variables);
+    }
+
+    @Override
+    public Map<String, Map<String, Atom>> getSubcoachVariablesCache() {
+      return subcoachVariableCache;
     }
   }
 
