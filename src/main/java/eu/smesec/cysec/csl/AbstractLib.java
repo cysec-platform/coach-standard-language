@@ -41,6 +41,7 @@ import eu.smesec.cysec.csl.questions.QuestionTypes;
 import eu.smesec.cysec.csl.skills.Endurance;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 import eu.smesec.cysec.csl.utils.Utils;
+import eu.smesec.cysec.platform.bridge.utils.Tuple;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +49,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.parseMvalues;
 
@@ -160,7 +162,7 @@ public abstract class AbstractLib implements CoachLibrary {
         persistanceManager.saveRating(fqcn);
         persistanceManager.saveSkills(fqcn);
 
-        updateActiveQuestions();
+        updateActiveQuestions(fqcn);
 
         // If this is a subcoach we have to update the variables cache in the parent coach
         if (!fqcn.isTopLevel() && executorContext.getParent() != null) {
@@ -215,6 +217,40 @@ public abstract class AbstractLib implements CoachLibrary {
                 .map(id -> Utils.findById(questionnaire, id))
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public List<Tuple<FQCN, Question>> peekQuestionsIncludingSubcoaches(FQCN fqcn) {
+        // Get active question ids and map them to question objects
+        List<Question> questions = activeQuestions
+                .stream()
+                .map(id -> Utils.findById(questionnaire, id))
+                .collect(Collectors.toList());
+
+        // Get subcoach questions
+        Map<String, List<String>> subcoachQuestions = executorContext.getSubcoachActiveQuestionsCache();
+
+        // Insert subcoach questions at each subcoach placeholder question position
+        return questions.stream().flatMap(q -> {
+            Tuple<FQCN, Question> fqcnQuestionTuple = new Tuple<>(fqcn, q);
+            if (Objects.equals(q.getType(), "subcoach")) {
+                try {
+                    Questionnaire subCoach = cal.getCoach(q.getSubcoachId());
+                    String subCoachKey = q.getSubcoachId() + "." + q.getInstanceName();
+                    Stream<Tuple<FQCN, Question>> subQuestions = Optional
+                            .ofNullable(subcoachQuestions.get(subCoachKey))
+                            .stream().flatMap(qs -> qs.stream()
+                                    .map(id -> new Tuple<>(FQCN.fromString(fqcn.getRootCoachId() + "." + subCoachKey), Utils.findById(subCoach, id))));
+                    return Stream.concat(Stream.of(fqcnQuestionTuple), subQuestions);
+                } catch (CacheException e) {
+                    logger.severe("An error occurred while getting active questions of subcoaches");
+                    return Stream.of(fqcnQuestionTuple);
+                }
+
+            } else {
+                return Stream.of(fqcnQuestionTuple);
+            }
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -282,7 +318,7 @@ public abstract class AbstractLib implements CoachLibrary {
                                 .setMvalue("parent-argument", q.getParentArgument())
                                 .buildCustom("subcoach-data");
                         cal.instantiateSubCoach(subcoach, Set.of(q.getInstanceName()), parentArgument);
-                        updateActiveQuestions();
+                        updateActiveQuestions(fqcn);
                     } catch (CacheException e) {
                         logger.severe("Error while instantiating sub-coaches: " + e.getMessage());
                     }
@@ -344,7 +380,7 @@ public abstract class AbstractLib implements CoachLibrary {
             }
             setColdStart(false);
         }
-        updateActiveQuestions();
+        updateActiveQuestions(fqcn);
 
         // Call library hook
         onResumeHook(questionId);
@@ -400,12 +436,17 @@ public abstract class AbstractLib implements CoachLibrary {
      * Clear active questions and readd all visible questions.
      */
     @Override
-    public void updateActiveQuestions() {
+    public void updateActiveQuestions(FQCN fqcn) {
         activeQuestions.clear();
         for(Question question : questionnaire.getQuestions().getQuestion()) {
             if(!question.isHidden()) {
                 activeQuestions.add(question.getId());
             }
+        }
+
+        // Sub coaches have to update the active questions cache of it's parent
+        if (getParent() != null) {
+            getParent().updateSubcoachActiveQuestionsCache(fqcn.getCoachId(), fqcn.getName(), activeQuestions);
         }
     }
 

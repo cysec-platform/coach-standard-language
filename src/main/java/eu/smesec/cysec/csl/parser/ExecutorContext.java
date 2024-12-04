@@ -137,4 +137,23 @@ public interface ExecutorContext {
    */
   Map<String, Map<String, Atom>> getSubcoachVariablesCache();
 
+  /**
+   * The subcoach active questions cache contains the current active questions
+   * of all subcoaches (if any). This is useful because there's only one executor context
+   * per subcoach instance which means if there are multiple instances, it cannot hold the active
+   * questions for all types.
+   *
+   * This method updates the active questions cache for one subcoach instance.
+   * @param coachId The subcoach id
+   * @param instanceName the subcoach instance id
+   * @param activeQuestions the new active questions of the subcoach
+   */
+  void updateSubcoachActiveQuestionsCache(String coachId, String instanceName, List<String> activeQuestions);
+
+  /**
+   * Returns the whole subcoach active questions cache.
+   * @return subcoach active questions cache
+   */
+  Map<String, List<String>> getSubcoachActiveQuestionsCache();
+
 }
