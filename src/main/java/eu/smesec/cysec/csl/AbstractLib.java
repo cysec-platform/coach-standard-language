@@ -318,7 +318,6 @@ public abstract class AbstractLib implements CoachLibrary {
                                 .setMvalue("parent-argument", q.getParentArgument())
                                 .buildCustom("subcoach-data");
                         cal.instantiateSubCoach(subcoach, Set.of(q.getInstanceName()), parentArgument);
-                        updateActiveQuestions(fqcn);
                     } catch (CacheException e) {
                         logger.severe("Error while instantiating sub-coaches: " + e.getMessage());
                     }
@@ -410,6 +409,9 @@ public abstract class AbstractLib implements CoachLibrary {
             String questionId = answer.getQid();
             getLogger().info(String.format("Restoring answer %s for question %s", answer.getText(), answer.getQid()));
             Question question = Utils.findById(questionnaire, questionId);
+
+            if (question == null) continue;
+
             // for typeA questions all selected option are stored in Aid list
             // SelectQuestion and TypeA question unfortunately inherit from Astar but dont use the Aid list.
             String questionType = question.getType();
