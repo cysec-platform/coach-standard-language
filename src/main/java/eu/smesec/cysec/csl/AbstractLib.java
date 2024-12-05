@@ -270,10 +270,32 @@ public abstract class AbstractLib implements CoachLibrary {
                         ScoreFactory.Score::getId,
                         ScoreFactory.Score::getValue));
 
-        values.put("subcoachVariables", executorContext.getSubcoachVariablesCache());
+
+        // Get the list of active subcoaches and insert their cached variables into the JSP model
+        List<FQCN> activeSubcoaches = getActiveSubcoaches();
+        Map<String, Map<String, Atom>> activeSubcoachVariables = executorContext.getSubcoachVariablesCache()
+                .entrySet()
+                .stream()
+                .filter(entry -> activeSubcoaches.contains(FQCN.fromString(questionnaire.getId() + "." + entry.getKey())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        values.put("subcoachVariables", activeSubcoachVariables);
 
         values.put(prop.getProperty("library.skills.endurance"), endurance.get());
         return values;
+    }
+
+    /**
+     * Get the list of active (e.g. visible, selected) subcoaches in this coach.
+     * @return A list of FQCNs
+     */
+    private List<FQCN> getActiveSubcoaches() {
+        return questionnaire.getQuestions().getQuestion()
+                .stream()
+                .filter(q -> activeQuestions.contains(q.getId()))
+                .filter(q -> q.getType().equals("subcoach"))
+                .map(q -> String.format("%s.%s.%s", questionnaire.getId(), q.getSubcoachId(), q.getInstanceName()))
+                .map(FQCN::fromString)
+                .collect(Collectors.toList());
     }
 
     private boolean isEndOfCoach(String question, List<String> questions) {
