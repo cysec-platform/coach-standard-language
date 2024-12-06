@@ -59,15 +59,47 @@ public abstract class AbstractLib implements CoachLibrary {
     protected Endurance endurance;
     private ExecutorContext executorContext;
     private String id;
-    private List<String> activeQuestions = new LinkedList<>();
+    private Map<String, List<String>> activeQuestionsPerInstance = new HashMap<>();
     private String[] gradeLetters = {"F", "E", "D", "C", "B", "A"};
     private Logger logger;
     public static Properties prop = new Properties();
     private LogicRunner logicRunner;
+    private String activeInstance = "";
 
 
     private PersistanceManager persistanceManager;
     private boolean coldStart = true;
+
+    private List<String> getActiveQuestions() {
+        return activeQuestionsPerInstance.getOrDefault("___DEFAULT_INSTANCE___", new ArrayList<>());
+    }
+
+    private List<String> getActiveQuestions(FQCN fqcn) {
+        if (fqcn.isTopLevel()) return getActiveQuestions();
+        return getActiveQuestions(fqcn.getName());
+    }
+
+    private List<String> getActiveQuestions(String instanceName) {
+        return activeQuestionsPerInstance.getOrDefault(instanceName, new ArrayList<>());
+    }
+
+    private void addActiveQuestion(String instanceName, String questionId) {
+        activeQuestionsPerInstance.computeIfAbsent(instanceName, k -> new ArrayList<>()).add(questionId);
+    }
+
+    private void addActiveQuestion(String questionId) {
+        addActiveQuestion("___DEFAULT_INSTANCE___", questionId);
+    }
+
+    @Override
+    public String getActiveInstance() {
+        return activeInstance;
+    }
+
+    @Override
+    public void setActiveInstance(String instance) {
+        activeInstance = instance;
+    }
 
     @Override
     public void setParent(Object context) {
@@ -127,7 +159,7 @@ public abstract class AbstractLib implements CoachLibrary {
         if(questions != null) {
             for(Question question : questions.getQuestion()) {
                 if(!question.isHidden()) {
-                    activeQuestions.add(question.getId());
+                    addActiveQuestion(question.getId());
                 }
             }
         }
@@ -171,7 +203,11 @@ public abstract class AbstractLib implements CoachLibrary {
 
         List<Command> commands = new ArrayList<>();
 
-        commands.add(new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(), activeQuestions.toArray(new String[0])));
+        if (!fqcn.isTopLevel()) {
+            commands.add(new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(), getActiveQuestions(fqcn.getName()).toArray(new String[0])));
+        } else {
+            commands.add(new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(), getActiveQuestions().toArray(new String[0])));
+        }
 
         return commands;
     }
@@ -194,13 +230,13 @@ public abstract class AbstractLib implements CoachLibrary {
 
         if(nextVar == null || nextVar.getType().equals(Atom.AtomType.NULL)) {
             // regular next in line
-            int indexOfCurrent = activeQuestions.indexOf(question.getId());
+            int indexOfCurrent = getActiveQuestions(fqcn).indexOf(question.getId());
             // what about last question getting last question?
             // then the setNext should be set to summaryPage!
-            if(indexOfCurrent == activeQuestions.size() - 1) {
+            if(indexOfCurrent == getActiveQuestions(fqcn).size() - 1) {
                 return null;
             }
-            nextId = activeQuestions.get(indexOfCurrent + 1);
+            nextId = getActiveQuestions(fqcn).get(indexOfCurrent + 1);
         } else {
             // access next variable
             nextId = nextVar.getId();
@@ -213,16 +249,15 @@ public abstract class AbstractLib implements CoachLibrary {
 
     @Override
     public List<Question> peekQuestions(Question question) {
-        return activeQuestions.stream()
+        return getActiveQuestions().stream()
                 .map(id -> Utils.findById(questionnaire, id))
                 .collect(Collectors.toList());
-
     }
 
     @Override
     public List<Tuple<FQCN, Question>> peekQuestionsIncludingSubcoaches(FQCN fqcn) {
         // Get active question ids and map them to question objects
-        List<Question> questions = activeQuestions
+        List<Question> questions = getActiveQuestions()
                 .stream()
                 .map(id -> Utils.findById(questionnaire, id))
                 .collect(Collectors.toList());
@@ -255,12 +290,12 @@ public abstract class AbstractLib implements CoachLibrary {
 
     @Override
     public Question getLastQuestion() {
-        String lastId = activeQuestions.get(activeQuestions.size() - 1);
+        String lastId = getActiveQuestions().get(getActiveQuestions().size() - 1);
         return Utils.findById(questionnaire, lastId);
     }
 
     public Question getFirstQuestion() {
-        String firstId = activeQuestions.get(0);
+        String firstId = getActiveQuestions().get(0);
         return Utils.findById(questionnaire, firstId);
     }
 
@@ -291,7 +326,7 @@ public abstract class AbstractLib implements CoachLibrary {
     private List<FQCN> getActiveSubcoaches() {
         return questionnaire.getQuestions().getQuestion()
                 .stream()
-                .filter(q -> activeQuestions.contains(q.getId()))
+                .filter(q -> getActiveQuestions().contains(q.getId()))
                 .filter(q -> q.getType().equals("subcoach"))
                 .map(q -> String.format("%s.%s.%s", questionnaire.getId(), q.getSubcoachId(), q.getInstanceName()))
                 .map(FQCN::fromString)
@@ -316,7 +351,7 @@ public abstract class AbstractLib implements CoachLibrary {
         List<Command> commands = new ArrayList<>();
 
         Command updateActiveQuestions = new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(),
-                activeQuestions.toArray(new String[0]));
+                getActiveQuestions().toArray(new String[0]));
         commands.add(updateActiveQuestions);
         commands.add(new Command(Commands.LOAD_BLOCK.toString(), new String[]{"b1"}));
 
@@ -420,7 +455,7 @@ public abstract class AbstractLib implements CoachLibrary {
             }
         }
         Command updateActiveQuestions = new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(),
-                activeQuestions.toArray(new String[0]));
+                getActiveQuestions().toArray(new String[0]));
         commands.add(updateActiveQuestions);
         commands.add(new Command(Commands.LOAD_BLOCK.toString(), new String[]{blockId}));
         return commands;
@@ -461,16 +496,18 @@ public abstract class AbstractLib implements CoachLibrary {
      */
     @Override
     public void updateActiveQuestions(FQCN fqcn) {
-        activeQuestions.clear();
+        getActiveQuestions(fqcn.getName()).clear();
+        getActiveQuestions().clear();
         for(Question question : questionnaire.getQuestions().getQuestion()) {
             if(!question.isHidden()) {
-                activeQuestions.add(question.getId());
+                addActiveQuestion(fqcn.getName(), question.getId());
+                addActiveQuestion(question.getId());
             }
         }
 
         // Sub coaches have to update the active questions cache of it's parent
         if (getParent() != null) {
-            getParent().updateSubcoachActiveQuestionsCache(fqcn.getCoachId(), fqcn.getName(), activeQuestions);
+            getParent().updateSubcoachActiveQuestionsCache(fqcn.getCoachId(), fqcn.getName(), getActiveQuestions(fqcn.getName()));
         }
     }
 
@@ -536,7 +573,7 @@ public abstract class AbstractLib implements CoachLibrary {
 
     // To ease and satisfy tests, can be removed in future
     public List<String> getQuestions() {
-        return activeQuestions;
+        return getActiveQuestions();
     }
 
     public PersistanceManager getPersistanceManager() {
