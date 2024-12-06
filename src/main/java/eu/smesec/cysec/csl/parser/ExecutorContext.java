@@ -87,6 +87,11 @@ public interface ExecutorContext {
    */
   Atom setVariable(String name, Atom value, String context);
 
+  /**
+   * Clears variables of the executor context.
+   */
+  void clearVariables();
+
   /***
    * <p>Execute a question script.</p>
    *

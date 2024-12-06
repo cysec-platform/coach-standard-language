@@ -98,7 +98,9 @@ public abstract class AbstractLib implements CoachLibrary {
 
     @Override
     public void setActiveInstance(String instance) {
+        if (instance.equals(activeInstance)) return;
         activeInstance = instance;
+        executorContext.clearVariables();
     }
 
     @Override

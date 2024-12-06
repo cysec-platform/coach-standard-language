@@ -204,6 +204,11 @@ public class CySeCExecutorContextFactory {
     }
 
     @Override
+    public void clearVariables() {
+      variables.clear();
+    }
+
+    @Override
     public int executeQuestion(List<CySeCLineAtom> atomList, CoachContext coachContext) throws ExecutorException {
       CySeCExecutorContext ec = (CySeCExecutorContext) (coachContext.getContext());
       synchronized (ec.executorLock) {
