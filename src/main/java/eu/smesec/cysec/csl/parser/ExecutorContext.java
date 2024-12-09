@@ -87,6 +87,11 @@ public interface ExecutorContext {
    */
   Atom setVariable(String name, Atom value, String context);
 
+  /**
+   * Clears variables of the executor context.
+   */
+  void clearVariables();
+
   /***
    * <p>Execute a question script.</p>
    *
@@ -119,5 +124,41 @@ public interface ExecutorContext {
    * @return the id of the library tied to this context
    */
   String getContextId();
+
+  /**
+   * This method can be used to update the subcoach variable cache of the executor context.
+   * The subcoach variable cache stores the executor variables of its subcoaches.
+   * This is really convenient because it allows us to read out the executor variables of a coach
+   * and it's subcoaches very easily when we need it at the end to render the summary page.
+   * @param coachId The ID of the subcoach
+   * @param instanceName The instance name of the subcoach
+   * @param variables The new variable state of the subcoach
+   */
+  void updateSubcoachVariablesCache(String coachId, String instanceName, Map<String, Atom> variables);
+
+  /**
+   * Returns the whole subcoach variables cache of the executor context.
+   * @return The entire subcoach variables cache
+   */
+  Map<String, Map<String, Atom>> getSubcoachVariablesCache();
+
+  /**
+   * The subcoach active questions cache contains the current active questions
+   * of all subcoaches (if any). This is useful because there's only one executor context
+   * per subcoach instance which means if there are multiple instances, it cannot hold the active
+   * questions for all types.
+   *
+   * This method updates the active questions cache for one subcoach instance.
+   * @param coachId The subcoach id
+   * @param instanceName the subcoach instance id
+   * @param activeQuestions the new active questions of the subcoach
+   */
+  void updateSubcoachActiveQuestionsCache(String coachId, String instanceName, List<String> activeQuestions);
+
+  /**
+   * Returns the whole subcoach active questions cache.
+   * @return subcoach active questions cache
+   */
+  Map<String, List<String>> getSubcoachActiveQuestionsCache();
 
 }

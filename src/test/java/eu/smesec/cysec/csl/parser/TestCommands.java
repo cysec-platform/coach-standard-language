@@ -24,12 +24,7 @@ import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-import eu.smesec.cysec.platform.bridge.generated.Answer;
-import eu.smesec.cysec.platform.bridge.generated.Dictionary;
-import eu.smesec.cysec.platform.bridge.generated.DictionaryEntry;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
-import eu.smesec.cysec.platform.bridge.generated.Questions;
+import eu.smesec.cysec.platform.bridge.generated.*;
 import eu.smesec.cysec.csl.AbstractLib;
 import eu.smesec.cysec.csl.demo.MockLibrary;
 import org.junit.After;
@@ -627,7 +622,7 @@ public class TestCommands extends AbstractTestCommands {
     coach.setId("my-subcoach-one");
     coach.setParent("lib-company");
     Mockito.when(coachContext.getCal().getCoach(anyString())).thenReturn(coach);
-    Mockito.doNothing().when(coachContext.getCal()).instantiateSubCoach(any(Questionnaire.class), any(Set.class));
+    Mockito.doNothing().when(coachContext.getCal()).instantiateSubCoach(any(Questionnaire.class), any(Set.class), any(Metadata.class));
     CoachLibrary mockLibrary = new MockLibrary();
     mockLibrary.init("eu.smesec.cysec.coach.MockLibrary", coach, cal, Logger.getGlobal());
 

@@ -28,13 +28,7 @@ import eu.smesec.cysec.csl.skills.RecommendationEventListener;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -86,6 +80,8 @@ public class CySeCExecutorContextFactory {
     private RecommendationFactory recommendations = new RecommendationFactory();
     private BadgeFactory badges = new BadgeFactory();
     private String contextId;
+    private Map<String, Map<String, Atom>> subcoachVariableCache = new HashMap<>();
+    private Map<String, List<String>> subcoachActiveQuestionsCache = new HashMap<>();
 
     public CySeCExecutorContext(String contextId, Logger log) {
       if (log != null) {
@@ -208,6 +204,11 @@ public class CySeCExecutorContextFactory {
     }
 
     @Override
+    public void clearVariables() {
+      variables.clear();
+    }
+
+    @Override
     public int executeQuestion(List<CySeCLineAtom> atomList, CoachContext coachContext) throws ExecutorException {
       CySeCExecutorContext ec = (CySeCExecutorContext) (coachContext.getContext());
       synchronized (ec.executorLock) {
@@ -268,6 +269,26 @@ public class CySeCExecutorContextFactory {
         }
         return ret;
       }
+    }
+
+    @Override
+    public void updateSubcoachVariablesCache(String coachId, String instanceName, Map<String, Atom> variables) {
+      subcoachVariableCache.put(coachId + "." + instanceName, variables);
+    }
+
+    @Override
+    public Map<String, Map<String, Atom>> getSubcoachVariablesCache() {
+      return subcoachVariableCache;
+    }
+
+    @Override
+    public void updateSubcoachActiveQuestionsCache(String coachId, String instanceName, List<String> activeQuestions) {
+      subcoachActiveQuestionsCache.put(coachId + "." + instanceName, new ArrayList<>(activeQuestions));
+    }
+
+    @Override
+    public Map<String, List<String>> getSubcoachActiveQuestionsCache() {
+      return subcoachActiveQuestionsCache;
     }
   }
 
