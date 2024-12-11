@@ -21,41 +21,35 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
+public class CommandArrayContains extends CommandAbstractList {
 
-public class CommandGetVar extends Command {
-
+  @Override
+  /**
+   * Checks if an array contains the element specified.
+   *
+   * <p>This command has two mandatory parameter:
+   *   <ul>
+   *     <li>(arrayList; String)The array to append to.</li>
+   *     <li>(arrayElement; String)The element to be appended.</li>
+   *   </ul>
+   * </p>
+   * @returns Always true
+   */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 1 parameter
-    checkNumParams(aList, 1,3);
+    // expects 2 parameter
+    checkNumParams(aList, 2,2);
 
     // evaluate parameters
-    Atom varName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varName");
-    Atom varDefault = null;
-    if(aList.size()>1) {
-      varDefault=checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING, AtomType.INTEGER, AtomType.BOOL,
-          AtomType.FLOAT), true, coachContext, "varDefault");
-    }
-    Atom varContext = NULL_ATOM;
-    if(aList.size()>2) {
-      varContext=checkAtomType(aList.get(2), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext, "varContext");
-    }
+    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "ArrayList" );
+    Atom elem = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "arrayElement" );
 
-    // set the score
-    Atom ret = coachContext.getContext().getVariable(varName.getId(), varContext == NULL_ATOM ? null : varContext.getId());
+    List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
 
-    if(ret==NULL_ATOM || ret==null) {
-      ret=varDefault;
-    }
-
-    if(ret==null) {
-      ret=NULL_ATOM;
-    }
-
-    return ret;
+    return tempList.contains(elem.getId())?Atom.TRUE:Atom.FALSE;
   }
 
 }

@@ -108,7 +108,7 @@
             </instruction>
         </question>
         <!-- Used for testing setNext -->
-        <question id="user-q11" type="A" hidden="true">
+        <question id="user-q11" type="A" hidden="false">
             <text>Have you provided cybersecurity training for all employees in your company?</text>
             <attachments/>
             <options correct="user-q11o1">

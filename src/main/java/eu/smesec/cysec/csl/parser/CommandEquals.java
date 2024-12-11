@@ -28,7 +28,7 @@ import java.util.List;
  * This command checks if two atoms are equivalent in type and content.
  *
  * <p>Syntax: equals(atom1, atom2);</p>
- * <p>Example: setMHidden("q20", "q40"); // returns FALSE</p>
+ * <p>Example: equals("q20", "q40"); // returns FALSE</p>
  */
 public class CommandEquals extends Command {
 

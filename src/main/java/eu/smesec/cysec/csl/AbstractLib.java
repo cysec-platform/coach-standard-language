@@ -41,36 +41,69 @@ import eu.smesec.cysec.csl.questions.QuestionTypes;
 import eu.smesec.cysec.csl.skills.Endurance;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 import eu.smesec.cysec.csl.utils.Utils;
+import eu.smesec.cysec.platform.bridge.utils.Tuple;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.parseMvalues;
 
 public abstract class AbstractLib implements CoachLibrary {
+    public static final String DEFAULT_INSTANCE = "___DEFAULT_INSTANCE___";
+
     protected Questionnaire questionnaire;
     protected ILibCal cal;
     protected Endurance endurance;
     private ExecutorContext executorContext;
     private String id;
-    private List<String> activeQuestions = new LinkedList<>();
+    private Map<String, List<String>> activeQuestionsPerInstance = new HashMap<>();
     private String[] gradeLetters = {"F", "E", "D", "C", "B", "A"};
     private Logger logger;
     public static Properties prop = new Properties();
     private LogicRunner logicRunner;
+    private String activeInstance = "";
 
 
     private PersistanceManager persistanceManager;
     private boolean coldStart = true;
+
+    private List<String> getActiveQuestions() {
+        return activeQuestionsPerInstance.getOrDefault(DEFAULT_INSTANCE, new ArrayList<>());
+    }
+
+    private List<String> getActiveQuestions(FQCN fqcn) {
+        if (fqcn.isTopLevel()) return getActiveQuestions();
+        return getActiveQuestions(fqcn.getName());
+    }
+
+    private List<String> getActiveQuestions(String instanceName) {
+        return activeQuestionsPerInstance.getOrDefault(instanceName, new ArrayList<>());
+    }
+
+    private void addActiveQuestion(String instanceName, String questionId) {
+        activeQuestionsPerInstance.computeIfAbsent(instanceName, k -> new ArrayList<>()).add(questionId);
+    }
+
+    private void addActiveQuestion(String questionId) {
+        addActiveQuestion(DEFAULT_INSTANCE, questionId);
+    }
+
+    @Override
+    public String getActiveInstance() {
+        return activeInstance;
+    }
+
+    @Override
+    public void setActiveInstance(String instance) {
+        if (instance.equals(activeInstance)) return;
+        activeInstance = instance;
+        executorContext.clearVariables();
+    }
 
     @Override
     public void setParent(Object context) {
@@ -92,7 +125,7 @@ public abstract class AbstractLib implements CoachLibrary {
     }
 
     @Override
-    public Object getParent() {
+    public ExecutorContext getParent() {
         return executorContext.getParent();
     }
 
@@ -130,7 +163,7 @@ public abstract class AbstractLib implements CoachLibrary {
         if(questions != null) {
             for(Question question : questions.getQuestion()) {
                 if(!question.isHidden()) {
-                    activeQuestions.add(question.getId());
+                    addActiveQuestion(question.getId());
                 }
             }
         }
@@ -165,11 +198,20 @@ public abstract class AbstractLib implements CoachLibrary {
         persistanceManager.saveRating(fqcn);
         persistanceManager.saveSkills(fqcn);
 
-        updateActiveQuestions();
+        updateActiveQuestions(fqcn);
+
+        // If this is a subcoach we have to update the variables cache in the parent coach
+        if (!fqcn.isTopLevel() && executorContext.getParent() != null) {
+            executorContext.getParent().updateSubcoachVariablesCache(fqcn.getCoachId(), fqcn.getName(), executorContext.getVariables(null));
+        }
 
         List<Command> commands = new ArrayList<>();
 
-        commands.add(new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(), activeQuestions.toArray(new String[0])));
+        if (!fqcn.isTopLevel()) {
+            commands.add(new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(), getActiveQuestions(fqcn.getName()).toArray(new String[0])));
+        } else {
+            commands.add(new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(), getActiveQuestions().toArray(new String[0])));
+        }
 
         return commands;
     }
@@ -192,13 +234,13 @@ public abstract class AbstractLib implements CoachLibrary {
 
         if(nextVar == null || nextVar.getType().equals(Atom.AtomType.NULL)) {
             // regular next in line
-            int indexOfCurrent = activeQuestions.indexOf(question.getId());
+            int indexOfCurrent = getActiveQuestions(fqcn).indexOf(question.getId());
             // what about last question getting last question?
             // then the setNext should be set to summaryPage!
-            if(indexOfCurrent == activeQuestions.size() - 1) {
+            if(indexOfCurrent == getActiveQuestions(fqcn).size() - 1) {
                 return null;
             }
-            nextId = activeQuestions.get(indexOfCurrent + 1);
+            nextId = getActiveQuestions(fqcn).get(indexOfCurrent + 1);
         } else {
             // access next variable
             nextId = nextVar.getId();
@@ -211,20 +253,54 @@ public abstract class AbstractLib implements CoachLibrary {
 
     @Override
     public List<Question> peekQuestions(Question question) {
-        return activeQuestions.stream()
+        return getActiveQuestions().stream()
+                .map(id -> Utils.findById(questionnaire, id))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Tuple<FQCN, Question>> peekQuestionsIncludingSubcoaches(FQCN fqcn) {
+        // Get active question ids and map them to question objects
+        List<Question> questions = getActiveQuestions()
+                .stream()
                 .map(id -> Utils.findById(questionnaire, id))
                 .collect(Collectors.toList());
 
+        // Get subcoach questions
+        Map<String, List<String>> subcoachQuestions = executorContext.getSubcoachActiveQuestionsCache();
+
+        // Insert subcoach questions at each subcoach placeholder question position
+        return questions.stream().flatMap(q -> {
+            Tuple<FQCN, Question> fqcnQuestionTuple = new Tuple<>(fqcn, q);
+            if (Objects.equals(q.getType(), "subcoach")) {
+                try {
+                    Questionnaire subCoach = cal.getCoach(q.getSubcoachId());
+                    String subCoachKey = q.getSubcoachId() + "." + q.getInstanceName();
+                    Stream<Tuple<FQCN, Question>> subQuestions = Optional
+                            .ofNullable(subcoachQuestions.get(subCoachKey))
+                            .stream().flatMap(qs -> qs.stream()
+                                    .map(id -> new Tuple<>(FQCN.fromString(fqcn.getRootCoachId() + "." + subCoachKey), Utils.findById(subCoach, id))));
+                    return Stream.concat(Stream.of(fqcnQuestionTuple), subQuestions);
+                } catch (CacheException e) {
+                    logger.severe("An error occurred while getting active questions of subcoaches");
+                    return Stream.of(fqcnQuestionTuple);
+                }
+
+            } else {
+                return Stream.of(fqcnQuestionTuple);
+            }
+        }).collect(Collectors.toList());
     }
 
     @Override
     public Question getLastQuestion() {
-        String lastId = activeQuestions.get(activeQuestions.size() - 1);
+        String lastId = getActiveQuestions().get(getActiveQuestions().size() - 1);
         return Utils.findById(questionnaire, lastId);
     }
 
-    public Question getFirstQuestion() {
-        String firstId = activeQuestions.get(0);
+    @Override
+    public Question getFirstQuestion(String instanceName) {
+        String firstId = getActiveQuestions(instanceName).get(0);
         return Utils.findById(questionnaire, firstId);
     }
 
@@ -234,8 +310,32 @@ public abstract class AbstractLib implements CoachLibrary {
                         ScoreFactory.Score::getId,
                         ScoreFactory.Score::getValue));
 
+
+        // Get the list of active subcoaches and insert their cached variables into the JSP model
+        List<FQCN> activeSubcoaches = getActiveSubcoaches();
+        Map<String, Map<String, Atom>> activeSubcoachVariables = executorContext.getSubcoachVariablesCache()
+                .entrySet()
+                .stream()
+                .filter(entry -> activeSubcoaches.contains(FQCN.fromString(questionnaire.getId() + "." + entry.getKey())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        values.put("subcoachVariables", activeSubcoachVariables);
+
         values.put(prop.getProperty("library.skills.endurance"), endurance.get());
         return values;
+    }
+
+    /**
+     * Get the list of active (e.g. visible, selected) subcoaches in this coach.
+     * @return A list of FQCNs
+     */
+    private List<FQCN> getActiveSubcoaches() {
+        return questionnaire.getQuestions().getQuestion()
+                .stream()
+                .filter(q -> getActiveQuestions().contains(q.getId()))
+                .filter(q -> q.getType().equals("subcoach"))
+                .map(q -> String.format("%s.%s.%s", questionnaire.getId(), q.getSubcoachId(), q.getInstanceName()))
+                .map(FQCN::fromString)
+                .collect(Collectors.toList());
     }
 
     private boolean isEndOfCoach(String question, List<String> questions) {
@@ -256,7 +356,7 @@ public abstract class AbstractLib implements CoachLibrary {
         List<Command> commands = new ArrayList<>();
 
         Command updateActiveQuestions = new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(),
-                activeQuestions.toArray(new String[0]));
+                getActiveQuestions().toArray(new String[0]));
         commands.add(updateActiveQuestions);
         commands.add(new Command(Commands.LOAD_BLOCK.toString(), new String[]{"b1"}));
 
@@ -265,6 +365,25 @@ public abstract class AbstractLib implements CoachLibrary {
         } catch (ParserException | ExecutorException e) {
             logger.log(Level.SEVERE, "Error running logic" ,e);
         }
+
+        // Instantiate all sub-coaches
+        questionnaire.getQuestions()
+                .getQuestion()
+                .stream()
+                .filter(q -> Objects.equals(q.getType(), "subcoach"))
+                .forEach(q -> {
+                    try {
+                        Questionnaire subcoach = cal.getCoach(q.getSubcoachId());
+                        CoachLibrary subcoachLibrary = cal.getLibraries(subcoach.getId()).get(0);
+                        Metadata parentArgument = MetadataBuilder
+                                .newInstance(subcoachLibrary)
+                                .setMvalue("parent-argument", q.getParentArgument())
+                                .buildCustom("subcoach-data");
+                        cal.instantiateSubCoach(subcoach, Set.of(q.getInstanceName()), parentArgument);
+                    } catch (CacheException e) {
+                        logger.severe("Error while instantiating sub-coaches: " + e.getMessage());
+                    }
+                });
 
         // Save max skill values
         String strengthScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strength")).getValue());
@@ -308,7 +427,8 @@ public abstract class AbstractLib implements CoachLibrary {
                 // restore Score and Skills
 
                 Metadata skills = cal.getMetadataOnCompany(MetadataUtils.MD_SKILLS);
-                Map<String, MetadataUtils.SimpleMvalue> skillsMap = parseMvalues(skills.getMvalue());
+                Map<String, MetadataUtils.SimpleMvalue> skillsMap =
+                    skills != null ? parseMvalues(skills.getMvalue()) : new HashMap<>();
 
                 String strengthScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strength")).getValue());
                 String knowhowScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.knowhow")).getValue());
@@ -321,6 +441,8 @@ public abstract class AbstractLib implements CoachLibrary {
             }
             setColdStart(false);
         }
+        updateActiveQuestions(fqcn);
+
         // Call library hook
         onResumeHook(questionId);
 
@@ -338,7 +460,7 @@ public abstract class AbstractLib implements CoachLibrary {
             }
         }
         Command updateActiveQuestions = new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(),
-                activeQuestions.toArray(new String[0]));
+                getActiveQuestions().toArray(new String[0]));
         commands.add(updateActiveQuestions);
         commands.add(new Command(Commands.LOAD_BLOCK.toString(), new String[]{blockId}));
         return commands;
@@ -349,6 +471,9 @@ public abstract class AbstractLib implements CoachLibrary {
             String questionId = answer.getQid();
             getLogger().info(String.format("Restoring answer %s for question %s", answer.getText(), answer.getQid()));
             Question question = Utils.findById(questionnaire, questionId);
+
+            if (question == null) continue;
+
             // for typeA questions all selected option are stored in Aid list
             // SelectQuestion and TypeA question unfortunately inherit from Astar but dont use the Aid list.
             String questionType = question.getType();
@@ -374,12 +499,20 @@ public abstract class AbstractLib implements CoachLibrary {
     /**
      * Clear active questions and readd all visible questions.
      */
-    private void updateActiveQuestions() {
-        activeQuestions.clear();
+    @Override
+    public void updateActiveQuestions(FQCN fqcn) {
+        getActiveQuestions(fqcn.getName()).clear();
+        getActiveQuestions().clear();
         for(Question question : questionnaire.getQuestions().getQuestion()) {
             if(!question.isHidden()) {
-                activeQuestions.add(question.getId());
+                addActiveQuestion(fqcn.getName(), question.getId());
+                addActiveQuestion(question.getId());
             }
+        }
+
+        // Sub coaches have to update the active questions cache of it's parent
+        if (getParent() != null) {
+            getParent().updateSubcoachActiveQuestionsCache(fqcn.getCoachId(), fqcn.getName(), getActiveQuestions(fqcn.getName()));
         }
     }
 
@@ -426,6 +559,11 @@ public abstract class AbstractLib implements CoachLibrary {
         this.cal = iLibCal;
     }
 
+    @Override
+    public Object getContext() {
+        return executorContext;
+    }
+
     public Logger getLogger() {
         return logger;
     }
@@ -440,7 +578,7 @@ public abstract class AbstractLib implements CoachLibrary {
 
     // To ease and satisfy tests, can be removed in future
     public List<String> getQuestions() {
-        return activeQuestions;
+        return getActiveQuestions();
     }
 
     public PersistanceManager getPersistanceManager() {

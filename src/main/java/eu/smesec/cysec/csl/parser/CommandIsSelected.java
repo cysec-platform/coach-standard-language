@@ -19,14 +19,15 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-import eu.smesec.cysec.platform.bridge.generated.Answer;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import eu.smesec.cysec.platform.bridge.execptions.CacheException;
+import eu.smesec.cysec.platform.bridge.generated.Answer;
+import eu.smesec.cysec.platform.bridge.generated.Question;
 
 public class CommandIsSelected extends Command {
 
@@ -54,7 +55,16 @@ public class CommandIsSelected extends Command {
         // disassemble option into question and option by splitting with "o": q10o1
         answer = coachContext.getCal().getAnswer(coachContext.getFqcn().toString(), questionId);
 
-      } else throw new ExecutorException("question id doesn't match pattern [^0-9]*[q]\\d+");
+        // Check if question is hidden and if so immediately return false since answers of hidden questions cannot be selected
+        if (coachContext.getCoach().getQuestions().getQuestion().stream()
+                .filter(q -> q.getId().equals(questionId))
+                .findFirst()
+                .map(Question::isHidden)
+                .orElseThrow(() -> new ExecutorException("Question id " + questionId + " doesn't exist"))) {
+          return new Atom(Atom.AtomType.BOOL, "FALSE", null);
+        }
+
+      } else throw new ExecutorException("question id doesn't match pattern [^0-9]*[q]\\d+: " + varContent.getId());
 
     } catch (CacheException e) {
       coachContext.getLogger().log(Level.SEVERE, String.format("Error loading answer %s", varContent.getId()));
@@ -66,7 +76,9 @@ public class CommandIsSelected extends Command {
     if(answer != null) {
       String vc=varContent.getId();
       ans=" "+(answer.getAidList() == null?answer.getText():answer.getAidList())+" ";
-      if(ans.contains(vc)) {
+
+      // don't use ans.contains to avoid unintended matches (e.g. q10HTTP should not match when q10HTTPS is choosen)
+      if(Arrays.stream(ans.split(" ")).anyMatch(it -> it.equals(vc))) {
         boolResult = "TRUE";
       } else {
         boolResult = "FALSE";

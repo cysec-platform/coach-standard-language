@@ -23,39 +23,31 @@ import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import java.util.Arrays;
 import java.util.List;
 
-import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
+public class CommandArrayElements extends CommandAbstractList {
 
-public class CommandGetVar extends Command {
-
+  @Override
+  /**
+   * Checks if an array has the specified size.
+   *
+   * <p>This command has two mandatory parameter:
+   *   <ul>
+   *     <li>(arrayList; String)The array to append to.</li>
+   *     <li>(arrayLength; String)The element to be appended.</li>
+   *   </ul>
+   * </p>
+   * @returns Always true
+   */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 1 parameter
-    checkNumParams(aList, 1,3);
+    // expects 2 parameter
+    checkNumParams(aList, 2,2);
 
     // evaluate parameters
-    Atom varName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varName");
-    Atom varDefault = null;
-    if(aList.size()>1) {
-      varDefault=checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING, AtomType.INTEGER, AtomType.BOOL,
-          AtomType.FLOAT), true, coachContext, "varDefault");
-    }
-    Atom varContext = NULL_ATOM;
-    if(aList.size()>2) {
-      varContext=checkAtomType(aList.get(2), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext, "varContext");
-    }
+    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "arrayList" );
+    Atom noelem = checkAtomType(aList.get(1), Arrays.asList(AtomType.INTEGER), true, coachContext, "arrayLength" );
 
-    // set the score
-    Atom ret = coachContext.getContext().getVariable(varName.getId(), varContext == NULL_ATOM ? null : varContext.getId());
+    List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
 
-    if(ret==NULL_ATOM || ret==null) {
-      ret=varDefault;
-    }
-
-    if(ret==null) {
-      ret=NULL_ATOM;
-    }
-
-    return ret;
+    return tempList.size()==Integer.valueOf(noelem.getId())?Atom.TRUE:Atom.FALSE;
   }
 
 }

@@ -24,12 +24,7 @@ import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-import eu.smesec.cysec.platform.bridge.generated.Answer;
-import eu.smesec.cysec.platform.bridge.generated.Dictionary;
-import eu.smesec.cysec.platform.bridge.generated.DictionaryEntry;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
-import eu.smesec.cysec.platform.bridge.generated.Questions;
+import eu.smesec.cysec.platform.bridge.generated.*;
 import eu.smesec.cysec.csl.AbstractLib;
 import eu.smesec.cysec.csl.demo.MockLibrary;
 import org.junit.After;
@@ -39,11 +34,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,49 +46,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 
-public class TestCommands {
-  private CoachContext coachContext;
-  private CySeCExecutorContextFactory.CySeCExecutorContext context;
-  private Questionnaire coach;
-  private ILibCal cal;
-  private Question question;
-  private Answer answer;
-  private FQCN fqcn = FQCN.fromString("lib-user");
-
-  @Before
-  public void setup() throws Exception{
-    cal = Mockito.mock(ILibCal.class);
-    context = CySeCExecutorContextFactory.getExecutorContext("test");
-    answer = new Answer();
-    answer.setQid("user-q20");
-    answer.setText("user-q20o1");
-    question = new Question();
-    question.setId("user-q20");
-    Questions questions = new Questions();
-    questions.getQuestion().add(question);
-    Dictionary dictionary = new Dictionary();
-    final DictionaryEntry dictionaryEntry = new DictionaryEntry();
-    dictionaryEntry.setKey("key-abc");
-    dictionaryEntry.setValue("Value ABC");
-    dictionary.getEntry().add(dictionaryEntry);
-    coach = Mockito.mock(Questionnaire.class);
-    when(coach.getQuestions()).thenReturn(questions);
-    when(coach.getDictionary()).thenReturn(dictionary);
-    coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answer), coach, fqcn);
-    // pass global logger
-    coachContext.setLogger(Logger.getGlobal());
-  }
-
-  @After
-  public void tearDown() {
-    context.reset();
-    coachContext = null;
-
-  }
-
+public class TestCommands extends AbstractTestCommands {
   @Test
   public void testBasicAddCommand() throws Exception {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
@@ -105,27 +61,29 @@ public class TestCommands {
     Atom a = new ParserLine("add(5,5.5,add(-.25,-1.25));").getAtom();
     String expected = "add( 5, 5.5, add( -0.25, -1.25 ) )";
     assertTrue("String is not as expected \"" + a + "\"!=\"" + expected + "\"", expected.equals(a.toString()));
-    assertTrue("Execution result is not as expected (" + a.execute(coachContext) + ")", "9.0".equals(a.execute(coachContext).toString()));
+    assertTrue("Execution result is not as expected (" + a.execute(coachContext) + ")",
+        "9.0".equals(a.execute(coachContext).toString()));
   }
 
   @Test
   public void testIsSelectedFalseCommand() throws Exception {
-    //For testSelectedFalse
+    // For testSelectedFalse
     when(coachContext.getCal().getAnswer(fqcn.toString(), coachContext.getQuestionContext())).thenReturn(null);
 
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("isSelected", new CommandIsSelected());
+    Command.registerCommand("arrayAdd", new CommandArrayAdd());
     try {
       StringBuilder s = new StringBuilder();
-      s.append("isSelected(\"company-q10o1\") : bla :  {" + System.lineSeparator());
-      s.append("                 addScore(\"myScore\",100);" + System.lineSeparator());
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 arrayAdd(\"myScore\",\"100\");" + System.lineSeparator());
+      s.append("                 arrayAdd(\"myScore\",\"100\");" + System.lineSeparator());
       s.append("              }; // This is a silly comment");
       System.out.println("testing " + s);
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
       context.executeQuestion(l, coachContext);
-      //Atom result = l.get(0).execute(coachContext);
+      // Atom result = l.get(0).execute(coachContext);
       assertTrue(context.getScore("myScore").getValue() == 0);
     } catch (Exception pe) {
       pe.printStackTrace();
@@ -135,7 +93,7 @@ public class TestCommands {
 
   @Test
   public void testEqualsEmptyStrings() throws Exception {
-    //For testSelectedFalse
+    // For testSelectedFalse
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
     Command.registerCommand("equals", new CommandEquals());
@@ -155,7 +113,7 @@ public class TestCommands {
 
   @Test
   public void testEqualsInequalStrings() throws Exception {
-    //For testSelectedFalse
+    // For testSelectedFalse
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("testInequalStrings");
     context.reset();
     Command.registerCommand("equals", new CommandEquals());
@@ -185,7 +143,7 @@ public class TestCommands {
       s.append("              };");
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
       context.executeQuestion(l, coachContext);
-      assertEquals(100, context.getScore("myScore").getValue(),0.1);
+      assertEquals(100, context.getScore("myScore").getValue(), 0.1);
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -204,7 +162,7 @@ public class TestCommands {
       s.append("              };");
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
       context.executeQuestion(l, coachContext);
-      assertEquals(0, context.getScore("myScore").getValue(),0.1);
+      assertEquals(0, context.getScore("myScore").getValue(), 0.1);
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -224,7 +182,7 @@ public class TestCommands {
       s.append("              };");
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
       context.executeQuestion(l, coachContext);
-      assertEquals(100, context.getScore("myScore").getValue(),0.1);
+      assertEquals(100, context.getScore("myScore").getValue(), 0.1);
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -249,7 +207,7 @@ public class TestCommands {
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
       context.executeQuestion(l, coachContext);
-      //Atom result = l.get(0).execute(coachContext);
+      // Atom result = l.get(0).execute(coachContext);
       assertTrue(context.getScore("myScore").getValue() == 100);
     } catch (Exception pe) {
       pe.printStackTrace();
@@ -266,13 +224,15 @@ public class TestCommands {
     try {
       StringBuilder s = new StringBuilder();
       s.append("TRUE : bla :  {" + System.lineSeparator());
-      s.append("                 addScore(\"myScore\",get(\"myVar\", 100 )); // the variable is unset... should return default value" + System.lineSeparator());
+      s.append(
+          "                 addScore(\"myScore\",get(\"myVar\", 100 )); // the variable is unset... should return default value"
+              + System.lineSeparator());
       s.append("              };");
       System.out.println("testing " + s);
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
       context.executeQuestion(l, coachContext);
-      //Atom result = l.get(0).execute(coachContext);
+      // Atom result = l.get(0).execute(coachContext);
       assertTrue(context.getScore("myScore").getValue() == 100);
     } catch (Exception pe) {
       pe.printStackTrace();
@@ -291,10 +251,10 @@ public class TestCommands {
     Pattern pattern = Pattern.compile(regex);
     Matcher match = pattern.matcher(content);
     match.find();
-    Assert.assertEquals(expected, content.substring(match.start(),match.end()));
+    Assert.assertEquals(expected, content.substring(match.start(), match.end()));
     Matcher match2 = pattern.matcher(content2);
     match2.find();
-    Assert.assertEquals(expected, content2.substring(match2.start(),match2.end()));
+    Assert.assertEquals(expected, content2.substring(match2.start(), match2.end()));
   }
 
   @Test
@@ -318,7 +278,7 @@ public class TestCommands {
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
       context.executeQuestion(l, coachContext);
-      //Atom result = l.get(0).execute(coachContext);
+      // Atom result = l.get(0).execute(coachContext);
       assertTrue(context.getScore("myScore").getValue() == 100);
     } catch (Exception pe) {
       pe.printStackTrace();
@@ -330,6 +290,12 @@ public class TestCommands {
   public void testIsSelectedMultiOptionsCommand() throws Exception {
     Answer answerQ70 = new Answer();
     answerQ70.setAidList("user-q70o1 user-q70o2");
+    Question q70 = new Question();
+    q70.setId("user-q70");
+    q70.setHidden(false);
+    Questions questions = Mockito.mock(Questions.class);
+    when(questions.getQuestion()).thenReturn(Collections.singletonList(q70));
+    when(coachContext.getCoach().getQuestions()).thenReturn(questions);
     coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answerQ70), coach, fqcn);
     coachContext.setLogger(Logger.getGlobal());
     when(coachContext.getCal().getAnswer(fqcn.toString(), "user-q70")).thenReturn(answerQ70);
@@ -346,7 +312,7 @@ public class TestCommands {
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
       context.executeQuestion(l, coachContext);
-      //Atom result = l.get(0).execute(coachContext);
+      // Atom result = l.get(0).execute(coachContext);
       assertTrue(context.getScore("myScore").getValue() == 100);
     } catch (Exception pe) {
       pe.printStackTrace();
@@ -354,15 +320,25 @@ public class TestCommands {
     }
   }
 
-
   @Test
   public void testIsAnsweredCommand() throws Exception {
     // Needs different coachcontext (answer == null)
     coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answer), coach, fqcn);
     coachContext.setLogger(Logger.getGlobal());
 
+    Question q10 = new Question();
+    q10.setId("user-q10");
+    q10.setHidden(false);
+
+    Question q50 = new Question();
+    q50.setId("user-q50");
+    q50.setHidden(false);
+    
     when(coachContext.getCal().getAnswer(fqcn.toString(), "user-q10")).thenReturn(new Answer());
     when(coachContext.getCal().getAnswer(fqcn.toString(), "user-q50")).thenReturn(null);
+    Questions questions = Mockito.mock(Questions.class);
+    when(questions.getQuestion()).thenReturn(Arrays.asList(q10, q50));
+    when(coachContext.getCoach().getQuestions()).thenReturn(questions);
 
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
@@ -374,7 +350,7 @@ public class TestCommands {
       s.append("              };" + System.lineSeparator());
       s.append("not(isAnswered(\"user-q10\")) : condition2 : {" + System.lineSeparator());
       s.append("                 addScore(\"myScore\", 100);" + System.lineSeparator());
-      s.append("              };"  + System.lineSeparator());
+      s.append("              };" + System.lineSeparator());
       s.append("isAnswered(\"user-q50\") : condition3 : {" + System.lineSeparator());
       s.append("                 addScore(\"myScore\", 30);" + System.lineSeparator());
       s.append("              };");
@@ -421,7 +397,7 @@ public class TestCommands {
       context.executeQuestion(l2, coachContext);
       assertFalse(coachContext.getQuestionContext().isHidden());
 
-      //Atom result = l.get(0).execute(coachContext);
+      // Atom result = l.get(0).execute(coachContext);
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -433,12 +409,13 @@ public class TestCommands {
     Command.registerCommand("if", new CommandIf());
     try {
       StringBuilder s = new StringBuilder();
-            /*
-               Syntax:
-               if(<condition>, <true>, <false>)
-             */
+      /*
+       * Syntax:
+       * if(<condition>, <true>, <false>)
+       */
       s.append("TRUE : bla :  {" + System.lineSeparator());
-      s.append("                 if(TRUE, addScore(\"myScore\",100), addScore(\"myScore\",200));" + System.lineSeparator());
+      s.append(
+          "                 if(TRUE, addScore(\"myScore\",100), addScore(\"myScore\",200));" + System.lineSeparator());
       s.append("              };");
       System.out.println("testing " + s);
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
@@ -456,10 +433,10 @@ public class TestCommands {
   public void testIfCommandSingle() {
     try {
       StringBuilder s = new StringBuilder();
-            /*
-               Syntax:
-               if(<condition>, <true>, <false>)
-             */
+      /*
+       * Syntax:
+       * if(<condition>, <true>, <false>)
+       */
       s.append("TRUE : bla :  {" + System.lineSeparator());
       s.append("                 if(FALSE, addScore(\"myScore\",100));" + System.lineSeparator());
       s.append("              };");
@@ -487,7 +464,7 @@ public class TestCommands {
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
       context.executeQuestion(l, coachContext);
-      assertEquals("youThere",context.getVariable("hello",null).getId());
+      assertEquals("youThere", context.getVariable("hello", null).getId());
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -509,7 +486,7 @@ public class TestCommands {
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
 
       context.executeQuestion(l, coachContext);
-      assertEquals("me",context.getVariable("hello",null).getId());
+      assertEquals("me", context.getVariable("hello", null).getId());
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -530,7 +507,8 @@ public class TestCommands {
       s.append("              };");
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
       context.executeQuestion(l, coachContext);
-      assertTrue("bad badge is awarded (is:"+context.getBadge("Badge1").getAwardedBadgeClass()+")","silver".equals(context.getBadge("badge1").getAwardedBadgeClass().getId()));
+      assertTrue("bad badge is awarded (is:" + context.getBadge("Badge1").getAwardedBadgeClass() + ")",
+          "silver".equals(context.getBadge("badge1").getAwardedBadgeClass().getId()));
 
       // award another badge
       s = new StringBuilder();
@@ -539,90 +517,99 @@ public class TestCommands {
       s.append("              };");
       l = new ParserLine(s.toString()).getCySeCListing();
       context.executeQuestion(l, coachContext);
-      assertTrue("bad Badge is awarded (is:"+context.getBadge("Badge1").getAwardedBadgeClass()+")","gold".equals(context.getBadge("Badge1").getAwardedBadgeClass().getId()));
-      assertTrue("Badge list is bad (is:"+context.getBadgeList().length+")",context.getBadgeList().length==1);
+      assertTrue("bad Badge is awarded (is:" + context.getBadge("Badge1").getAwardedBadgeClass() + ")",
+          "gold".equals(context.getBadge("Badge1").getAwardedBadgeClass().getId()));
+      assertTrue("Badge list is bad (is:" + context.getBadgeList().length + ")", context.getBadgeList().length == 1);
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
     }
   }
 
-    @Test
-    public void testRevokeBadgeCommand() {
-        try {
-            StringBuilder s = new StringBuilder();
-            s.append("TRUE : bla :  {" + System.lineSeparator());
-            s.append("                 addBadge(\"Badge1\",0,\"\",\"\",\"\",\"\");" + System.lineSeparator());
-            s.append("                 addBadgeClass(\"Badge1\",\"gold\",0,\"\",\"\",\"\",\"\");" + System.lineSeparator());
-            s.append("                 awardBadge(\"Badge1\",\"gold\");" + System.lineSeparator());
-            s.append("              };");
-            List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
-            context.executeQuestion(l, coachContext);
-            assertTrue("bad badge! is awarded (is:"+context.getBadge("Badge1").getAwardedBadgeClass()+")","gold".equals(context.getBadge("badge1").getAwardedBadgeClass().getId()));
+  @Test
+  public void testRevokeBadgeCommand() {
+    try {
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 addBadge(\"Badge1\",0,\"\",\"\",\"\",\"\");" + System.lineSeparator());
+      s.append("                 addBadgeClass(\"Badge1\",\"gold\",0,\"\",\"\",\"\",\"\");" + System.lineSeparator());
+      s.append("                 awardBadge(\"Badge1\",\"gold\");" + System.lineSeparator());
+      s.append("              };");
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+      context.executeQuestion(l, coachContext);
+      assertTrue("bad badge! is awarded (is:" + context.getBadge("Badge1").getAwardedBadgeClass() + ")",
+          "gold".equals(context.getBadge("badge1").getAwardedBadgeClass().getId()));
 
-            // revoke existing badeClass
-            s = new StringBuilder();
-            s.append("TRUE : bla :  {" + System.lineSeparator());
-            s.append("                 revokeBadge(\"Badge1\");" + System.lineSeparator());
-            s.append("              };");
-            l = new ParserLine(s.toString()).getCySeCListing();
-            context.executeQuestion(l, coachContext);
-            // expect current class to be null now
-            assertNull(
-                    "bad Badge! is awarded (is:"+context.getBadge("Badge1").getAwardedBadgeClass()+")",
-                    context.getBadge("Badge1").getAwardedBadgeClass());
+      // revoke existing badeClass
+      s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 revokeBadge(\"Badge1\");" + System.lineSeparator());
+      s.append("              };");
+      l = new ParserLine(s.toString()).getCySeCListing();
+      context.executeQuestion(l, coachContext);
+      // expect current class to be null now
+      assertNull(
+          "bad Badge! is awarded (is:" + context.getBadge("Badge1").getAwardedBadgeClass() + ")",
+          context.getBadge("Badge1").getAwardedBadgeClass());
 
-            // expect badge list to still hold 1 entry
-            assertTrue("Badge list is bad! (is:"+context.getBadgeList().length+")",
-                    context.getBadgeList().length==1);
-        } catch (Exception pe) {
-            pe.printStackTrace();
-            fail("got unexpected exception " + pe);
-        }
+      // expect badge list to still hold 1 entry
+      assertTrue("Badge list is bad! (is:" + context.getBadgeList().length + ")",
+          context.getBadgeList().length == 1);
+    } catch (Exception pe) {
+      pe.printStackTrace();
+      fail("got unexpected exception " + pe);
     }
+  }
 
-    @Test
-    // @Ignore(value = "Pending change to remove this behavior")
-    public void testRevokeNonExistingBadge() {
-      CySeCExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("badgeTest");
-      try {
-          // try to revoke class from non-existing badge
-          StringBuilder s = new StringBuilder();
-          s.append("TRUE : bla :  {" + System.lineSeparator());
-          s.append("                 revokeBadge(\"Badge1\");" + System.lineSeparator());
-          s.append("              };");
-          List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
-          context.executeQuestion(l, coachContext);
+  @Test
+  // @Ignore(value = "Pending change to remove this behavior")
+  public void testRevokeNonExistingBadge() {
+    CySeCExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("badgeTest");
+    try {
+      // try to revoke class from non-existing badge
+      StringBuilder s = new StringBuilder();
+      s.append("TRUE : bla :  {" + System.lineSeparator());
+      s.append("                 revokeBadge(\"Badge1\");" + System.lineSeparator());
+      s.append("              };");
+      List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
+      context.executeQuestion(l, coachContext);
 
-          // Satify constructor call from ParserLine and executeQuestion()
-      } catch (ParserException e) {
-          e.printStackTrace();
-          fail("got unexpected parser exception");
-      } catch (ExecutorException e) {
-          // expect badge list to be empty
-          e.printStackTrace();
-          assertTrue("Badge list is bad! (is:"+context.getBadgeList().length+")",
-                  context.getBadgeList().length==0);
-          return;
-      }
-      fail("no exception when revoking nonexistent badge");
+      // Satify constructor call from ParserLine and executeQuestion()
+    } catch (ParserException e) {
+      e.printStackTrace();
+      fail("got unexpected parser exception");
+    } catch (ExecutorException e) {
+      // expect badge list to be empty
+      e.printStackTrace();
+      assertTrue("Badge list is bad! (is:" + context.getBadgeList().length + ")",
+          context.getBadgeList().length == 0);
+      return;
     }
+    fail("no exception when revoking nonexistent badge");
+  }
 
   @Test
   public void testRecommendationCommands() {
     try {
       StringBuilder s = new StringBuilder();
       s.append("TRUE : bla :  {" + System.lineSeparator());
-      s.append("                 addRecommendation(\"rec1\",0,\"TestUrl\",\"TestAlt\",\"TestTitle\",\"TestDescription\",\"TextLink\",\"TestLink\");" + System.lineSeparator());
-      s.append("                 addRecommendation(\"rec2\",0,\"TestUrl2\",\"TestAlt2\",\"TestTitle2\",\"TestDescription2\",\"TextLink2\",\"TestLink2\");" + System.lineSeparator());
+      s.append(
+          "                 addRecommendation(\"rec1\",0,\"TestUrl\",\"TestAlt\",\"TestTitle\",\"TestDescription\",\"TextLink\",\"TestLink\");"
+              + System.lineSeparator());
+      s.append(
+          "                 addRecommendation(\"rec2\",0,\"TestUrl2\",\"TestAlt2\",\"TestTitle2\",\"TestDescription2\",\"TextLink2\",\"TestLink2\");"
+              + System.lineSeparator());
       s.append("              };");
       List<CySeCLineAtom> l = new ParserLine(s.toString()).getCySeCListing();
       context.executeQuestion(l, coachContext);
-      assertTrue("Recommendation is not (is:"+context.getRecommendation("rec1")+")",context.getRecommendation("rec1")!=null);
+      assertTrue("Recommendation is not (is:" + context.getRecommendation("rec1") + ")",
+          context.getRecommendation("rec1") != null);
 
-      assertTrue("Recommendation list is bad (is:"+context.getRecommendationList().length+")",context.getRecommendationList().length==1);
-      assertTrue("Recommendation content is bad","TestTitle".equals(context.getRecommendation("rec1").getTitle()));
-      assertTrue("Recommendation content is bad (2)","TestTitle2".equals(context.getRecommendation("rec2").getTitle()));
+      assertTrue("Recommendation list is bad (is:" + context.getRecommendationList().length + ")",
+          context.getRecommendationList().length == 1);
+      assertTrue("Recommendation content is bad", "TestTitle".equals(context.getRecommendation("rec1").getTitle()));
+      assertTrue("Recommendation content is bad (2)",
+          "TestTitle2".equals(context.getRecommendation("rec2").getTitle()));
     } catch (Exception pe) {
       pe.printStackTrace();
       fail("got unexpected exception " + pe);
@@ -635,7 +622,7 @@ public class TestCommands {
     coach.setId("my-subcoach-one");
     coach.setParent("lib-company");
     Mockito.when(coachContext.getCal().getCoach(anyString())).thenReturn(coach);
-    Mockito.doNothing().when(coachContext.getCal()).instantiateSubCoach(any(Questionnaire.class), any(Set.class));
+    Mockito.doNothing().when(coachContext.getCal()).instantiateSubCoach(any(Questionnaire.class), any(Set.class), any(Metadata.class));
     CoachLibrary mockLibrary = new MockLibrary();
     mockLibrary.init("eu.smesec.cysec.coach.MockLibrary", coach, cal, Logger.getGlobal());
 
@@ -656,9 +643,8 @@ public class TestCommands {
       context.executeQuestion(l, coachContext);
       // assert libcal called
 
-
       // assert parent context is correct
-      assertEquals(((AbstractLib)mockLibrary).getExecutorContext().getParent(), context);
+      assertEquals(((AbstractLib) mockLibrary).getExecutorContext().getParent(), context);
 
     } catch (Exception pe) {
       pe.printStackTrace();
@@ -899,4 +885,34 @@ public class TestCommands {
     assertEquals(5, context.getScore("s").getValue(), 1e-6);
   }
 
+  @Test
+  public void testSetAnswerCommand() {
+    Command.registerCommand("setAnswer", new CommandSetAnswer());
+    String targetQid = "user-q20";
+
+    Questions questions = Mockito.mock(Questions.class);
+    when(questions.getQuestion()).thenReturn(Collections.singletonList(question));
+    when(coachContext.getCoach().getQuestions()).thenReturn(questions);
+
+    // create new answer
+    String value = "test answer value";
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("TRUE : x : {" + System.lineSeparator());
+    sb.append(String.format("                setAnswer(\"%s\", \"%s\");", targetQid, value) + System.lineSeparator());
+    sb.append("            };");
+    System.out.println("testing " + sb);
+
+    try {
+      context.executeQuestion(
+          new ParserLine(sb.toString()).getCySeCListing(),
+          coachContext);
+
+      // FIXME missing call
+      // verify(cal, times(1)).createAnswer(eq(fqcn.getCoachId()), any(Answer.class));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail();
+    }
+  }
 }

@@ -67,6 +67,13 @@ public abstract class Command {
     registerCommand("createSubcoach", new CommandCreateSubcoach());
     registerCommand("print", new CommandPrint());
     registerCommand("tn", new CommandDictionaryLookup());
+    registerCommand("arrayAdd", new CommandArrayAdd());
+    registerCommand("arrayRemove", new CommandArrayRemove());
+    registerCommand("arrayContains", new CommandArrayContains());
+    registerCommand("arrayElements", new CommandArrayElements());
+    registerCommand("arrayLength", new CommandArrayLength());
+    registerCommand("removeSubcoach", new CommandRemoveSubcoach());
+    registerCommand("getParentArgument", new CommandGetParentArgument());
   }
 
   public static void registerCommand(String commandName, Command command) {
