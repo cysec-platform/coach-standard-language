@@ -298,8 +298,9 @@ public abstract class AbstractLib implements CoachLibrary {
         return Utils.findById(questionnaire, lastId);
     }
 
-    public Question getFirstQuestion() {
-        String firstId = getActiveQuestions().get(0);
+    @Override
+    public Question getFirstQuestion(String instanceName) {
+        String firstId = getActiveQuestions(instanceName).get(0);
         return Utils.findById(questionnaire, firstId);
     }
 
