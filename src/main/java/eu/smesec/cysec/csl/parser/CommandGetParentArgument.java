@@ -31,8 +31,13 @@ public class CommandGetParentArgument extends Command {
     try {
       Metadata parentMetadata = coachContext.getCal().getMetadata(coachContext.getFqcn(), "subcoach-data");
       if (parentMetadata != null) {
-        String value = parentMetadata.getMvalue().get(0).getStringValueOrBinaryValue().getValue();
-        return new Atom(Atom.AtomType.STRING,value,null);
+        return parentMetadata.getMvalue()
+                .stream()
+                .filter(mval -> mval.getKey().equals("parent-argument"))
+                .findFirst()
+                .map(mval -> mval.getStringValueOrBinaryValue().getValue())
+                .map(argument -> new Atom(Atom.AtomType.STRING, argument, null))
+                .orElse(new Atom(Atom.AtomType.STRING,"",null));
       }
     } catch (CacheException e) {
       coachContext.getLogger().severe("There was an error while executing command 'getParentArgument': " + e.getMessage());
