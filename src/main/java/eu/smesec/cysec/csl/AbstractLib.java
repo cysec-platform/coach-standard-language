@@ -54,7 +54,7 @@ import java.util.stream.Stream;
 import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.parseMvalues;
 
 public abstract class AbstractLib implements CoachLibrary {
-    public static final String DEFAULT_INSTANCE = "___DEFAULT_INSTANCE___";
+    public static final String DEFAULT_INSTANCE = "default";
 
     protected Questionnaire questionnaire;
     protected ILibCal cal;
@@ -76,7 +76,7 @@ public abstract class AbstractLib implements CoachLibrary {
         return activeQuestionsPerInstance.getOrDefault(DEFAULT_INSTANCE, new ArrayList<>());
     }
 
-    private List<String> getActiveQuestions(FQCN fqcn) {
+    public List<String> getActiveQuestions(FQCN fqcn) {
         if (fqcn.isTopLevel()) return getActiveQuestions();
         return getActiveQuestions(fqcn.getName());
     }
@@ -506,7 +506,6 @@ public abstract class AbstractLib implements CoachLibrary {
         for(Question question : questionnaire.getQuestions().getQuestion()) {
             if(!question.isHidden()) {
                 addActiveQuestion(fqcn.getName(), question.getId());
-                addActiveQuestion(question.getId());
             }
         }
 
