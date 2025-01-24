@@ -24,7 +24,10 @@ import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Answer;
 import eu.smesec.cysec.platform.bridge.generated.Question;
+import eu.smesec.cysec.platform.bridge.generated.QuestionType;
+
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -68,7 +71,7 @@ public class CommandSetAnswer extends Command {
 
       if (answer != null) {
         // update existing
-        if (question.getType().startsWith("Astar")) {
+        if (EnumSet.of(QuestionType.ASTAR, QuestionType.ASTAREXCL).contains(question.getType())) {
           answer.setAidList(value);
           answer.setText(value.split(" ")[0]);
         } else {
@@ -83,7 +86,7 @@ public class CommandSetAnswer extends Command {
         answer.setQid(qid);
         answer.setText(value);
 
-        if (question.getType() != null && question.getType().startsWith("Astar")) {
+        if (EnumSet.of(QuestionType.ASTAR, QuestionType.ASTAREXCL).contains(question.getType())) {
           answer.setAidList(value);
         }
 

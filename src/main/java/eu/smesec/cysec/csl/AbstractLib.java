@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,6 +29,7 @@ import eu.smesec.cysec.platform.bridge.generated.Answer;
 import eu.smesec.cysec.platform.bridge.generated.Block;
 import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.platform.bridge.generated.Question;
+import eu.smesec.cysec.platform.bridge.generated.QuestionType;
 import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
 import eu.smesec.cysec.platform.bridge.generated.Questions;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
@@ -37,7 +38,6 @@ import eu.smesec.cysec.csl.parser.ExecutorException;
 import eu.smesec.cysec.csl.parser.ParserException;
 import eu.smesec.cysec.csl.parser.Atom;
 import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
-import eu.smesec.cysec.csl.questions.QuestionTypes;
 import eu.smesec.cysec.csl.skills.Endurance;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 import eu.smesec.cysec.csl.utils.Utils;
@@ -272,7 +272,7 @@ public abstract class AbstractLib implements CoachLibrary {
         // Insert subcoach questions at each subcoach placeholder question position
         return questions.stream().flatMap(q -> {
             Tuple<FQCN, Question> fqcnQuestionTuple = new Tuple<>(fqcn, q);
-            if (Objects.equals(q.getType(), "subcoach")) {
+            if (Objects.equals(q.getType(), QuestionType.SUBCOACH)) {
                 try {
                     Questionnaire subCoach = cal.getCoach(q.getSubcoachId());
                     String subCoachKey = q.getSubcoachId() + "." + q.getInstanceName();
@@ -349,7 +349,7 @@ public abstract class AbstractLib implements CoachLibrary {
         questionnaire.getQuestions()
                 .getQuestion()
                 .stream()
-                .filter(q -> Objects.equals(q.getType(), "subcoach"))
+                .filter(q -> Objects.equals(q.getType(), QuestionType.SUBCOACH))
                 .forEach(q -> {
                     try {
                         Questionnaire subcoach = cal.getCoach(q.getSubcoachId());
@@ -458,10 +458,9 @@ public abstract class AbstractLib implements CoachLibrary {
 
             if (question == null) continue;
 
-            // for typeA questions all selected option are stored in Aid list
-            // SelectQuestion and TypeA question unfortunately inherit from Astar but dont use the Aid list.
-            String questionType = question.getType();
-            if(questionType.equals(QuestionTypes.Astar) && !questionType.equals(QuestionTypes.yesno) && !(questionType.equals(QuestionTypes.A))) {
+            // Type A questions store all selected answers in the AID list, separated by a space.
+            QuestionType questionType = question.getType();
+            if(questionType.equals(QuestionType.ASTAR)) {
                 String[] options = answer.getAidList().split(" ");
                 for(String option : options) {
                     Answer answerOption = new Answer();
@@ -470,9 +469,8 @@ public abstract class AbstractLib implements CoachLibrary {
                     // invoke onResponseChange as if each option as given separatedly
                     onResponseChange(question, answerOption, fqcn);
                 }
-            } else if(questionType.equals(QuestionTypes.text) || questionType.equals(QuestionTypes.date)) {
-                onResponseChange(question, answer, fqcn);
             } else {
+                // Otherwise, trigger only one answer update.
                 onResponseChange(question, answer, fqcn);
             }
         }
