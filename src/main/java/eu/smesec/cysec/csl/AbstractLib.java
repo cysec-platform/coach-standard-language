@@ -364,6 +364,9 @@ public abstract class AbstractLib implements CoachLibrary {
                     }
                 });
 
+        // Clear subcoach variables cache
+        executorContext.getSubcoachVariablesCache().clear();
+
         // Save max skill values
         String strengthScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strength")).getValue());
         String strengthMaxScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strengthMax")).getValue());
