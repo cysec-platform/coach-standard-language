@@ -21,7 +21,6 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.BadgeFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,14 +40,14 @@ public class CommandAddBadge extends Command {
     checkNumParams(list,6);
 
     // evaluate parameters
-    Atom badgeName = checkAtomType(list.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName" );
-    Atom order = checkAtomType(list.get(1),Arrays.asList(Atom.AtomType.INTEGER),true,  coachContext, "BadgeClassName" );
-    Atom urlImg = checkAtomType(list.get(2),Arrays.asList(Atom.AtomType.STRING),true,  coachContext, "ImageUrl");
-    Atom altImg = checkAtomType(list.get(3),Arrays.asList(Atom.AtomType.STRING),true,  coachContext, "ImageDescription");
-    Atom description =checkAtomType(list.get(4),Arrays.asList(Atom.AtomType.STRING),true,  coachContext,"Description");
-    Atom urlLink = checkAtomType(list.get(5),Arrays.asList(Atom.AtomType.STRING),true,  coachContext,"urlLink");
+    Atom badgeName = checkAtomType(list.get(0),  Atom.AtomType.STRING, true, coachContext, "BadgeName" );
+    Atom order = checkAtomType(list.get(1), Atom.AtomType.INTEGER,true,  coachContext, "BadgeClassName" );
+    Atom urlImg = checkAtomType(list.get(2), Atom.AtomType.STRING,true,  coachContext, "ImageUrl");
+    Atom altImg = checkAtomType(list.get(3), Atom.AtomType.STRING,true,  coachContext, "ImageDescription");
+    Atom description = checkAtomType(list.get(4), Atom.AtomType.STRING,true,  coachContext,"Description");
+    Atom urlLink = checkAtomType(list.get(5), Atom.AtomType.STRING,true,  coachContext,"urlLink");
 
-    CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
+    CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) coachContext.getContext();
     BadgeFactory.Badge b = c.getBadge(badgeName.getId());
     if (b != null) {
       throw new ExecutorException("Badge id "+badgeName.getId()+" does already exist");

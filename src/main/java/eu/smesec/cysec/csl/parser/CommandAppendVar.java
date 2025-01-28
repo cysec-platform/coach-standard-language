@@ -19,7 +19,6 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class CommandAppendVar extends Command {
 
     // evaluate parameters
     Atom varName = aList.get(0).execute(coachContext);
-    Atom varContent = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "content");
+    Atom varContent = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "content");
 
     // set the variable
     coachContext.getContext().setVariable(varName.getId(),new Atom(AtomType.STRING,coachContext.getContext().getVariable(varName.getId(),null).getId()+varContent.getId(),null), null);

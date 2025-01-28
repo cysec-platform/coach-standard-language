@@ -20,10 +20,9 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
+
 import java.util.Arrays;
 import java.util.List;
-
-import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
 
 public class CommandGetVar extends Command {
 
@@ -33,19 +32,30 @@ public class CommandGetVar extends Command {
     checkNumParams(aList, 1,3);
 
     // evaluate parameters
-    Atom varName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varName");
-    Atom varDefault = null;
-    if(aList.size()>1) {
-      varDefault=checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING, AtomType.INTEGER, AtomType.BOOL,
-          AtomType.FLOAT), true, coachContext, "varDefault");
+    Atom varName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "variable");
+    Atom varDefault = Atom.NULL_ATOM;
+    if(aList.size() > 1) {
+      varDefault = checkAtomType(
+        aList.get(1),
+        Arrays.asList(AtomType.STRING, AtomType.INTEGER, AtomType.BOOL, AtomType.FLOAT),
+        true,
+        coachContext,
+        "default"
+      );
     }
-    Atom varContext = NULL_ATOM;
-    if(aList.size()>2) {
-      varContext=checkAtomType(aList.get(2), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext, "varContext");
+    Atom varContext = Atom.NULL_ATOM;
+    if(aList.size() > 2) {
+      varContext = checkAtomType(
+        aList.get(2),
+        Arrays.asList(AtomType.STRING, AtomType.NULL),
+        true,
+        coachContext,
+        "context"
+      );
     }
 
     // set the score
-    Atom ret = coachContext.getContext().getVariable(varName.getId(), varContext == NULL_ATOM ? null : varContext.getId());
+    Atom ret = coachContext.getContext().getVariable(varName.getId(), varContext == Atom.NULL_ATOM ? null : varContext.getId());
 
     if(ret==NULL_ATOM || ret==null) {
       ret=varDefault;

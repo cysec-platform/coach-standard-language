@@ -21,7 +21,7 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import eu.smesec.cysec.platform.bridge.generated.Question;
-import java.util.Arrays;
+
 import java.util.List;
 
 /**
@@ -44,9 +44,9 @@ public class CommandSetMHidden extends Command {
     checkNumParams(aList, 3);
 
     // evaluate parameters
-    Atom varLowId = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "lowID");
-    Atom varHighId = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "highID");
-    boolean varContentBool = Boolean.valueOf(checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.BOOL), true, coachContext,"hideState").getId());
+    Atom varLowId = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "lowID");
+    Atom varHighId = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "highID");
+    boolean varContentBool = Boolean.valueOf(checkAtomType(aList.get(2), Atom.AtomType.BOOL, true, coachContext, "hideState").getId());
     coachContext.getLogger().info(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), varContentBool));
 
     // Update question hidden status

@@ -26,7 +26,6 @@ import eu.smesec.cysec.platform.bridge.generated.Answer;
 import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.platform.bridge.generated.QuestionType;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -47,17 +46,11 @@ public class CommandSetAnswer extends Command {
     checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom questionId = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "questionID");
-    Atom answerValue = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext,
-        "answerValue");
+    Atom questionId = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "question ID");
+    Atom answerValue = checkAtomType(aList.get(1), AtomType.STRING, true, coachContext, "answer id(s)");
 
-    if (answerValue.getType() != AtomType.STRING || questionId.getType() != AtomType.STRING) {
-      // TODO is type string really enogh for answer values?
-      throw new ExecutorException("Invalid types for parameters: Provide [0] String and [1] String");
-    }
-
-    String value = answerValue.getId(); // use getId over toString since toString adds unnecessary " around the value
     String qid = questionId.getId();
+    String value = answerValue.getId(); // use getId over toString since toString adds unnecessary " around the value
 
     // determine provided option is selected
     ILibCal cal = coachContext.getCal();

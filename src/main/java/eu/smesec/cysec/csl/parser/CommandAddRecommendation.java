@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,14 +37,14 @@ public class CommandAddRecommendation extends Command {
     checkNumParams(aList, 8);
 
     // evaluate parameters
-    Atom recommendationName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "recommendationName");
-    Atom order = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.INTEGER), true, coachContext, "order");
-    Atom urlImg = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "urlImg");
-    Atom altImg = checkAtomType(aList.get(3), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "altImg");
-    Atom title = checkAtomType(aList.get(4), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "title");
-    Atom description = checkAtomType(aList.get(5), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "description");
-    Atom textLink = checkAtomType(aList.get(6), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "textLink");
-    Atom urlLink = checkAtomType(aList.get(7), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "urlLink");
+    Atom recommendationName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "recommendationName");
+    Atom order = checkAtomType(aList.get(1), Atom.AtomType.INTEGER, true, coachContext, "order");
+    Atom urlImg = checkAtomType(aList.get(2), Atom.AtomType.STRING, true, coachContext, "urlImg");
+    Atom altImg = checkAtomType(aList.get(3), Atom.AtomType.STRING, true, coachContext, "altImg");
+    Atom title = checkAtomType(aList.get(4), Atom.AtomType.STRING, true, coachContext, "title");
+    Atom description = checkAtomType(aList.get(5), Atom.AtomType.STRING, true, coachContext, "description");
+    Atom textLink = checkAtomType(aList.get(6), Atom.AtomType.STRING, true, coachContext, "textLink");
+    Atom urlLink = checkAtomType(aList.get(7), Atom.AtomType.STRING, true, coachContext, "urlLink");
 
     // execute command
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());

@@ -21,7 +21,6 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.platform.bridge.generated.Dictionary;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,16 +33,16 @@ public class CommandDictionaryLookup extends Command {
         checkNumParams(aList,1);
 
         // determine key of the entry to search in the dictionary
-        Atom a = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext,null) ;
+        Atom dictionaryKey = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext,"dictionary key");
 
         // handle empty id (return null)
-        final String key = a.getId();
+        String key = dictionaryKey.getId();
         if (key == null || key.isEmpty()) {
             return Atom.NULL_ATOM;
         }
 
         // handle non-existent dictionary
-        final Dictionary dictionary = coachContext.getCoach().getDictionary();
+        Dictionary dictionary = coachContext.getCoach().getDictionary();
         if (dictionary == null || dictionary.getEntry() == null) {
             return Atom.NULL_ATOM;
         }

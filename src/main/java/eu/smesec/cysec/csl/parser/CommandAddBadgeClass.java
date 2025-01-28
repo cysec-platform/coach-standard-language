@@ -21,7 +21,6 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.BadgeFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,13 +41,13 @@ public class CommandAddBadgeClass extends Command {
     checkNumParams(aList,7);
 
     // evaluate parameters
-    Atom badgeName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName");
-    Atom badgeClassName = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeClass");
-    Atom order = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.INTEGER), true, coachContext,"BadgeOrder");
-    Atom urlImg = checkAtomType(aList.get(3), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "ImageURL");
-    Atom altImg = checkAtomType(aList.get(4), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"ImageAlternate" );
-    Atom description = checkAtomType(aList.get(5), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"Description");
-    Atom urlLink = checkAtomType(aList.get(6), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"LinkURL");
+    Atom badgeName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "BadgeName");
+    Atom badgeClassName = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "BadgeClass");
+    Atom order = checkAtomType(aList.get(2), Atom.AtomType.INTEGER, true, coachContext,"BadgeOrder");
+    Atom urlImg = checkAtomType(aList.get(3), Atom.AtomType.STRING, true, coachContext, "ImageURL");
+    Atom altImg = checkAtomType(aList.get(4), Atom.AtomType.STRING, true, coachContext,"ImageAlternate" );
+    Atom description = checkAtomType(aList.get(5), Atom.AtomType.STRING, true, coachContext,"Description");
+    Atom urlLink = checkAtomType(aList.get(6), Atom.AtomType.STRING, true, coachContext,"LinkURL");
 
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     BadgeFactory.Badge b = c.getBadge(badgeName.getId());

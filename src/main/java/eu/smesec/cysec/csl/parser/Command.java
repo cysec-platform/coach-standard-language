@@ -108,7 +108,24 @@ public abstract class Command {
     return execute(list, cc);
   }
 
-  public Atom checkAtomType(Atom atom, List<AtomType> type, boolean evaluate, CoachContext context,
+  /**
+   * Helper method that only checks for a singular Atom type, wrapping it in a Singleton List before passing
+   * to {@link #checkAtomType(Atom, List, boolean, CoachContext, String)}.
+   */
+  public Atom checkAtomType(
+          Atom atom, AtomType type, boolean evaluate, CoachContext context,
+          String parameterName)
+          throws ExecutorException {
+    return checkAtomType(atom, Collections.singletonList(type), evaluate, context, parameterName);
+  }
+
+  /**
+   * Verifies the given Atom is, or (if evaluate is true) evaluates to, one of the allowed atom types.
+   * Returns the validated Atom (important if evaluation occurred).
+   *
+   * @throws ExecutorException if the atom or its evaluation result does not have one of the provided types.
+   */
+  public Atom checkAtomType(Atom atom, List<AtomType> types, boolean evaluate, CoachContext context,
       String parameterName)
       throws ExecutorException {
     if (atom == null) {
@@ -120,26 +137,28 @@ public abstract class Command {
     }
 
     // check for appropriate type
-    if (!type.contains(atom.getType())) {
+    if (!types.contains(atom.getType())) {
 
-      // concatenate allowed types
-      StringBuffer typeString = new StringBuffer();
-      for (int i = 0; i < type.size(); i++) {
-        if (i > 0 && i < type.size() - 1) {
+      // concatenate allowed types for exception message
+      StringBuilder typeString = new StringBuilder();
+      for (int i = 0; i < types.size(); i++) {
+        // separate elements by ", " after the first.
+        if (i > 0) {
           typeString.append(", ");
-        } else if (i == type.size() - 1) {
-          typeString.append(", or ");
         }
-        typeString.append(type.get(i).name());
+        if (i == types.size() - 1) {
+          // last one gets an additional "or " to its separator.
+          typeString.append("or ");
+        }
+        typeString.append(types.get(i).name());
       }
 
       // build exception message
       String msg;
-      if (parameterName != null && !"".equals(parameterName)) {
-        msg = "Illegal type for Parameter " + parameterName + " (should: " + typeString + "; was: "
-            + atom.getType() + ")";
+      if (parameterName != null && !parameterName.isEmpty()) {
+        msg = String.format("Illegal type for Parameter \"%s\" (should be: %s; was: %s)", parameterName, typeString, atom.getType());
       } else {
-        msg = "Illegal type for parameter (should:" + typeString + "; was: " + atom.getType() + ")";
+        msg = String.format("Illegal type for Parameter (should be: %s; was: %s)", typeString, atom.getType());
       }
 
       // throw exception

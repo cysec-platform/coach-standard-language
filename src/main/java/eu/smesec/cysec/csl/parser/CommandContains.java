@@ -20,7 +20,7 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
-import java.util.Arrays;
+
 import java.util.List;
 
 public class CommandContains extends Command {
@@ -31,8 +31,8 @@ public class CommandContains extends Command {
     checkNumParams(aList, 2,2);
 
     // evaluate parameters
-    Atom varHaystack = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "content");
-    Atom varNeedle = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "content");
+    Atom haystack = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "haystack");
+    Atom needle = checkAtomType(aList.get(1), AtomType.STRING, true, coachContext, "needle");
 
     return (varHaystack.getId().contains(varNeedle.getId())?Atom.TRUE:Atom.FALSE);
   }

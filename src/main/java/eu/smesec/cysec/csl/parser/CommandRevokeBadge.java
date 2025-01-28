@@ -21,7 +21,6 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.BadgeFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,7 +41,7 @@ public class CommandRevokeBadge extends Command {
     checkNumParams(aList, 1, 1);
 
     // evaluate parameters
-    Atom badgeName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName" );
+    Atom badgeName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "badge name");
 
     // execute command
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());

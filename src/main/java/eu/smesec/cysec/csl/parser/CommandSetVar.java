@@ -19,6 +19,7 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandSetVar extends Command {
@@ -29,13 +30,15 @@ public class CommandSetVar extends Command {
     checkNumParams(aList, 2,3);
 
     // evaluate parameters
-    Atom varName = aList.get(0).execute(coachContext);
-    Atom varContext = aList.get(1).execute(coachContext);
-    Atom varContent = null;
+    Atom varName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "variable");
+    Atom varContext;
+    Atom varContent;
     if (aList.size() == 2) {
       varContext = new Atom(Atom.AtomType.STRING, coachContext.getQuestionContext().getId(), null);
       varContent = aList.get(1).execute(coachContext);
     } else {
+      // Explicit context given.
+      varContext = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING, Atom.AtomType.NULL), true, coachContext, "context");
       varContent = aList.get(2).execute(coachContext);
     }
 

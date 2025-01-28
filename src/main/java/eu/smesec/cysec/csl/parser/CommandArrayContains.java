@@ -20,10 +20,8 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
-import java.util.Arrays;
-import java.util.HashSet;
+
 import java.util.List;
-import java.util.Set;
 
 public class CommandArrayContains extends CommandAbstractList {
 
@@ -44,12 +42,12 @@ public class CommandArrayContains extends CommandAbstractList {
     checkNumParams(aList, 2,2);
 
     // evaluate parameters
-    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "ArrayList" );
-    Atom elem = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "arrayElement" );
+    Atom array = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "array");
+    Atom element = checkAtomType(aList.get(1), AtomType.STRING, true, coachContext, "element");
 
-    List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
+    List<String> tempList = stringToList(coachContext.getContext().getVariable(array.getId(),null).getId());
 
-    return tempList.contains(elem.getId())?Atom.TRUE:Atom.FALSE;
+    return tempList.contains(element.getId()) ? Atom.TRUE : Atom.FALSE;
   }
 
 }

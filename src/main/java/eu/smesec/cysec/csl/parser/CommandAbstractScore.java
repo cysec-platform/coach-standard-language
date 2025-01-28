@@ -31,8 +31,8 @@ public abstract class CommandAbstractScore extends Command {
     checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom scoreName = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "scoreName");
-    Atom scoreValue = checkAtomType(aList.get(1), Arrays.asList(new AtomType[]{AtomType.INTEGER, AtomType.FLOAT}), true, coachContext, "scoreValue");
+    Atom scoreName = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "scoreName");
+    Atom scoreValue = checkAtomType(aList.get(1), Arrays.asList(AtomType.INTEGER, AtomType.FLOAT), true, coachContext, "scoreValue");
 
     // set the score
     score(scoreName.getId(), coachContext.getQuestionContext().getId(), Double.valueOf(scoreValue.getId()), coachContext.getContext());

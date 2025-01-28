@@ -37,8 +37,8 @@ public class CommandRemoveSubcoach extends Command {
     checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom coachID = checkAtomType(aList.get(0), List.of(Atom.AtomType.STRING), true, coachContext, "coachID");
-    Atom fileIdentifier = checkAtomType(aList.get(1), List.of(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
+    Atom coachID = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "coachID");
+    Atom fileIdentifier = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "fileIdentifier");
 
     FQCN fqcn = FQCN.fromString(String.join(".", Arrays.asList(coachContext.getCoach().getId(), coachID.getId(), fileIdentifier.getId())));
 

@@ -20,7 +20,7 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
-import eu.smesec.cysec.platform.bridge.generated.Question;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,16 +38,28 @@ public class CommandEquals extends Command {
     checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom atom1 = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING,AtomType.INTEGER,AtomType.FLOAT,AtomType.BOOL,AtomType.NULL), true, coachContext, "leftValue" );
-    Atom atom2 = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING,AtomType.INTEGER,AtomType.FLOAT,AtomType.BOOL,AtomType.NULL), true, coachContext, "rightValue" );
+    Atom lhs = checkAtomType(
+      aList.get(0),
+      Arrays.asList(Atom.AtomType.INTEGER, Atom.AtomType.FLOAT, Atom.AtomType.BOOL, Atom.AtomType.STRING, Atom.AtomType.NULL),
+      true,
+      coachContext,
+      "leftValue"
+    );
+    Atom rhs = checkAtomType(
+      aList.get(1),
+      Arrays.asList(Atom.AtomType.INTEGER, Atom.AtomType.FLOAT, Atom.AtomType.BOOL, Atom.AtomType.STRING, Atom.AtomType.NULL),
+      true,
+      coachContext,
+      "rightValue"
+    );
 
     // Check equivalence
-    if(atom1.getType().equals(atom2.getType())) {
-      if(AtomType.NULL.equals(atom1.getType())) {
+    if(lhs.getType().equals(rhs.getType())) {
+      if(AtomType.NULL.equals(lhs.getType())) {
         // Return TRUE if both atoms are of a NULL type
         return Atom.TRUE;
-      } else if( atom1.getType()!=AtomType.METHODE ) {
-        if(atom1.getId().equals(atom2.getId())) {
+      } else if (lhs.getType() != AtomType.METHODE) {
+        if(lhs.getId().equals(rhs.getId())) {
           // Both atoms are of same type and value
           return Atom.TRUE;
         } else {

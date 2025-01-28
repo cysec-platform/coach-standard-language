@@ -20,7 +20,7 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
-import java.util.Arrays;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,11 +49,11 @@ public class CommandArrayAdd extends CommandAbstractList {
     checkNumParams(aList, 2,3);
 
     // evaluate parameters
-    Atom arr = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "ArrayList" );
-    Atom elem = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "ArrayList" );
+    Atom arr = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "array");
+    Atom elem = checkAtomType(aList.get(1), AtomType.STRING, true, coachContext, "element");
     Atom unique = Atom.FALSE;
-    if(aList.size()>2) {
-      unique=checkAtomType(aList.get(2), Arrays.asList(AtomType.BOOL), true, coachContext, "unique");
+    if(aList.size() > 2) {
+      unique = checkAtomType(aList.get(2), AtomType.BOOL, true, coachContext, "unique");
     }
 
     Atom arrayVar = coachContext.getContext().getVariable(arr.getId(), null);

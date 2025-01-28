@@ -25,7 +25,6 @@ import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,11 +46,11 @@ public class CommandCreateSubcoach extends Command {
     checkNumParams(aList, 2, 3);
 
     // evaluate parameters
-    Atom coachID = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "coachID");
-    Atom fileIdentifier = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
+    Atom coachID = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "coachID");
+    Atom fileIdentifier = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "fileIdentifier");
     Atom parentArgument;
     if (aList.size() == 3) {
-      parentArgument = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "parentArgument");
+      parentArgument = checkAtomType(aList.get(2), Atom.AtomType.STRING, true, coachContext, "parentArgument");
     } else {
       parentArgument = Atom.NULL_ATOM;
     }
