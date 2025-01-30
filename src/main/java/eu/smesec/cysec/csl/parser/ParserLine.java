@@ -465,7 +465,7 @@ public class ParserLine {
       ret = new Atom(Atom.AtomType.STRING, s, null);
     } else if ("TRUE".equals(snoopBytes(4)) || "FALSE".equals(snoopBytes(5))) {
       // get boolean
-      ret = new Atom(Atom.AtomType.BOOL, getATag().equals("TRUE") ? "TRUE" : "FALSE", null);
+      ret = Atom.fromBoolean(getATag().equals("TRUE"));
     } else if ("-+.0123456789".contains(snoopBytes(1))) {
       // get numerical
       ret = getNumericalAtom();

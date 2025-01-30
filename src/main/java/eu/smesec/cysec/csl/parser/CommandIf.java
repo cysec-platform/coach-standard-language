@@ -48,13 +48,13 @@ public class CommandIf extends Command {
       if(aList.size()==3) {
         ret = aList.get(2).execute(coachContext);
       } else {
-        ret=null;
+        ret = Atom.FALSE;
       }
     }
     if (ret != null) {
       return ret;
     } else {
-      return new Atom(Atom.AtomType.BOOL, "FALSE", null);
+      return Atom.FALSE;
     }
   }
 }

@@ -28,7 +28,7 @@ public class Atom {
   public static final Atom TRUE = new Atom(AtomType.BOOL, "TRUE", null);
   public static final Atom FALSE = new Atom(AtomType.BOOL, "FALSE", null);
 
-  public enum AtomType {METHODE, INTEGER, FLOAT, BOOL, STRING, NULL;}
+  public enum AtomType {METHODE, INTEGER, FLOAT, BOOL, STRING, NULL}
 
   private AtomType type = null;
   private String id = null;
@@ -44,6 +44,11 @@ public class Atom {
   public Atom(AtomType type, String id, List<Atom> parameters, int parent) {
     this(type,id,parameters);
     this.parentPointer = parent;
+  }
+
+  public static Atom fromBoolean(boolean b) {
+    if(b) return Atom.TRUE;
+    else return Atom.FALSE;
   }
 
   private ExecutorContext getExecutorContext(CoachContext cc) {
@@ -137,21 +142,25 @@ public class Atom {
     return ret;
   }
 
+  /**
+   * Evaluates this Atom and returns {@code true} if it results in the boolean atom {@link Atom#TRUE}.
+   *
+   * @throws ExecutorException if this is not a boolean atom (or a method that didn't return a boolean atom)
+   */
   public boolean isTrue(CoachContext coachContext) throws ExecutorException {
     Atom eval = this;
     if (getType() == AtomType.METHODE) {
       eval = execute(coachContext);
     }
     if (eval.getType() != AtomType.BOOL) {
-      throw new ExecutorException("condition \"" + this.toString() + "\" does not evaluate to BOOL (is:" + eval + ")");
+      throw new ExecutorException("Condition \"" + this + "\" does not evaluate to BOOL (is: " + eval + ")");
     }
     if ("TRUE".equals(eval.getId())) {
       return true;
     } else if ("FALSE".equals(eval.getId())) {
       return false;
     } else {
-      throw new ExecutorException("boolean value is illegal \"" + eval.toString() + "\" (OUCH! How did that happen)");
+      throw new ExecutorException("boolean value is illegal \"" + eval + "\" (OUCH! How did that happen)");
     }
   }
-
 }

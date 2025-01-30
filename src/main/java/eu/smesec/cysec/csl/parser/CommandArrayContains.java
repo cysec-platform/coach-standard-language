@@ -47,7 +47,6 @@ public class CommandArrayContains extends CommandAbstractList {
 
     List<String> tempList = stringToList(coachContext.getContext().getVariable(array.getId(),null).getId());
 
-    return tempList.contains(element.getId()) ? Atom.TRUE : Atom.FALSE;
+    return Atom.fromBoolean(tempList.contains(element.getId()));
   }
-
 }

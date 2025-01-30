@@ -34,7 +34,7 @@ public class CommandContains extends Command {
     Atom haystack = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "haystack");
     Atom needle = checkAtomType(aList.get(1), AtomType.STRING, true, coachContext, "needle");
 
-    return (varHaystack.getId().contains(varNeedle.getId())?Atom.TRUE:Atom.FALSE);
+    return Atom.fromBoolean(haystack.getId().contains(needle.getId()));
   }
 
 }

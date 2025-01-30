@@ -58,7 +58,7 @@ public class CommandIsSelected extends Command {
                 .findFirst()
                 .map(Question::isHidden)
                 .orElseThrow(() -> new ExecutorException("Question id " + questionId + " doesn't exist"))) {
-          return new Atom(Atom.AtomType.BOOL, "FALSE", null);
+          return Atom.FALSE;
         }
 
         // find answer value for the parsed question id (company-q10o4 resulted in q10)
@@ -72,25 +72,22 @@ public class CommandIsSelected extends Command {
     }
 
     // determine provided option is selected
-    String boolResult;
-    String ans=null;
+    Atom result;
+    String actualAnswerText;
     if(answer != null) {
-      String vc = queriedAnswerId.getId();
-      ans=" "+(answer.getAidList() == null?answer.getText():answer.getAidList())+" ";
+      String queriedAnswerText = queriedAnswerId.getId();
+      actualAnswerText = " " + (answer.getAidList() == null ? answer.getText() : answer.getAidList()) + " ";
 
-      // don't use ans.contains to avoid unintended matches (e.g. q10HTTP should not match when q10HTTPS is choosen)
-      if(Arrays.stream(ans.split(" ")).anyMatch(it -> it.equals(vc))) {
-        boolResult = "TRUE";
-      } else {
-        boolResult = "FALSE";
-      }
+      // don't use ans.contains directly to avoid unintended matches (e.g. q10HTTP should not match when q10HTTPS is choosen)
+      result = Atom.fromBoolean(
+              Arrays.asList(actualAnswerText.split(" ")).contains(queriedAnswerText)
+      );
     } else {
-      ans="<UNSET>";
-      boolResult = "FALSE";
+      actualAnswerText = "<UNSET>";
+      result = Atom.FALSE;
     }
-    coachContext.getLogger().info(String.format("isSelected(%s) == currently:%s ==> %s", queriedAnswerId.getId(), ans, boolResult));
+    coachContext.getLogger().info(String.format("isSelected(%s) == currently:%s ==> %s", queriedAnswerId.getId(), actualAnswerText, result.getId()));
 
-    return new Atom(Atom.AtomType.BOOL, boolResult, null);
+    return result;
   }
-
 }

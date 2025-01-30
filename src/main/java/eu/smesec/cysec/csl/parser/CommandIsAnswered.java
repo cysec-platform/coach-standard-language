@@ -56,14 +56,6 @@ public class CommandIsAnswered extends Command {
     } catch (CacheException e) {
       throw new NullPointerException();
     }
-    String boolResult;
-    if (answer != null) {
-      boolResult = "TRUE";
-    } else {
-      boolResult = "FALSE";
-    }
-
-    return new Atom(Atom.AtomType.BOOL, boolResult, null);
+    return Atom.fromBoolean(answer != null);
   }
-
 }

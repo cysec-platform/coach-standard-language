@@ -24,9 +24,6 @@ import java.util.Vector;
 
 public abstract class CommandAbstractBoolOp extends Command {
 
-  private final static Atom TRUE = new Atom(Atom.AtomType.BOOL, "TRUE", null);
-  private final static Atom FALSE = new Atom(Atom.AtomType.BOOL, "FALSE", null);
-
   @Override
   public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
     if (list == null || list.size() < 1) {
@@ -44,11 +41,7 @@ public abstract class CommandAbstractBoolOp extends Command {
         throw new ExecutorException("Exception while evaluating parameter "+old+"in boolean op "+getCommandName(),e);
       }
     }
-    if (evaluate(blist, coachContext.getContext())) {
-      return TRUE;
-    } else {
-      return FALSE;
-    }
+    return Atom.fromBoolean(evaluate(blist, coachContext.getContext()));
   }
 
   abstract boolean evaluate(List<Boolean> list, ExecutorContext context) throws ExecutorException;

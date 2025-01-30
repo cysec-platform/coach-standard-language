@@ -43,6 +43,6 @@ public abstract class CommandNumberBinaryPredicate extends Command implements Bi
         BigDecimal rhsVal = new BigDecimal(rhs.getId());
 
         // evaluate the test method and return accordingly
-        return test(lhsVal, rhsVal) ? Atom.TRUE : Atom.FALSE;
+        return Atom.fromBoolean(test(lhsVal, rhsVal));
     }
 }
