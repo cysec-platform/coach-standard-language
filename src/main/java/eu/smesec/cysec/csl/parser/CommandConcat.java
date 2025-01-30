@@ -27,14 +27,13 @@ public class CommandConcat extends Command {
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
     checkNumParams(aList, 1, Integer.MAX_VALUE);
 
-    StringBuilder sb = new StringBuilder();
+    StringBuilder total = new StringBuilder();
     for (Atom a : aList) {
       if (a.getType() == Atom.AtomType.METHODE) {
         a = a.execute(coachContext);
       }
-      sb.append(a.getType() == Atom.AtomType.STRING ? a.getId() : a.toString());
+      total.append(a.getType() == Atom.AtomType.STRING ? a.getId() : a.toString());
     }
-    return new Atom(Atom.AtomType.STRING, sb.toString(), null);
+    return Atom.fromString(total.toString());
   }
-
 }

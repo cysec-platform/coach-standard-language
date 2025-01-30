@@ -462,7 +462,7 @@ public class ParserLine {
       // get string
       String s = getQuotedString();
       // collate value
-      ret = new Atom(Atom.AtomType.STRING, s, null);
+      ret = Atom.fromString(s);
     } else if ("TRUE".equals(snoopBytes(4)) || "FALSE".equals(snoopBytes(5))) {
       // get boolean
       ret = Atom.fromBoolean(getATag().equals("TRUE"));

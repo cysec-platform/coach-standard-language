@@ -70,11 +70,8 @@ public class CommandArrayAdd extends CommandAbstractList {
       tempList.addAll(tempSet);
     }
 
-    Atom result = new Atom(AtomType.STRING,listToString(tempList),null);
-
-    coachContext.getContext().setVariable(arr.getId(), result, null);
+    coachContext.getContext().setVariable(arr.getId(), Atom.fromString(listToString(tempList)), null);
 
     return Atom.TRUE;
   }
-
 }

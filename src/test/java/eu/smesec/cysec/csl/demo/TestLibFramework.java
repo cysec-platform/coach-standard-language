@@ -334,7 +334,7 @@ public class TestLibFramework {
         question.setId("user-q10");
         String nextId = "user-q50";
         String variable = "_coach.nextPage";
-        Atom nextAtom = new Atom(Atom.AtomType.STRING, nextId, null);
+        Atom nextAtom = Atom.fromString(nextId);
 
         // Save efforts of providing cysec context mock
         // mock cysec context to enable stubbing of getVariable method
@@ -344,7 +344,7 @@ public class TestLibFramework {
         PowerMockito.mockStatic(CySeCExecutorContextFactory.class);
         Mockito.when(CySeCExecutorContextFactory.getExecutorContext(anyString(), any(Logger.class))).thenReturn((CySeCExecutorContextFactory.CySeCExecutorContext) context);
 
-        Atom nextAtom = new Atom(Atom.AtomType.STRING, "user-q160", null);
+        Atom nextAtom = Atom.fromString("user-q160");
         when(context.getVariable("_coach.nextPage", "user-q20"))
                 .thenReturn(nextAtom);*/
 
@@ -354,16 +354,16 @@ public class TestLibFramework {
 
         // Overwrite variable and make sure change is visible
         nextId = "user-q90";
-        nextAtom = new Atom(Atom.AtomType.STRING, nextId, null);
-        context.setVariable("_coach.nextPage", new Atom(Atom.AtomType.STRING, nextId, null), "user-q10");
+        nextAtom = Atom.fromString(nextId);
+        context.setVariable("_coach.nextPage", Atom.fromString(nextId), "user-q10");
         next = library.getNextQuestion(question, fqcn);
         assertNotNull(next);
         assertEquals(nextId, next.getId());
 
         // And back once again
         nextId = "user-q50";
-        nextAtom = new Atom(Atom.AtomType.STRING, nextId, null);
-        context.setVariable("_coach.nextPage", new Atom(Atom.AtomType.STRING, nextId, null), "user-q10");
+        nextAtom = Atom.fromString(nextId);
+        context.setVariable("_coach.nextPage", Atom.fromString(nextId), "user-q10");
         next = library.getNextQuestion(question, fqcn);
         assertNotNull(next);
         assertEquals(nextId, next.getId());

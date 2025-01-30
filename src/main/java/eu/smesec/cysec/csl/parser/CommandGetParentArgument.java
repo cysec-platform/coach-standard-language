@@ -36,13 +36,12 @@ public class CommandGetParentArgument extends Command {
                 .filter(mval -> mval.getKey().equals("parent-argument"))
                 .findFirst()
                 .map(mval -> mval.getStringValueOrBinaryValue().getValue())
-                .map(argument -> new Atom(Atom.AtomType.STRING, argument, null))
-                .orElse(new Atom(Atom.AtomType.STRING,"",null));
+                .map(Atom::fromString)
+                .orElse(Atom.fromString(""));
       }
     } catch (CacheException e) {
       coachContext.getLogger().severe("There was an error while executing command 'getParentArgument': " + e.getMessage());
     }
-    return new Atom(Atom.AtomType.STRING,"",null);
+    return Atom.fromString("");
   }
-
 }

@@ -34,10 +34,9 @@ public class CommandAppendVar extends Command {
     Atom varContent = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "content");
 
     // set the variable
-    coachContext.getContext().setVariable(varName.getId(),new Atom(AtomType.STRING,coachContext.getContext().getVariable(varName.getId(),null).getId()+varContent.getId(),null), null);
+    coachContext.getContext().setVariable(varName.getId(), Atom.fromString(coachContext.getContext().getVariable(varName.getId(), null).getId() + varContent.getId()), null);
     coachContext.getLogger().info(String.format("Set variable %s to %s in context %s", varName.getId(), varContent.getId(), varContent.getId()));
 
     return Atom.NULL_ATOM;
   }
-
 }

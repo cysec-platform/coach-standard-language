@@ -51,7 +51,7 @@ public class CommandDictionaryLookup extends Command {
         return dictionary.getEntry().stream()
                 .filter(e -> key.equals(e.getKey()))
                 .findFirst()
-                .map(e -> new Atom(Atom.AtomType.STRING, e.getValue(), null))
+                .map(e -> Atom.fromString(e.getValue()))
                 .orElse(Atom.NULL_ATOM);
     }
 }

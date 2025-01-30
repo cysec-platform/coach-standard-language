@@ -51,6 +51,10 @@ public class Atom {
     else return Atom.FALSE;
   }
 
+  public static Atom fromString(String s) {
+    return new Atom(Atom.AtomType.STRING, s, null);
+  }
+
   private ExecutorContext getExecutorContext(CoachContext cc) {
     int i = parentPointer;
     ExecutorContext context = cc.getContext();

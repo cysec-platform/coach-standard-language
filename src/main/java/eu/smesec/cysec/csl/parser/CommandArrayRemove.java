@@ -56,11 +56,9 @@ public class CommandArrayRemove extends CommandAbstractList {
     List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
     tempList.remove(elem.getId());
 
-    Atom result = new Atom(AtomType.STRING,listToString(tempList),null);
 
-    coachContext.getContext().setVariable(arr.getId(), result, null);
+    coachContext.getContext().setVariable(arr.getId(), Atom.fromString(listToString(tempList)), null);
 
     return Atom.TRUE;
   }
-
 }
