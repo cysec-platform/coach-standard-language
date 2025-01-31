@@ -73,7 +73,4 @@ public abstract class CommandAbstractList extends Command {
     }
     return result.toString();
   }
-
-  abstract public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException;
-
 }

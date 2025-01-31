@@ -69,27 +69,36 @@ public class Atom {
     return execute(coachContext, getExecutorContext(coachContext));
   }
 
+  /**
+   * Executes this Atom if it represents a method call, looking up the appropriate command.
+   * If this is not a method call Atom, returns itself unchanged.
+   *
+   * @throws ExecutorException if a method name is unknown, or the evaluation fails otherwise.
+   */
   private Atom execute(CoachContext coachContext, ExecutorContext context) throws ExecutorException {
     if (type == AtomType.METHODE) {
       // execute here
       Command command = Command.getCommand(id);
       if (command != null) {
+        int numberOfNormalizedParams = command.getNumberOfNormalizedParams();
 
         // normalize parameter list as far as we can
-        List<Atom> pl = new Vector<>();
+        List<Atom> pl = new ArrayList<>(parameters.size());
         int i = 0;
         for (Atom a : parameters) {
           i++;
-          if (a.getType() == AtomType.METHODE && (i <= command.getNumberOfNormalizedParams() || command.getNumberOfNormalizedParams() == -1)) {
+          // Execute the parameter up to the limit of normalized parameters
+          if (a.getType() == AtomType.METHODE && i <= numberOfNormalizedParams) {
             a = a.execute(coachContext);
           }
           pl.add(a);
         }
 
         // execute command
+        // FIXME: getExecutorContext(coachContext) is equivalent to the context parameter we have. Redundant?
         return command.execute(pl, coachContext, getExecutorContext(coachContext));
       } else {
-        throw new ExecutorException("Found unknown methode \"" + id + "\"");
+        throw new ExecutorException("Tried executing unknown method: \"" + id + "\"");
       }
     } else {
       return this;
@@ -160,10 +169,7 @@ public class Atom {
    * @throws ExecutorException if this is not a boolean atom (or a method that didn't return a boolean atom)
    */
   public boolean isTrue(CoachContext coachContext) throws ExecutorException {
-    Atom eval = this;
-    if (getType() == AtomType.METHODE) {
-      eval = execute(coachContext);
-    }
+    Atom eval = this.execute(coachContext);
     if (eval.getType() != AtomType.BOOL) {
       throw new ExecutorException("Condition \"" + this + "\" does not evaluate to BOOL (is: " + eval + ")");
     }

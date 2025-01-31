@@ -29,9 +29,9 @@ public class CommandConcat extends Command {
 
     StringBuilder total = new StringBuilder();
     for (Atom a : aList) {
-      if (a.getType() == Atom.AtomType.METHODE) {
-        a = a.execute(coachContext);
-      }
+      // Execute the atom (no-op for non-method calls).
+      a = a.execute(coachContext);
+      // Append the atom's value to the builder.
       total.append(a.getType() == Atom.AtomType.STRING ? a.getId() : a.toString());
     }
     return Atom.fromString(total.toString());

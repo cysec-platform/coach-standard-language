@@ -23,9 +23,12 @@ import java.util.List;
 
 public class CommandIf extends Command {
 
-  public CommandIf() {
-    super();
-    numberOfNormalizedParams = 1;
+  /**
+   * @return the value 1 to only evaluate the condition, not the alternatives.
+   */
+  @Override
+  public int getNumberOfNormalizedParams() {
+    return 1;
   }
 
   @Override

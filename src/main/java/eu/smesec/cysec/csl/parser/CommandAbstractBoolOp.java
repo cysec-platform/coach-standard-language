@@ -30,15 +30,12 @@ public abstract class CommandAbstractBoolOp extends Command {
       throw new ExecutorException("boolean operations require at least one argument");
     }
     List<Boolean> blist = new Vector<>();
-    for (Atom a : list) {
-      String old = a.toString();
-      try{
-        if (a.getType() == Atom.AtomType.METHODE) {
-          a = a.execute(coachContext);
-        }
-        blist.add(a.isTrue(coachContext));
+    for (Atom atom : list) {
+        try {
+        // Check whether the atom is or evaluates to TRUE.
+        blist.add(atom.isTrue(coachContext));
       } catch(ExecutorException e) {
-        throw new ExecutorException("Exception while evaluating parameter "+old+"in boolean op "+getCommandName(),e);
+        throw new ExecutorException("Exception while evaluating parameter " + atom + " in boolean op " + getCommandName(), e);
       }
     }
     return Atom.fromBoolean(evaluate(blist, coachContext.getContext()));

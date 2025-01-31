@@ -95,12 +95,17 @@ public abstract class Command {
     return commandName == null ? null : commands.get(commandName);
   }
 
-  protected int numberOfNormalizedParams = -1; /* -1 denotes "all" */
-
+  /**
+   * Maximum amount of parameters that should be evaluated before evaluating this
+   * command. The default value of {@link Integer#MAX_VALUE} ensures all parameters are maximally evaluated.
+   */
   public int getNumberOfNormalizedParams() {
-    return numberOfNormalizedParams;
+    return Integer.MAX_VALUE;
   }
 
+  /**
+   * Executes this Atom with the given list of parameter atoms, in the given contexts.
+   */
   public Atom execute(List<Atom> list, CoachContext coachContext, ExecutorContext eContext)
       throws ExecutorException {
     CoachContext cc = coachContext.copy();
@@ -131,8 +136,8 @@ public abstract class Command {
     if (atom == null) {
       throw new RuntimeException("SEVERE ERROR: ATOM was passed as null when checking atom type... please check calling function");
     }
-    // evaluate once if required and allowed
-    if (atom.getType() == AtomType.METHODE && evaluate) {
+    // evaluate if allowed
+    if (evaluate) {
       atom = atom.execute(context);
     }
 
@@ -187,5 +192,4 @@ public abstract class Command {
   }
 
   public abstract Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException;
-
 }
