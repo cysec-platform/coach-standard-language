@@ -115,22 +115,30 @@ public class Atom {
   }
 
   public String toString() {
-    String ret = "";
+    String ret;
     switch (type) {
       case METHODE:
-        ret += id + "( ";
-        for (Atom a : parameters) {
-          ret += a.toString() + ", ";
-        }
-        if (parameters.size() >= 1) {
-          ret = ret.substring(0, ret.length() - 2) + " )";
+        StringBuilder methodCall = new StringBuilder(id);
+
+        // If no parameters are present, simply "method()"
+        if(parameters.isEmpty()) {
+          methodCall.append("()");
         } else {
-          // in case of no atoms
-          ret = ret.substring(0, ret.length() - 1) + ")";
+          // Parameters are present, so we do "method( arg1, arg2, arg3 )"
+          methodCall.append("( ");
+          boolean first = true;
+          for (Atom a : parameters) {
+            if(!first)
+              methodCall.append(", ");
+            methodCall.append(a.toString());
+            first = false;
+          }
+          methodCall.append(" )");
         }
+        ret = methodCall.toString();
         break;
       case STRING:
-        ret += "\"" + id + "\"";
+        ret = "\"" + id + "\"";
         break;
       case NULL:
         ret = "NULL";
@@ -138,7 +146,7 @@ public class Atom {
       case INTEGER:
       case FLOAT:
       case BOOL:
-        ret += id;
+        ret = id;
         break;
       default:
         throw new NullPointerException("type " + type + " cannot be printed (Not implemented)");
