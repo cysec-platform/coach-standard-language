@@ -33,7 +33,6 @@ import java.util.List;
 public class CommandEquals extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
     // Two parameters expected: Two atoms of any type meant to compare
     checkNumParams(aList, 2);
 

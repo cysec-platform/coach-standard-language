@@ -32,6 +32,7 @@ import java.util.function.BiPredicate;
 public abstract class CommandNumberBinaryPredicate extends Command implements BiPredicate<BigDecimal, BigDecimal> {
     @Override
     public Atom execute(List<Atom> atoms, CoachContext coachContext) throws ExecutorException {
+        // expects 2 parameters
         checkNumParams(atoms, 2);
 
         // Extract arguments

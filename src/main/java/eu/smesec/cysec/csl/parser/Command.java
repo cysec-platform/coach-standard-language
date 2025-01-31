@@ -172,21 +172,34 @@ public abstract class Command {
     return atom;
   }
 
+  /**
+   * Verifies the amount of parameters in the list is exactly the given number.
+   * @throws ExecutorException if there are fewer or more elements than are allowed.
+   */
   public void checkNumParams(List<Atom> aList, int num) throws ExecutorException {
     checkNumParams(aList, num, num);
   }
 
-  public void checkNumParams(List<Atom> aList, int lowNum, int highNum) throws ExecutorException {
-    if (aList.size() > highNum || aList.size() < lowNum) {
-      if (highNum == lowNum) {
+  /**
+   * Verifies the amount of parameters in the list is within the inclusive min-max range.
+   * @throws ExecutorException if there are fewer or more elements than are allowed.
+   */
+  public void checkNumParams(List<Atom> aList, int minimum, int maximum) throws ExecutorException {
+    if (aList.size() < minimum || maximum < aList.size()) {
+      if (maximum == minimum) {
         throw new ExecutorException(
-            "Invalid number of arguments. Expected " + lowNum + " parameters but got "
-                + aList.size() + " parameters in command " + getCommandName() + ".");
+                String.format(
+                        "Invalid number of arguments. Expected %d parameters but got %d parameters in command %s.",
+                        minimum, aList.size(), getCommandName()
+                )
+        );
       } else {
         throw new ExecutorException(
-            "Invalid number of arguments. Expected between " + lowNum + " and " + highNum
-                + " parameters but got "
-                + aList.size() + " parameters in command " + getCommandName() + ".");
+                String.format(
+                        "Invalid number of arguments. Expected between %d and %d parameters but got %d parameters in command %s.",
+                        minimum, maximum, aList.size(), getCommandName()
+                )
+        );
       }
     }
   }

@@ -41,8 +41,7 @@ import java.util.List;
 public class CommandSetAnswer extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 2 parameters: name and value of an answer
+    // expects 2 parameters: question id and answer id
     checkNumParams(aList, 2);
 
     // evaluate parameters

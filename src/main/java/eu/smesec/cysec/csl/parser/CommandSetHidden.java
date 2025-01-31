@@ -37,7 +37,7 @@ public class CommandSetHidden extends Command {
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
     // expects 2 parameters: name and hidden state
-    checkNumParams(aList,2);
+    checkNumParams(aList, 2);
 
     // evaluate parameters
     Atom questionID = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "questionID");

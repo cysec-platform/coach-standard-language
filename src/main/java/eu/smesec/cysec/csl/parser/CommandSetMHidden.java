@@ -39,8 +39,7 @@ import java.util.List;
 public class CommandSetMHidden extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // Three parameters expected: Lower name (inclusive), higher value (exclusive) and hiding value
+    // expects 3 parameters: Lower name (inclusive), higher value (exclusive) and hiding value
     checkNumParams(aList, 3);
 
     // evaluate parameters

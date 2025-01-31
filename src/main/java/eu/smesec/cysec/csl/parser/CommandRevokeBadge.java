@@ -38,7 +38,8 @@ import java.util.List;
 public class CommandRevokeBadge extends Command {
   @Override
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    checkNumParams(aList, 1, 1);
+    // expects 1 parameter
+    checkNumParams(aList, 1);
 
     // evaluate parameters
     Atom badgeName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "badge name");

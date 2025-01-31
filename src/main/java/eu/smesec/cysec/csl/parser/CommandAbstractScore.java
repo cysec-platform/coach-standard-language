@@ -26,8 +26,7 @@ import java.util.List;
 public abstract class CommandAbstractScore extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 3 parameters: origin question id, score name and value
+    // expects 2 parameters: score name and value
     checkNumParams(aList, 2);
 
     // evaluate parameters

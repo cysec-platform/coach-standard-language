@@ -25,6 +25,7 @@ public class CommandConcat extends Command {
 
   @Override
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    // expects 1-* arguments
     checkNumParams(aList, 1, Integer.MAX_VALUE);
 
     StringBuilder total = new StringBuilder();

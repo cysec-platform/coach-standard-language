@@ -38,8 +38,8 @@ public class CommandArrayContains extends CommandAbstractList {
    * @returns Always true
    */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    // expects 2 parameter
-    checkNumParams(aList, 2,2);
+    // expects 2 parameters
+    checkNumParams(aList, 2);
 
     // evaluate parameters
     Atom array = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "array");

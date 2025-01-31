@@ -30,7 +30,8 @@ public class CommandDictionaryLookup extends Command {
 
     @Override
     public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-        checkNumParams(aList,1);
+        // expects 1 parameter
+        checkNumParams(aList, 1);
 
         // determine key of the entry to search in the dictionary
         Atom dictionaryKey = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext,"dictionary key");

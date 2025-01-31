@@ -39,7 +39,7 @@ public class CommandArrayElements extends CommandAbstractList {
    */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
     // expects 2 parameter
-    checkNumParams(aList, 2,2);
+    checkNumParams(aList, 2);
 
     // evaluate parameters
     Atom array = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "array");

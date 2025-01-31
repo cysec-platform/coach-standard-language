@@ -26,9 +26,8 @@ import java.util.List;
 public class CommandContains extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 2 or 3 parameters
-    checkNumParams(aList, 2,2);
+    // expects 2 parameters
+    checkNumParams(aList, 2);
 
     // evaluate parameters
     Atom haystack = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "haystack");

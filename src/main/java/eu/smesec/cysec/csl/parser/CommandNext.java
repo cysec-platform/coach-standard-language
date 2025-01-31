@@ -37,7 +37,6 @@ import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
 public class CommandNext extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
     // expects 1 parameter: next page string
     checkNumParams(aList, 1);
 

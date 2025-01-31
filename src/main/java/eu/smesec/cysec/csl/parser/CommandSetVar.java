@@ -25,9 +25,8 @@ import java.util.List;
 public class CommandSetVar extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 2 or 3 parameters
-    checkNumParams(aList, 2,3);
+    // expects 2-3 parameters
+    checkNumParams(aList, 2, 3);
 
     // evaluate parameters
     Atom varName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "variable");

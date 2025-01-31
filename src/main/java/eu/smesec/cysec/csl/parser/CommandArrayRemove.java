@@ -45,8 +45,8 @@ public class CommandArrayRemove extends CommandAbstractList {
    * @returns Always true
    */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    // expects 1 parameter
-    checkNumParams(aList, 2,3);
+    // expects 2-3 parameters
+    checkNumParams(aList, 2, 3);
 
     // evaluate parameters
     Atom arr = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "array");

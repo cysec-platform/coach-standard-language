@@ -38,7 +38,7 @@ public class CommandAddBadgeClass extends Command {
   @Override
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
     // expects 7 parameters
-    checkNumParams(aList,7);
+    checkNumParams(aList, 7);
 
     // evaluate parameters
     Atom badgeName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "BadgeName");

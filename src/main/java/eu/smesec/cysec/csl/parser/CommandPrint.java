@@ -25,6 +25,8 @@ public class CommandPrint extends Command {
 
     @Override
     public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
+        // expects 0-1 parameters
+        checkNumParams(list, 0, 1);
 
         if(list.size() == 0) {
             coachContext.getLogger().info("");

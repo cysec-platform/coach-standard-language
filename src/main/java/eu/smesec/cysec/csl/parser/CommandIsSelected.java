@@ -32,8 +32,7 @@ import java.util.regex.Pattern;
 public class CommandIsSelected extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 3 parameters: name, context of var and value
+    // expects 1 parameter: answer id
     checkNumParams(aList, 1);
 
     // evaluate parameters

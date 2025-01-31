@@ -43,6 +43,7 @@ public class CommandCreateSubcoach extends Command {
 
   @Override
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    // expects 2-3 parameters
     checkNumParams(aList, 2, 3);
 
     // evaluate parameters
