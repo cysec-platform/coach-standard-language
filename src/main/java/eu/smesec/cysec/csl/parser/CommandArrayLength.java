@@ -45,7 +45,6 @@ public class CommandArrayLength extends CommandAbstractList {
 
     List<String> list = stringToList(coachContext.getContext().getVariable(array.getId(), null).getId());
 
-    return new Atom(AtomType.INTEGER, "" + list.size(), null);
+    return Atom.fromInteger(list.size());
   }
-
 }

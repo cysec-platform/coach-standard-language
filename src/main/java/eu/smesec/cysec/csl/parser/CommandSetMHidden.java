@@ -61,7 +61,7 @@ public class CommandSetMHidden extends Command {
         cnt++;
       }
     }
-    return new Atom(AtomType.INTEGER, "" + cnt, null);
-  }
 
+    return Atom.fromInteger(cnt);
+  }
 }

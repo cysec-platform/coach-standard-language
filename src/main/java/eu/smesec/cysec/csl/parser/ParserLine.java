@@ -442,14 +442,14 @@ public class ParserLine {
     Matcher REGEX_FLOAT = Pattern.compile("^([-+]?\\d*\\.\\d+)").matcher(buffer);
     if (REGEX_FLOAT.find()) {
       // get float
-      String id = "" + Double.valueOf(REGEX_FLOAT.group(1));
+      double value = Double.parseDouble(REGEX_FLOAT.group(1));
       skipBytes(REGEX_FLOAT.group(1).length());
-      return new Atom(Atom.AtomType.FLOAT, id, null);
+      return Atom.fromFloat(value);
     } else if (REGEX_INTEGER.find()) {
       // get integer
-      String id = "" + Integer.valueOf(REGEX_INTEGER.group(1));
+      int value = Integer.parseInt(REGEX_INTEGER.group(1));
       skipBytes(REGEX_INTEGER.group(1).length());
-      return new Atom(Atom.AtomType.INTEGER, id, null);
+      return Atom.fromInteger(value);
     } else {
       throw new ParserException("Exception while getting numerical atom", this);
     }

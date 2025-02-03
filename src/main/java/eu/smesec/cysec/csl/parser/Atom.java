@@ -46,6 +46,14 @@ public class Atom {
     this.parentPointer = parent;
   }
 
+  public static Atom fromInteger(int value) {
+    return new Atom(AtomType.INTEGER, "" + value, null);
+  }
+
+  public static Atom fromFloat(double value) {
+    return new Atom(AtomType.FLOAT, "" + value, null);
+  }
+
   public static Atom fromBoolean(boolean b) {
     if(b) return Atom.TRUE;
     else return Atom.FALSE;
