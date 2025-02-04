@@ -26,7 +26,7 @@ public abstract class CommandAbstractBoolOp extends Command {
 
   @Override
   public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    if (list == null || list.size() < 1) {
+    if (list == null || list.isEmpty()) {
       throw new ExecutorException("boolean operations require at least one argument");
     }
     List<Boolean> blist = new Vector<>();

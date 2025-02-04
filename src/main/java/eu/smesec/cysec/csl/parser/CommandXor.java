@@ -21,17 +21,13 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * {@code xor(...args)} evaluates to {@link Atom#TRUE} if exactly one argument evaluates to {@link Atom#TRUE}.
+ */
 public class CommandXor extends CommandAbstractBoolOp {
 
   @Override
-  boolean evaluate(List<Boolean> list,ExecutorContext context) {
-    int ret = 0;
-    for ( boolean b:list ) {
-      if(b) {
-        ret++;
-      }
-    }
-    return ret==1;
+  boolean evaluate(List<Boolean> list, ExecutorContext context) {
+    return list.stream().filter(Boolean::booleanValue).count() == 1L;
   }
-
 }
