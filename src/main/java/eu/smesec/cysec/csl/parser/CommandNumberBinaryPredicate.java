@@ -35,8 +35,15 @@ public abstract class CommandNumberBinaryPredicate extends Command implements Bi
         checkNumParams(atoms, 2);
 
         // Extract arguments
-        Atom lhs = checkAtomType(atoms.get(0), Arrays.asList(Atom.AtomType.FLOAT, Atom.AtomType.INTEGER), true, coachContext, "leftHandSide");
-        Atom rhs = checkAtomType(atoms.get(1), Arrays.asList(Atom.AtomType.FLOAT, Atom.AtomType.INTEGER), true, coachContext, "rightHandSide");
+        Atom lhs;
+        Atom rhs;
+        try {
+            lhs = checkAtomType(atoms.get(0), Arrays.asList(Atom.AtomType.FLOAT, Atom.AtomType.INTEGER), true, coachContext, "leftHandSide");
+            rhs = checkAtomType(atoms.get(1), Arrays.asList(Atom.AtomType.FLOAT, Atom.AtomType.INTEGER), true, coachContext, "rightHandSide");
+        } catch (ExecutorException e) {
+            // If the parameters are not numbers we cannot compare them, thus the result of the comparison must be false
+            return Atom.FALSE;
+        }
 
         // Extract value and store as BigDecimal since it can store all other number types
         BigDecimal lhsVal = new BigDecimal(lhs.getId());
