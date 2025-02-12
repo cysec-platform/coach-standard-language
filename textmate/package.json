@@ -1,0 +1,22 @@
+{
+  "name": "csl",
+  "version": "1.0.0",
+  "description": "csl",
+  "contributes": {
+    "languages": [
+      {
+        "id": "csl",
+        "extensions": [
+          ".csl"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "csl",
+        "scopeName": "source.csl",
+        "path": "./csl.tmLanguage.json"
+      }
+    ]
+  }
+}
