@@ -123,23 +123,48 @@ public class CySeCExecutorContextFactory {
     }
 
     public RecommendationFactory.Recommendation getRecommendation (String id){
-      return recommendations.getRecommendation(id);
+      if (parent != null && parent instanceof CySeCExecutorContext) {
+        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
+        return parentContext.getRecommendation(id);
+      } else {
+        return recommendations.getRecommendation(id);
+      }
     }
 
     public RecommendationFactory.Recommendation[] getRecommendationList(){
-      return recommendations.getRecommendationList();
+      if (parent != null && parent instanceof CySeCExecutorContext) {
+        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
+        return parentContext.getRecommendationList();
+      } else {
+        return recommendations.getRecommendationList();
+      }
     }
 
     public void addRecommendation (RecommendationFactory.Recommendation r){
-      recommendations.addRecommendation(r);
+      if (parent != null && parent instanceof CySeCExecutorContext) {
+        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
+        parentContext.addRecommendation(r);
+      } else {
+        recommendations.addRecommendation(r);
+      }
     }
 
     public RecommendationFactory.Recommendation removeRecommendation (String id){
-      return recommendations.removeRecommendation(id);
+      if (parent != null && parent instanceof CySeCExecutorContext) {
+        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
+        return parentContext.removeRecommendation(id);
+      } else {
+        return recommendations.removeRecommendation(id);
+      }
     }
 
     public void setRecommendationListener(RecommendationEventListener listener) {
-      recommendations.setListener(listener);
+      if (parent != null && parent instanceof CySeCExecutorContext) {
+        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
+        parentContext.setRecommendationListener(listener);
+      } else {
+        recommendations.setListener(listener);
+      }
     }
 
     public BadgeFactory.Badge getBadge(String id){

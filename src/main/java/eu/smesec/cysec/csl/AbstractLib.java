@@ -19,6 +19,7 @@
  */
 package eu.smesec.cysec.csl;
 
+import eu.smesec.cysec.csl.skills.RecommendationFactory;
 import eu.smesec.cysec.platform.bridge.Command;
 import eu.smesec.cysec.platform.bridge.Commands;
 import eu.smesec.cysec.platform.bridge.FQCN;
@@ -41,6 +42,7 @@ import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
 import eu.smesec.cysec.csl.skills.Endurance;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 import eu.smesec.cysec.csl.utils.Utils;
+import eu.smesec.cysec.platform.bridge.md.Recommendation;
 import eu.smesec.cysec.platform.bridge.utils.Tuple;
 
 import java.io.IOException;
@@ -311,8 +313,15 @@ public abstract class AbstractLib implements CoachLibrary {
                         ScoreFactory.Score::getId,
                         ScoreFactory.Score::getValue));
 
-        // Add all subcoach varaibles into JSP model
+        // Add all subcoach variables into JSP model
         values.put("subcoachVariables", executorContext.getSubcoachVariablesCache());
+
+        // Add recommendations to JSP model
+        if (executorContext instanceof CySeCExecutorContextFactory.CySeCExecutorContext) {
+            CySeCExecutorContextFactory.CySeCExecutorContext cySeCExecutorContext = (CySeCExecutorContextFactory.CySeCExecutorContext) executorContext;
+            List<RecommendationFactory.Recommendation> recommendations = Arrays.asList(cySeCExecutorContext.getRecommendationList());
+            values.put("recommendations", recommendations);
+        }
 
         values.put(prop.getProperty("library.skills.endurance"), endurance.get());
         return values;
