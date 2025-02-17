@@ -19,8 +19,8 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class Atom {
 
@@ -30,9 +30,9 @@ public class Atom {
 
   public enum AtomType {METHODE, INTEGER, FLOAT, BOOL, STRING, NULL}
 
-  private AtomType type = null;
-  private String id = null;
-  private List<Atom> parameters = new Vector<>();
+  private final AtomType type;
+  private final String id;
+  private final List<Atom> parameters;
   private int parentPointer = 0;
 
   public Atom(AtomType type, String id, List<Atom> parameters) {
