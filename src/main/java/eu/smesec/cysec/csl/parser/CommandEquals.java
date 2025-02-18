@@ -52,26 +52,20 @@ public class CommandEquals extends Command {
       "rightValue"
     );
 
-    // Check equivalence
-    if(lhs.getType().equals(rhs.getType())) {
-      if(AtomType.NULL.equals(lhs.getType())) {
-        // Return TRUE if both atoms are of a NULL type
+    // Check that types are equal.
+    if (lhs.getType() == rhs.getType()) {
+      // Nulls are always equal.
+      if (lhs.getType() == AtomType.NULL) {
         return Atom.TRUE;
-      } else if (lhs.getType() != AtomType.METHODE) {
-        if(lhs.getId().equals(rhs.getId())) {
-          // Both atoms are of same type and value
-          return Atom.TRUE;
-        } else {
-          // The atoms are of the same type but contain different values
-          return Atom.FALSE;
-        }
-      } else {
-        return Atom.FALSE;
       }
-    } else {
-      // types are inequal
-      return Atom.FALSE;
-    }
-  }
 
+      // All other values check equality through their id.
+      if (rhs.getId().equals(lhs.getId())) {
+        return Atom.TRUE;
+      }
+    }
+
+    // Either the types were unequal, or their ids were unequal.
+    return Atom.FALSE;
+  }
 }
