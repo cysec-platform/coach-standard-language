@@ -54,7 +54,7 @@ public class CommandSetHidden extends Command {
       question.setHidden(Boolean.valueOf(varContentBool.getId()));
     }
 
-    return new Atom(Atom.AtomType.NULL, null, null);
+    return Atom.NULL_ATOM;
   }
 
 }

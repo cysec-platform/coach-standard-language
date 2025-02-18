@@ -50,7 +50,7 @@ public class CommandAddRecommendation extends Command {
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     c.addRecommendation(new RecommendationFactory.Recommendation(recommendationName.getId(), Integer.valueOf(order.getId()), urlImg.getId(), altImg.getId(), title.getId(), description.getId(), textLink.getId(), urlLink.getId()));
 
-    return null;
+    return Atom.NULL_ATOM;
   }
 
 }

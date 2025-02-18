@@ -49,7 +49,7 @@ public class CommandRemoveSubcoach extends Command {
       coachContext.getLogger().log(Level.SEVERE, "Error trying to remove sub-coach", e);
     }
 
-    return null;
+    return Atom.NULL_ATOM;
   }
 
 }

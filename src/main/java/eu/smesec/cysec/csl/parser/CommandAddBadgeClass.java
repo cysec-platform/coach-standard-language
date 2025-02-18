@@ -56,7 +56,6 @@ public class CommandAddBadgeClass extends Command {
     }
     b.addBadgeClass(new BadgeFactory.BadgeClass(badgeClassName.getId(), Integer.valueOf(order.getId()), urlImg.getId(), altImg.getId(), description.getId(), urlLink.getId()));
 
-    return null;
+    return Atom.NULL_ATOM;
   }
-
 }

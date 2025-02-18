@@ -89,7 +89,6 @@ public class CommandCreateSubcoach extends Command {
       }
     }
 
-    return null;
+    return Atom.NULL_ATOM;
   }
-
 }
