@@ -87,6 +87,10 @@ public class RecommendationFactory {
             return urlLink;
         }
 
+        public List<Tag> getTags() {
+            return tags;
+        }
+
         private String objStr() {
             return "" + id + ":" + order + ":" + urlImg + ":" + altImg + ":" + title + ":" + description + ":" + textLink + ":" + urlLink + "|";
         }
@@ -260,13 +264,9 @@ public class RecommendationFactory {
      * @return An array of all assigned recommendations
      */
     public Recommendation[] getRecommendationList() {
-        Map<Integer, Recommendation> ret = new TreeMap<>();
-        synchronized (recommendations) {
-            for (Recommendation r : recommendations.values()) {
-                ret.put(r.getOrder(), r);
-            }
-        }
-        return new ArrayList<>(ret.values()).toArray(new Recommendation[ret.size()]);
+        ArrayList<Recommendation> recs = new ArrayList<>(recommendations.values());
+        recs.sort(Comparator.comparingInt(Recommendation::getOrder));
+        return recs.toArray(new Recommendation[0]);
     }
 
     /**

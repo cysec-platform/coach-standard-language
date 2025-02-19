@@ -19,6 +19,8 @@
  */
 package eu.smesec.cysec.csl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
 import eu.smesec.cysec.platform.bridge.Command;
 import eu.smesec.cysec.platform.bridge.Commands;
@@ -320,7 +322,12 @@ public abstract class AbstractLib implements CoachLibrary {
         if (executorContext instanceof CySeCExecutorContextFactory.CySeCExecutorContext) {
             CySeCExecutorContextFactory.CySeCExecutorContext cySeCExecutorContext = (CySeCExecutorContextFactory.CySeCExecutorContext) executorContext;
             List<RecommendationFactory.Recommendation> recommendations = Arrays.asList(cySeCExecutorContext.getRecommendationList());
-            values.put("recommendations", recommendations);
+            try {
+                String json = new ObjectMapper().writeValueAsString(recommendations);
+                values.put("recommendationsJson",  json);
+            } catch (JsonProcessingException e) {
+                logger.severe("There was an error while trying to JSON-serialize the recommendation: " + e.getMessage());
+            }
         }
 
         values.put(prop.getProperty("library.skills.endurance"), endurance.get());
