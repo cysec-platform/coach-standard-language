@@ -28,13 +28,7 @@ import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-import eu.smesec.cysec.platform.bridge.generated.Answer;
-import eu.smesec.cysec.platform.bridge.generated.Block;
-import eu.smesec.cysec.platform.bridge.generated.Metadata;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-import eu.smesec.cysec.platform.bridge.generated.QuestionType;
-import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
-import eu.smesec.cysec.platform.bridge.generated.Questions;
+import eu.smesec.cysec.platform.bridge.generated.*;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
 import eu.smesec.cysec.csl.parser.ExecutorContext;
 import eu.smesec.cysec.csl.parser.ExecutorException;
@@ -44,7 +38,6 @@ import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
 import eu.smesec.cysec.csl.skills.Endurance;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 import eu.smesec.cysec.csl.utils.Utils;
-import eu.smesec.cysec.platform.bridge.md.Recommendation;
 import eu.smesec.cysec.platform.bridge.utils.Tuple;
 
 import java.io.IOException;
@@ -314,6 +307,18 @@ public abstract class AbstractLib implements CoachLibrary {
                 .collect(Collectors.toMap(
                         ScoreFactory.Score::getId,
                         ScoreFactory.Score::getValue));
+
+        // Add a mapping from question ID to FQCN into the JSP model
+        // This is needed to correctly link to questions in recommendations
+        try {
+            Map<String, String> questionFqcnMapping = cal.getActiveQuestionsWithFqcn().stream()
+                    .map(tuple -> new Tuple<>(tuple.getFirst().toString(), tuple.getSecond().getId()))
+                    .collect(Collectors.toMap(Tuple::getSecond, Tuple::getFirst));
+            String json = new ObjectMapper().writeValueAsString(questionFqcnMapping);
+            values.put("questionFqcnMappingJson", json);
+        } catch (CacheException | JsonProcessingException e) {
+            logger.severe("There was an error while fetching all questions: " + e.getMessage());
+        }
 
         // Add all subcoach variables into JSP model
         values.put("subcoachVariables", executorContext.getSubcoachVariablesCache());
