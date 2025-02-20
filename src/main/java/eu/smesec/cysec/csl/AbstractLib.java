@@ -313,7 +313,7 @@ public abstract class AbstractLib implements CoachLibrary {
         try {
             Map<String, String> questionFqcnMapping = cal.getActiveQuestionsWithFqcn().stream()
                     .map(tuple -> new Tuple<>(tuple.getFirst().toString(), tuple.getSecond().getId()))
-                    .collect(Collectors.toMap(Tuple::getSecond, Tuple::getFirst));
+                    .collect(Collectors.toMap(Tuple::getSecond, Tuple::getFirst, (a, b) -> a));
             String json = new ObjectMapper().writeValueAsString(questionFqcnMapping);
             values.put("questionFqcnMappingJson", json);
         } catch (CacheException | JsonProcessingException e) {
