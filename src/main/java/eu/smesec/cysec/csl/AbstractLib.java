@@ -100,6 +100,9 @@ public abstract class AbstractLib implements CoachLibrary {
         if (instance.equals(activeInstance)) return;
         activeInstance = instance;
         executorContext.clearVariables();
+        if (executorContext instanceof CySeCExecutorContextFactory.CySeCExecutorContext) {
+            ((CySeCExecutorContextFactory.CySeCExecutorContext) executorContext).setActiveInstance(instance);
+        }
     }
 
     @Override
@@ -326,7 +329,7 @@ public abstract class AbstractLib implements CoachLibrary {
         // Add recommendations to JSP model
         if (executorContext instanceof CySeCExecutorContextFactory.CySeCExecutorContext) {
             CySeCExecutorContextFactory.CySeCExecutorContext cySeCExecutorContext = (CySeCExecutorContextFactory.CySeCExecutorContext) executorContext;
-            List<RecommendationFactory.Recommendation> recommendations = Arrays.asList(cySeCExecutorContext.getRecommendationList());
+            List<RecommendationFactory.Recommendation> recommendations = cySeCExecutorContext.getRecommendationListIncludingSubcoaches();
             try {
                 String json = new ObjectMapper().writeValueAsString(recommendations);
                 values.put("recommendationsJson",  json);

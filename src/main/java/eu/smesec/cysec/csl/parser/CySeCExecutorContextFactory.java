@@ -19,7 +19,6 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
 import eu.smesec.cysec.csl.skills.BadgeEventListener;
 import eu.smesec.cysec.csl.skills.BadgeFactory;
@@ -32,6 +31,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
 
@@ -82,6 +82,8 @@ public class CySeCExecutorContextFactory {
     private String contextId;
     private Map<String, Map<String, Atom>> subcoachVariableCache = new HashMap<>();
     private Map<String, List<String>> subcoachActiveQuestionsCache = new HashMap<>();
+    private Map<String, RecommendationFactory> subcoachRecommendationsCache = new HashMap<>();
+    private String activeInstance;
 
     public CySeCExecutorContext(String contextId, Logger log) {
       if (log != null) {
@@ -122,28 +124,48 @@ public class CySeCExecutorContextFactory {
       return contextId;
     }
 
-    public RecommendationFactory.Recommendation getRecommendation (String id){
+    public RecommendationFactory.Recommendation getRecommendation (String id) {
       if (parent != null && parent instanceof CySeCExecutorContext) {
         CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        return parentContext.getRecommendation(id);
+        return parentContext
+                .subcoachRecommendationsCache
+                .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
+                .getRecommendation(id);
       } else {
         return recommendations.getRecommendation(id);
       }
     }
 
-    public RecommendationFactory.Recommendation[] getRecommendationList(){
+    public RecommendationFactory.Recommendation[] getRecommendationList() {
       if (parent != null && parent instanceof CySeCExecutorContext) {
         CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        return parentContext.getRecommendationList();
+        return parentContext
+                .subcoachRecommendationsCache
+                .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
+                .getRecommendationList();
       } else {
         return recommendations.getRecommendationList();
+      }
+    }
+
+    public List<RecommendationFactory.Recommendation> getRecommendationListIncludingSubcoaches() {
+      if (parent != null && parent instanceof CySeCExecutorContext) {
+        return Arrays.asList(getRecommendationList());
+      } else {
+        return Stream.concat(Stream.of(recommendations), subcoachRecommendationsCache.values().stream())
+                .flatMap(r -> Arrays.stream(r.getRecommendationList()))
+                .distinct()
+                .collect(Collectors.toList());
       }
     }
 
     public void addRecommendation (RecommendationFactory.Recommendation r){
       if (parent != null && parent instanceof CySeCExecutorContext) {
         CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        parentContext.addRecommendation(r);
+        parentContext
+                .subcoachRecommendationsCache
+                .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
+                .addRecommendation(r);
       } else {
         recommendations.addRecommendation(r);
       }
@@ -152,7 +174,10 @@ public class CySeCExecutorContextFactory {
     public RecommendationFactory.Recommendation removeRecommendation (String id){
       if (parent != null && parent instanceof CySeCExecutorContext) {
         CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        return parentContext.removeRecommendation(id);
+        return parentContext
+                .subcoachRecommendationsCache
+                .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
+                .removeRecommendation(id);
       } else {
         return recommendations.removeRecommendation(id);
       }
@@ -161,7 +186,10 @@ public class CySeCExecutorContextFactory {
     public void setRecommendationListener(RecommendationEventListener listener) {
       if (parent != null && parent instanceof CySeCExecutorContext) {
         CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        parentContext.setRecommendationListener(listener);
+        parentContext
+                .subcoachRecommendationsCache
+                .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
+                .setListener(listener);
       } else {
         recommendations.setListener(listener);
       }
@@ -314,6 +342,10 @@ public class CySeCExecutorContextFactory {
     @Override
     public Map<String, List<String>> getSubcoachActiveQuestionsCache() {
       return subcoachActiveQuestionsCache;
+    }
+
+    public void setActiveInstance(String activeInstance) {
+      this.activeInstance = activeInstance;
     }
   }
 
