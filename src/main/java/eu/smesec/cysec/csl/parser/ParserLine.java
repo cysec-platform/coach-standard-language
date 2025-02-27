@@ -512,9 +512,8 @@ public class ParserLine {
         skipBytes(1);
         skipNoFunc();
 
-        ret = new Atom(Atom.AtomType.METHODE, commandName, parameters);
+        ret = Atom.fromCommand(commandName, parameters);
         ret.setParent(parentPointer);
-
       }
     } else {
       throw new ParserUnexpectedTokenException(this);

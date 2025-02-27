@@ -35,15 +35,14 @@ public class Atom {
   private final List<Atom> parameters;
   private int parentPointer = 0;
 
-  public Atom(AtomType type, String id, List<Atom> parameters) {
+  private Atom(AtomType type, String id, List<Atom> parameters) {
     this.type = type;
     this.id = id;
     this.parameters = parameters;
   }
 
-  public Atom(AtomType type, String id, List<Atom> parameters, int parent) {
-    this(type,id,parameters);
-    this.parentPointer = parent;
+  public static Atom fromCommand(String commandName, List<Atom> parameters) {
+    return new Atom(AtomType.METHODE, commandName, parameters);
   }
 
   public static Atom fromInteger(int value) {
