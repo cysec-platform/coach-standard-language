@@ -25,25 +25,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * {@code arrayAdd("arrName", "element"[, unique = FALSE])} adds the given element to the end of the array
+ * identified by the name. If the optional parameter {@code unique} is provided and set to {@link Atom#TRUE},
+ * duplicate entries are removed from the Array. Always returns {@link Atom#TRUE}.
+ */
 public class CommandArrayAdd extends CommandAbstractList {
 
   @Override
-  /**
-   * Adds an element to an existing array.
-   *
-   * <p>This command has two mandatory parameter:
-   *   <ul>
-   *     <li>(arrayList; String)The array to append to.</li>
-   *     <li>(arrayElement; String)The element to be appended.</li>
-   *   </ul>
-   * </p>
-   * <p>This Command has one optional parameter:
-   *   <ul>
-   *     <li>(boolean; default false) Remove duplicated entries and sort.</li>
-   *   </ul>
-   * </p>
-   * @returns Always true
-   */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
     // expects 2-3 parameters
     checkNumParams(aList, 2, 3);

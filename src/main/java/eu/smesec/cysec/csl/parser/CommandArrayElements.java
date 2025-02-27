@@ -23,20 +23,12 @@ import eu.smesec.cysec.csl.parser.Atom.AtomType;
 
 import java.util.List;
 
+/**
+ * {@code arrayElements(arrName, length)} checks whether the array is of the given length.
+ */
 public class CommandArrayElements extends CommandAbstractList {
 
   @Override
-  /**
-   * Checks if an array has the specified size.
-   *
-   * <p>This command has two mandatory parameter:
-   *   <ul>
-   *     <li>(arrayList; String)The array to append to.</li>
-   *     <li>(arrayLength; String)The element to be appended.</li>
-   *   </ul>
-   * </p>
-   * @returns Always true
-   */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
     // expects 2 parameter
     checkNumParams(aList, 2);

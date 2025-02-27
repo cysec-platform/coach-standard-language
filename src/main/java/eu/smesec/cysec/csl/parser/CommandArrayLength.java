@@ -23,19 +23,12 @@ import eu.smesec.cysec.csl.parser.Atom.AtomType;
 
 import java.util.List;
 
+/**
+ * {@code arrayLength(array)} returns the length of the array specified in the name.
+ */
 public class CommandArrayLength extends CommandAbstractList {
 
   @Override
-  /**
-   * Returns the size of the specified array as Integer.
-   *
-   * <p>This command has one mandatory parameter:
-   *   <ul>
-   *     <li>(arrayList; String)The array to append to.</li>
-   *   </ul>
-   * </p>
-   * @returns Always true
-   */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
     // expects 1 parameter
     checkNumParams(aList, 1);

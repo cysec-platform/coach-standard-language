@@ -25,25 +25,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * {@code arrayRemove("arrName", "element"[, unique = FALSE])} removes the given element from the array
+ * identified by the name. If the optional parameter {@code unique} is provided and set to {@link Atom#TRUE},
+ * duplicate entries are removed from the Array. Always returns {@link Atom#TRUE}.
+ */
 public class CommandArrayRemove extends CommandAbstractList {
 
   @Override
-  /**
-   * Adds an element to an existing array.
-   *
-   * <p>This command has two mandatory parameter:
-   *   <ul>
-   *     <li>(arrayList; String)The array to append to.</li>
-   *     <li>(arrayElement; String)The element to be appended.</li>
-   *   </ul>
-   * </p>
-   * <p>This Command has one optional parameter:
-   *   <ul>
-   *     <li>(boolean; default false) Remove duplicated entries and sort.</li>
-   *   </ul>
-   * </p>
-   * @returns Always true
-   */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
     // expects 2-3 parameters
     checkNumParams(aList, 2, 3);
@@ -52,10 +41,23 @@ public class CommandArrayRemove extends CommandAbstractList {
     Atom arr = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "array");
     Atom elem = checkAtomType(aList.get(1), AtomType.STRING, true, coachContext, "element");
     Atom unique = Atom.FALSE;
+    if(aList.size() > 2) {
+      unique = checkAtomType(aList.get(2), AtomType.BOOL, true, coachContext, "unique");
+    }
 
-    List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
+    Atom arrayVar = coachContext.getContext().getVariable(arr.getId(), null);
+    if (arrayVar == null) {
+      throw new ExecutorException(String.format("arrayRemove failed because the array '%s' couldn't be found. You cannot remove an element from an array that does not exist!\n", arr.getId()));
+    }
+    List<String> tempList = stringToList(arrayVar.getId());
     tempList.remove(elem.getId());
 
+    // process unique modifier
+    if(unique.isTrue(coachContext)) {
+      Set<String> tempSet = new HashSet<>(tempList);
+      tempList.clear();
+      tempList.addAll(tempSet);
+    }
 
     coachContext.getContext().setVariable(arr.getId(), Atom.fromString(listToString(tempList)), null);
 
