@@ -21,6 +21,11 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * {@code if(condition, trueBranch[, falseBranch = FALSE])} evaluates the condition and checks whether
+ * that evaluates to {@link Atom#TRUE}. If so, evaluates and returns the value of the second parameter,
+ * if not, it evaluates the false branch in the third parameter.
+ */
 public class CommandIf extends Command {
 
   /**
@@ -35,29 +40,25 @@ public class CommandIf extends Command {
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
     checkNumParams(aList, 2, 3);
 
-    Atom cond = aList.get(0);
-
-    Atom ret = null;
+    Atom condition = aList.get(0);
+    Atom trueBranch = aList.get(1);
+    Atom falseBranch = Atom.FALSE;
+    if(aList.size() > 2) {
+      falseBranch = aList.get(2);
+    }
 
     boolean isTrue;
     try {
-      isTrue = cond.isTrue(coachContext);
+      isTrue = condition.isTrue(coachContext);
     } catch(ExecutorException e) {
-      throw new ExecutorException("Error while executing if condition "+aList.get(0) ,e);
+      throw new ExecutorException("Error while executing if condition " + condition, e);
     }
+
+    // Evaluates the correct branch and returns its result.
     if (isTrue) {
-      ret = aList.get(1).execute(coachContext);
+      return trueBranch.execute(coachContext);
     } else {
-      if(aList.size()==3) {
-        ret = aList.get(2).execute(coachContext);
-      } else {
-        ret = Atom.FALSE;
-      }
-    }
-    if (ret != null) {
-      return ret;
-    } else {
-      return Atom.FALSE;
+      return falseBranch.execute(coachContext);
     }
   }
 }
