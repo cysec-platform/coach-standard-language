@@ -22,6 +22,10 @@ package eu.smesec.cysec.csl.parser;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * {@code set(name, [context,] value)} stores the given value, optionally under the specified
+ * context, so it can be referenced later. The context defaults to the question ID.
+ */
 public class CommandSetVar extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {

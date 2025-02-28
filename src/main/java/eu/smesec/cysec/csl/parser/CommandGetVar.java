@@ -24,6 +24,10 @@ import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * {@code get(name [, default [, context]])} appends the given string, optionally under the specified
+ * context, to the specified variable. The context defaults to the question ID.
+ */
 public class CommandGetVar extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
