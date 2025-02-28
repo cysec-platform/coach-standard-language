@@ -54,7 +54,7 @@ public class CommandAddBadgeClass extends Command {
     if (b == null) {
       throw new ExecutorException("Badge id "+badgeName.getId()+" is not known");
     }
-    b.addBadgeClass(new BadgeFactory.BadgeClass(badgeClassName.getId(), Integer.valueOf(order.getId()), urlImg.getId(), altImg.getId(), description.getId(), urlLink.getId()));
+    b.addBadgeClass(new BadgeFactory.BadgeClass(badgeClassName.getId(), Integer.parseInt(order.getId()), urlImg.getId(), altImg.getId(), description.getId(), urlLink.getId()));
 
     return Atom.NULL_ATOM;
   }

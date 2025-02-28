@@ -45,7 +45,7 @@ public class CommandSetMHidden extends Command {
     // evaluate parameters
     Atom varLowId = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "lowID");
     Atom varHighId = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "highID");
-    boolean varContentBool = Boolean.valueOf(checkAtomType(aList.get(2), Atom.AtomType.BOOL, true, coachContext, "hideState").getId());
+    boolean varContentBool = Boolean.parseBoolean(checkAtomType(aList.get(2), Atom.AtomType.BOOL, true, coachContext, "hideState").getId());
     coachContext.getLogger().info(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), varContentBool));
 
     // Update question hidden status

@@ -49,12 +49,11 @@ public class CommandSetHidden extends Command {
         .findFirst()
         .orElseThrow(
             () -> new ExecutorException("Question id " + questionID.getId() + " doesn't exist"));
-    if(question.isHidden()!=Boolean.valueOf(varContentBool.getId())) {
+    if(question.isHidden() != Boolean.parseBoolean(varContentBool.getId())) {
       coachContext.getLogger().info(String.format("question %s is new set to hidden=%s (setHidden)", question.getId(), varContentBool.getId()));
-      question.setHidden(Boolean.valueOf(varContentBool.getId()));
+      question.setHidden(Boolean.parseBoolean(varContentBool.getId()));
     }
 
     return Atom.NULL_ATOM;
   }
-
 }

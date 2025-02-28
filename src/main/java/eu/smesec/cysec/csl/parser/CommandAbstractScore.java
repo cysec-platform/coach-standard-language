@@ -34,12 +34,11 @@ public abstract class CommandAbstractScore extends Command {
     Atom scoreValue = checkAtomType(aList.get(1), Arrays.asList(AtomType.INTEGER, AtomType.FLOAT), true, coachContext, "scoreValue");
 
     // set the score
-    score(scoreName.getId(), coachContext.getQuestionContext().getId(), Double.valueOf(scoreValue.getId()), coachContext.getContext());
-    coachContext.getLogger().info( String.format("Adding %s to score %s in context %s", scoreValue.getId(), scoreName.getId(), coachContext.getContext()));
+    score(scoreName.getId(), coachContext.getQuestionContext().getId(), Double.parseDouble(scoreValue.getId()), coachContext.getContext());
+    coachContext.getLogger().info(String.format("Adding %s to score %s in context %s", scoreValue.getId(), scoreName.getId(), coachContext.getContext()));
 
     return Atom.NULL_ATOM;
   }
 
   abstract void score(String scoreId, String questionId, double value, ExecutorContext context);
-
 }

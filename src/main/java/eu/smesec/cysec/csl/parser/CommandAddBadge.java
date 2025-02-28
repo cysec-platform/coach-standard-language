@@ -53,7 +53,7 @@ public class CommandAddBadge extends Command {
     if (b != null) {
       throw new ExecutorException("Badge id "+badgeName.getId()+" does already exist");
     }
-    c.setBadge(new BadgeFactory.Badge(badgeName.getId(), Integer.valueOf(order.getId()), urlImg.getId(), altImg.getId(), description.getId(), urlLink.getId()));
+    c.setBadge(new BadgeFactory.Badge(badgeName.getId(), Integer.parseInt(order.getId()), urlImg.getId(), altImg.getId(), description.getId(), urlLink.getId()));
 
     return Atom.NULL_ATOM;
   }

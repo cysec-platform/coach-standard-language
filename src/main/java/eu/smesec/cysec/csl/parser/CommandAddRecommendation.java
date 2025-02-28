@@ -48,9 +48,8 @@ public class CommandAddRecommendation extends Command {
 
     // execute command
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
-    c.addRecommendation(new RecommendationFactory.Recommendation(recommendationName.getId(), Integer.valueOf(order.getId()), urlImg.getId(), altImg.getId(), title.getId(), description.getId(), textLink.getId(), urlLink.getId()));
+    c.addRecommendation(new RecommendationFactory.Recommendation(recommendationName.getId(), Integer.parseInt(order.getId()), urlImg.getId(), altImg.getId(), title.getId(), description.getId(), textLink.getId(), urlLink.getId()));
 
     return Atom.NULL_ATOM;
   }
-
 }
