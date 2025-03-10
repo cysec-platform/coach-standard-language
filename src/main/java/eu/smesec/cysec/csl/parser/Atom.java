@@ -41,23 +41,49 @@ public class Atom {
     this.parameters = parameters;
   }
 
+  /**
+   * Create an Atom representing a method call with the given parameters.
+   * <p>
+   * This method does not actually verify the command name, use {@link #validateCommand(String)}
+   * for that purpose.
+   */
   public static Atom fromCommand(String commandName, List<Atom> parameters) {
     return new Atom(AtomType.METHODE, commandName, parameters);
   }
 
+  /**
+   * Create an Atom representing the given integer value.
+   * Note that we only store its String representation, so the value
+   * has to be recovered when needed.
+   */
   public static Atom fromInteger(int value) {
     return new Atom(AtomType.INTEGER, "" + value, null);
   }
 
+  /**
+   * Create an Atom representing the given double floating-point value.
+   * Note that we only store its String representation, so the value
+   * has to be recovered when needed.
+   */
   public static Atom fromFloat(double value) {
     return new Atom(AtomType.FLOAT, "" + value, null);
   }
 
+  /**
+   * Returns either {@link Atom#TRUE} or {@link Atom#FALSE} depending
+   * on the value of the boolean.
+   * <p>
+   * This factory method ensures that those two are the only possible boolean
+   * atoms in existence.
+   */
   public static Atom fromBoolean(boolean b) {
     if(b) return Atom.TRUE;
     else return Atom.FALSE;
   }
 
+  /**
+   * Create a String Atom from the given String.
+   */
   public static Atom fromString(String s) {
     return new Atom(Atom.AtomType.STRING, s, null);
   }
@@ -112,24 +138,33 @@ public class Atom {
     }
   }
 
+  /**
+   * Check whether the given name could be resolved to a {@link Command}.
+   */
   public static boolean validateCommand(String name) {
     return Command.getCommand(name) != null;
   }
 
+  /**
+   * Replaces the parent pointer for this Atom, returning the old one.
+   */
   public int setParent(int parentPointer) {
     int ret = this.parentPointer;
     this.parentPointer = parentPointer;
     return ret;
   }
 
+  /** The type of this Atom. */
   public AtomType getType() {
     return type;
   }
 
+  /** The String id of this Atom, or {@code null} in the case of {@link Atom#NULL_ATOM}. */
   public String getId() {
     return id;
   }
 
+  // FIXME Java 14 Switch Expressions
   public String toString() {
     String ret;
     switch (type) {
@@ -165,7 +200,7 @@ public class Atom {
         ret = id;
         break;
       default:
-        throw new NullPointerException("type " + type + " cannot be printed (Not implemented)");
+        throw new IllegalArgumentException("type " + type + " cannot be printed (Not implemented)");
     }
     return ret;
   }
@@ -185,6 +220,7 @@ public class Atom {
     } else if ("FALSE".equals(eval.getId())) {
       return false;
     } else {
+      // Technically cannot happen anymore, but better safe than sorry.
       throw new ExecutorException("boolean value is illegal \"" + eval + "\" (OUCH! How did that happen)");
     }
   }
