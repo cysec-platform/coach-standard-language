@@ -29,6 +29,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * {@code isSelected(answerId)} checks whether the given answer ID is selected or not.
+ */
 public class CommandIsSelected extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
@@ -67,7 +70,7 @@ public class CommandIsSelected extends Command {
       }
 
     } catch (CacheException e) {
-      coachContext.getLogger().log(Level.SEVERE, String.format("Error loading answer %s", varContent.getId()));
+      coachContext.getLogger().log(Level.SEVERE, String.format("Error loading answer %s", queriedAnswerId.getId()), e);
     }
 
     // determine provided option is selected

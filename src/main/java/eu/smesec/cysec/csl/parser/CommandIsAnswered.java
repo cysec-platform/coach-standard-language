@@ -26,6 +26,12 @@ import eu.smesec.cysec.platform.bridge.generated.Question;
 
 import java.util.List;
 
+/**
+ * {@code isAnswered(questionId)} checks whether the given question ID has been answered.
+ * Hidden questions get treated as unanswered.
+ *
+ * @see CommandIsSelected
+ */
 public class CommandIsAnswered extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
@@ -47,14 +53,14 @@ public class CommandIsAnswered extends Command {
 
     // determine provided option is selected
     ILibCal cal = coachContext.getCal();
-    Answer answer = null;
+    Answer answer;
     try {
       // Attention: Use the inner Id of the questionId Atom. getAnswer accepts Object, unfortunately.
       // Answer object in CoachContext is answer of evaluated question, isAnswered may be executed for another question
       // which is not in the current context.
       answer = cal.getAnswer(coachContext.getFqcn().toString(), questionId.getId());
     } catch (CacheException e) {
-      throw new NullPointerException();
+      throw new NullPointerException("Could not get isAnswered state for: " + questionId.getId());
     }
     return Atom.fromBoolean(answer != null);
   }
