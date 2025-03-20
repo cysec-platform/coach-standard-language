@@ -23,6 +23,9 @@ import eu.smesec.cysec.csl.parser.Atom.AtomType;
 
 import java.util.List;
 
+/**
+ * {@code contains(haystack, needle)} checks whether the given needle is within the haystack strign.
+ */
 public class CommandContains extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
@@ -35,5 +38,4 @@ public class CommandContains extends Command {
 
     return Atom.fromBoolean(haystack.getId().contains(needle.getId()));
   }
-
 }

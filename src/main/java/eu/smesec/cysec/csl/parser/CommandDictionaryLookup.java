@@ -24,7 +24,7 @@ import eu.smesec.cysec.platform.bridge.generated.Dictionary;
 import java.util.List;
 
 /**
- * A command that replaces the provided key with the referenced entry in the coach dictionary
+ * {@code tn(dictionaryKey)} evaluates to the entry's translation in the coach dictionary.
  */
 public class CommandDictionaryLookup extends Command {
 

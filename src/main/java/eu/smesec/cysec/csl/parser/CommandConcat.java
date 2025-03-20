@@ -21,6 +21,9 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * {@code concat(...args)} concatenates all given arguments as strings, returning the result.
+ */
 public class CommandConcat extends Command {
 
   @Override
