@@ -31,6 +31,8 @@ import java.util.List;
  *
  * <p>Syntax: setHidden(id, hidden);</p>
  * <p>Example: setHidden("q20", FALSE);</p>
+ *
+ * Returns null.
  */
 public class CommandSetHidden extends Command {
 
@@ -41,7 +43,8 @@ public class CommandSetHidden extends Command {
 
     // evaluate parameters
     Atom questionID = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "questionID");
-    Atom varContentBool = checkAtomType(aList.get(1), Atom.AtomType.BOOL, true, coachContext, "hideState");
+    Atom hideStateVar = checkAtomType(aList.get(1), Atom.AtomType.BOOL, true, coachContext, "hideState");
+    boolean hideState = Boolean.parseBoolean(hideStateVar.getId());
 
     // Update question hidden status
     Question question = coachContext.getCoach().getQuestions().getQuestion().stream()
@@ -49,9 +52,11 @@ public class CommandSetHidden extends Command {
         .findFirst()
         .orElseThrow(
             () -> new ExecutorException("Question id " + questionID.getId() + " doesn't exist"));
-    if(question.isHidden() != Boolean.parseBoolean(varContentBool.getId())) {
-      coachContext.getLogger().info(String.format("question %s is new set to hidden=%s (setHidden)", question.getId(), varContentBool.getId()));
-      question.setHidden(Boolean.parseBoolean(varContentBool.getId()));
+
+    // Check if a change actually occurs.
+    if(question.isHidden() != hideState) {
+      coachContext.getLogger().info(String.format("question %s is now set to hidden=%s (setHidden)", question.getId(), hideStateVar));
+      question.setHidden(hideState);
     }
 
     return Atom.NULL_ATOM;

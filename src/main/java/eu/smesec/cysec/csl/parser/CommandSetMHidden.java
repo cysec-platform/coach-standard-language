@@ -19,22 +19,20 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import eu.smesec.cysec.platform.bridge.generated.Question;
 
 import java.util.List;
 
 /**
  * This command modifies the display status of multiple question from hidden to show (or vice
- * versa).
+ * versa). Returns the count of updated questions.
  *
  * <p>Remember to add a condition to hide a question again, if it should not be displayed all the
  * time once it is unhidden.</p>
  *
  * <p>Syntax: setMHidden(lowID, highID, hidden);</p>
  * <p>Example: setMHidden("q20", "q40", FALSE); // this updates all question ids starting with
- * "q20"
- * (inclusive) and "q40" (exclusive).</p>
+ *                                                 "q20" (inclusive) and "q40" (exclusive).</p>
  */
 public class CommandSetMHidden extends Command {
 
@@ -45,23 +43,34 @@ public class CommandSetMHidden extends Command {
     // evaluate parameters
     Atom varLowId = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "lowID");
     Atom varHighId = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "highID");
-    boolean varContentBool = Boolean.parseBoolean(checkAtomType(aList.get(2), Atom.AtomType.BOOL, true, coachContext, "hideState").getId());
-    coachContext.getLogger().info(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), varContentBool));
+    Atom hideStateVar = checkAtomType(aList.get(2), Atom.AtomType.BOOL, true, coachContext, "hideState");
+    boolean hideState = Boolean.parseBoolean(hideStateVar.getId());
+    String hideStateText = hideState ? "HIDDEN" : "VISIBLE";
+
+    coachContext.getLogger().info(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), hideStateVar));
 
     // Update question hidden status
-    int cnt = 0;
+    int updatedCount = 0;
     for (Question question : coachContext.getCoach().getQuestions().getQuestion()) {
       //coachContext.getLogger().info(String.format("    low:  %s?=%s=%s", varLowId.getId(),question.getId(), varLowId.getId().compareTo(question.getId())));
       //coachContext.getLogger().info(String.format("    high: %s?=%s=%s", varHighId.getId(),question.getId(), varHighId.getId().compareTo(question.getId())));
       if (varLowId.getId().compareTo(question.getId()) <= 0
           && varHighId.getId().compareTo(question.getId()) > 0
-          && question.isHidden()!=varContentBool) {
-        question.setHidden(varContentBool);
-        coachContext.getLogger().info(String.format("  question %s is new set to hidden=%s (%d/%d)", question.getId(), varContentBool?"HIDDEN":"VISIBLE",varLowId.getId().compareTo(question.getId()),varHighId.getId().compareTo(question.getId())));
-        cnt++;
+          && question.isHidden() != hideState) {
+        question.setHidden(hideState);
+        coachContext.getLogger().info(
+          String.format(
+            "  question %s is now set to hidden=%s (%d/%d)",
+            question.getId(),
+            hideStateText,
+            varLowId.getId().compareTo(question.getId()),
+            varHighId.getId().compareTo(question.getId())
+          )
+        );
+        updatedCount++;
       }
     }
 
-    return Atom.fromInteger(cnt);
+    return Atom.fromInteger(updatedCount);
   }
 }

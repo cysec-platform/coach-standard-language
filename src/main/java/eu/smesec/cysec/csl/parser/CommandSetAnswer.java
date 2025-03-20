@@ -30,12 +30,11 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * Set an answer for another question by passing the question id as first parameter and the decired value
- * as second parameter.
+ * {@code setAnswer("qid", "answer")} sets the answer(s) for another question.
+ * <br>
+ * <b>Special note on Astar questions:</b>
  * <br><br>
- * <b>Astar questions:</b>
- * <br><br>
- * To select multiple values pass the option ids space seperated. Note that the answer value will
+ * To select multiple answers at once, pass the Option IDs seperated by Spaces. Note that the answer value will
  * <b>overwrite</b> any existing values (so already selected options are not respected).
  */
 public class CommandSetAnswer extends Command {
@@ -87,10 +86,9 @@ public class CommandSetAnswer extends Command {
       }
 
     } catch (CacheException e) {
-      throw new ExecutorException("error while setting answer of question");
+      throw new ExecutorException("Error while setting answer of question");
     }
 
     return Atom.NULL_ATOM;
   }
-
 }
