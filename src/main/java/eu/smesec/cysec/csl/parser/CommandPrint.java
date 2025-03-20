@@ -28,15 +28,12 @@ public class CommandPrint extends Command {
         // expects 0-1 parameters
         checkNumParams(list, 0, 1);
 
-        if(list.size() == 0) {
+        if (list.isEmpty()) {
             coachContext.getLogger().info("");
-
         } else {
             coachContext.getLogger().info(list.get(0).getId());
-
         }
 
         return Atom.NULL_ATOM;
     }
-
 }

@@ -51,7 +51,7 @@ public class CommandAddBadge extends Command {
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) coachContext.getContext();
     BadgeFactory.Badge b = c.getBadge(badgeName.getId());
     if (b != null) {
-      throw new ExecutorException("Badge id "+badgeName.getId()+" does already exist");
+      throw new ExecutorException("Badge id " + badgeName.getId() + " does already exist");
     }
     c.setBadge(new BadgeFactory.Badge(badgeName.getId(), Integer.parseInt(order.getId()), urlImg.getId(), altImg.getId(), description.getId(), urlLink.getId()));
 

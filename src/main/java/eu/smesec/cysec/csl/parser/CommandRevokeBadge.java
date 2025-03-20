@@ -27,7 +27,7 @@ import java.util.List;
  * Revokes the current badgeClass of a badge class in {@link BadgeFactory}. This method may only be executed after a Badge is awarded using {@link CommandAwardBadge}.
  * If no Badge with the given ID or class exist, Executor throws an exception.
  *
- * <p>Syntax: revokeBadge( badgeName);</p>
+ * <p>Syntax: revokeBadge(badgeName);</p>
  *  <p>Example: revokeBadge("ServerSavior");</p>
  *
  * @see CommandAddBadge
@@ -48,12 +48,11 @@ public class CommandRevokeBadge extends Command {
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     BadgeFactory.Badge badge = c.getBadge(badgeName.getId());
     if (badge == null) {
-      throw new ExecutorException("Badge id "+badgeName.getId()+" doesn't exist");
+      throw new ExecutorException("Badge id " + badgeName.getId() + " doesn't exist");
     } else {
       badge.revokeAwardedBadge();
     }
 
     return Atom.NULL_ATOM;
   }
-
 }

@@ -50,5 +50,4 @@ public class CommandRevokeRecommendation extends Command {
 
     return Atom.NULL_ATOM;
   }
-
 }

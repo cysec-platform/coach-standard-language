@@ -52,7 +52,7 @@ public class CommandAddBadgeClass extends Command {
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     BadgeFactory.Badge b = c.getBadge(badgeName.getId());
     if (b == null) {
-      throw new ExecutorException("Badge id "+badgeName.getId()+" is not known");
+      throw new ExecutorException("Badge id " + badgeName.getId() + " is not known");
     }
     b.addBadgeClass(new BadgeFactory.BadgeClass(badgeClassName.getId(), Integer.parseInt(order.getId()), urlImg.getId(), altImg.getId(), description.getId(), urlLink.getId()));
 

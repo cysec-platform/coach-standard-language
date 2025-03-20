@@ -59,7 +59,7 @@ public class CommandCreateSubcoach extends Command {
     try {
       Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
       if (subcoach == null) {
-        throw new ExecutorException("Coach id " + coachID.getId() +" does not exist");
+        throw new ExecutorException("Coach id " + coachID.getId() + " does not exist");
       }
       // Append current coach id to segment: e.g lib-company.lib-subcoach-backup
       Set<String> segment = new HashSet<>();
