@@ -31,13 +31,18 @@ import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * Invokes the creation of a new coach instance on the platform
+ * Invokes the creation of a new coach instance on the platform.
  *
  * <p>The coach with the given ID must exist in the coach directory of the platform,
  * otherwise the command throws an ExecutorException.
  *
  * <p>Syntax: createSubcoach("coachId", "sub-id")</p>
  * <p>Example: createSubcoach("lib-subcoach-backup", "www.test.ch")</p>
+ *
+ * An optional third argument can be specified that specifies the parent argument.
+ * Defaults no NULL.
+ * <br>
+ * Always returns null.
  */
 public class CommandCreateSubcoach extends Command {
 

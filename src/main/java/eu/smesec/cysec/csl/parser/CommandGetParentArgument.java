@@ -24,10 +24,12 @@ import eu.smesec.cysec.platform.bridge.generated.Metadata;
 
 import java.util.List;
 
+/**
+ * {@code getParentArgument()} returns the parent argument given to this subcoach.
+ */
 public class CommandGetParentArgument extends Command {
 
   public Atom execute(List<Atom> a, CoachContext coachContext) {
-
     try {
       Metadata parentMetadata = coachContext.getCal().getMetadata(coachContext.getFqcn(), "subcoach-data");
       if (parentMetadata != null) {

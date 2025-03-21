@@ -22,13 +22,16 @@ package eu.smesec.cysec.csl.parser;
 import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 
-import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
  * Removes an existing sub-coach
  *
  * <p>Example: removeSubcoach("protocol-coach", "ssh")</p>
+ *
+ * Does not fail when the removal does not succeed, and just logs
+ * the error that occurred on a severe level. Always returns null.
  */
 public class CommandRemoveSubcoach extends Command {
 
@@ -41,15 +44,21 @@ public class CommandRemoveSubcoach extends Command {
     Atom coachID = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "coachID");
     Atom fileIdentifier = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "fileIdentifier");
 
-    FQCN fqcn = FQCN.fromString(String.join(".", Arrays.asList(coachContext.getCoach().getId(), coachID.getId(), fileIdentifier.getId())));
+    // Construct the full name of the subcoach.
+    FQCN fqcn = FQCN.fromString(String.join(
+      ".",
+      coachContext.getCoach().getId(),
+      coachID.getId(),
+      fileIdentifier.getId()
+    ));
 
     try {
       coachContext.getCal().removeSubCoach(fqcn);
     } catch (CacheException e) {
-      coachContext.getLogger().log(Level.SEVERE, "Error trying to remove sub-coach", e);
+      // We do not error out when removal fails.
+      coachContext.getLogger().log(Level.SEVERE, String.format("Error trying to remove sub-coach %s", fqcn), e);
     }
 
     return Atom.NULL_ATOM;
   }
-
 }
