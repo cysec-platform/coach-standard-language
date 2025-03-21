@@ -21,6 +21,9 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * {@code print([arg])} prints the given value to the internal logger, or an empty message if no argument is given.
+ */
 public class CommandPrint extends Command {
 
     @Override

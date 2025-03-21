@@ -75,7 +75,7 @@ public class CySeCExecutorContextFactory {
             (new Throwable()).getStackTrace()[0].getClassName());
     private ScoreFactory scores = new ScoreFactory();
     private final Object executorLock = new Object();
-    private Map<String, Variable> variables = new HashMap<>();
+    private final Map<String, Variable> variables = new HashMap<>();
     private ExecutorContext parent = null;
     private RecommendationFactory recommendations = new RecommendationFactory();
     private BadgeFactory badges = new BadgeFactory();
@@ -183,7 +183,7 @@ public class CySeCExecutorContextFactory {
         return variables.entrySet().stream()
           .filter(kv -> kv.getValue().getVariable(context) != null)
           .collect(Collectors.toMap(
-            kv -> kv.getKey(),
+            Map.Entry::getKey,
             kv -> kv.getValue().getVariable(context)));
       }
     }
@@ -303,11 +303,10 @@ public class CySeCExecutorContextFactory {
 
   public static CySeCExecutorContext getExecutorContext(String contextId, Logger log) {
     synchronized (contextMap) {
-      if (contextMap.get(contextId.toLowerCase()) == null) {
-        contextMap.put(contextId.toLowerCase(), new CySeCExecutorContext(contextId, log));
-      }
-      return contextMap.get(contextId.toLowerCase());
+      return contextMap.computeIfAbsent(
+        contextId.toLowerCase(),
+        _s -> new CySeCExecutorContext(contextId, log)
+      );
     }
   }
-
 }

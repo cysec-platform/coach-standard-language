@@ -20,20 +20,22 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
-import eu.smesec.cysec.platform.bridge.execptions.CacheException;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class Command {
 
-  private static Map<String, Command> commands = new HashMap<>();
+  private static final Map<String, Command> commands = new HashMap<>();
 
   static {
     registerCommands();
   }
 
   public static void registerCommands() {
+    // TODO: null() resulting in "", while NULL resulting in the Null Atom, feels inconsistent.
     registerCommand("null", new CommandBlank());
     registerCommand("addScore", new CommandAddScore());
     registerCommand("capScore", new CommandCapScore());

@@ -168,6 +168,7 @@ public class ParserLine {
         && ABNF_QUOTED_SPECIALS.contains(snoopBytes(2).substring(1, 2));
   }
 
+  // FIXME: This method does not read anything, it simply returns a boolean that is ignored. Most likely not intended?
   private boolean readBuffer(long num) {
     // make sure that we have sufficient bytes in the buffer
 
