@@ -713,7 +713,7 @@ public class TestCommands extends AbstractTestCommands {
   public void testCommandGreaterThanInt() throws ExecutorException, ParserException {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("greaterThan", new CommandGreaterThan());
+    Command.registerCommand("greaterThan", new CommandNumberBinaryPredicate.CommandGreaterThan());
 
     String code = "greaterThan(10, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
     List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
@@ -735,7 +735,7 @@ public class TestCommands extends AbstractTestCommands {
   public void testCommandGreaterThanFloat() throws ExecutorException, ParserException {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("greaterThan", new CommandGreaterThan());
+    Command.registerCommand("greaterThan", new CommandNumberBinaryPredicate.CommandGreaterThan());
 
     String code = "greaterThan(10.5, 10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
     List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
@@ -757,7 +757,7 @@ public class TestCommands extends AbstractTestCommands {
   public void testCommandGreaterThanOrEqualsInt() throws ExecutorException, ParserException {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("greaterThanOrEq", new CommandGreaterThanOrEquals());
+    Command.registerCommand("greaterThanOrEq", new CommandNumberBinaryPredicate.CommandGreaterThanOrEquals());
 
     String code = "greaterThanOrEq(10, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
     List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
@@ -779,7 +779,7 @@ public class TestCommands extends AbstractTestCommands {
   public void testCommandGreaterThanOrEqualsFloat() throws ExecutorException, ParserException {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("greaterThanOrEq", new CommandGreaterThanOrEquals());
+    Command.registerCommand("greaterThanOrEq", new CommandNumberBinaryPredicate.CommandGreaterThanOrEquals());
 
     String code = "greaterThanOrEq(10.5, 10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
     List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
@@ -801,7 +801,7 @@ public class TestCommands extends AbstractTestCommands {
   public void testCommandLowerThanInt() throws ExecutorException, ParserException {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("lowerThan", new CommandLowerThan());
+    Command.registerCommand("lowerThan", new CommandNumberBinaryPredicate.CommandLowerThan());
 
     String code = "lowerThan(10, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
     List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
@@ -823,7 +823,7 @@ public class TestCommands extends AbstractTestCommands {
   public void testCommandLowerThanFloat() throws ExecutorException, ParserException {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("lowerThan", new CommandLowerThan());
+    Command.registerCommand("lowerThan", new CommandNumberBinaryPredicate.CommandLowerThan());
 
     String code = "lowerThan(10.5, 10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
     List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
@@ -845,7 +845,7 @@ public class TestCommands extends AbstractTestCommands {
   public void testCommandLowerThanOrEqualsInt() throws ExecutorException, ParserException {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("lowerThanOrEq", new CommandLowerThanOrEquals());
+    Command.registerCommand("lowerThanOrEq", new CommandNumberBinaryPredicate.CommandLowerThanOrEquals());
 
     String code = "lowerThanOrEq(10, 5) : foo : { addScore(`s`, 5); };".replace('`', '"');
     List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();
@@ -867,7 +867,7 @@ public class TestCommands extends AbstractTestCommands {
   public void testCommandLowerThanOrEqualsFloat() throws ExecutorException, ParserException {
     ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext("test");
     context.reset();
-    Command.registerCommand("lowerThanOrEq", new CommandLowerThanOrEquals());
+    Command.registerCommand("lowerThanOrEq", new CommandNumberBinaryPredicate.CommandLowerThanOrEquals());
 
     String code = "lowerThanOrEq(10.5, 10.2) : foo : { addScore(`s`, 5); };".replace('`', '"');
     List<CySeCLineAtom> l = new ParserLine(code).getCySeCListing();

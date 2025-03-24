@@ -29,7 +29,7 @@ import java.util.function.BiPredicate;
  * This class can be used by extending from it and implementing the {@link BiPredicate#test(Object, Object) test} method. The
  * {@link BiPredicate#test(Object, Object) test} method determines how the return value of the command is calculated.
  */
-public abstract class CommandNumberBinaryPredicate extends Command implements BiPredicate<BigDecimal, BigDecimal> {
+public sealed abstract class CommandNumberBinaryPredicate extends Command implements BiPredicate<BigDecimal, BigDecimal> {
     @Override
     public Atom execute(List<Atom> atoms, CoachContext coachContext) throws ExecutorException {
         // expects 2 parameters
@@ -52,5 +52,50 @@ public abstract class CommandNumberBinaryPredicate extends Command implements Bi
 
         // evaluate the test method and return accordingly
         return Atom.fromBoolean(test(lhsVal, rhsVal));
+    }
+
+    /**
+     * Command that checks whether a number is greater than another number. See {@link CommandNumberBinaryPredicate}
+     * for more information.
+     */
+    public static final class CommandGreaterThan extends CommandNumberBinaryPredicate {
+
+        @Override
+        public boolean test(BigDecimal lhs, BigDecimal rhs) {
+            return lhs.compareTo(rhs) > 0;
+        }
+    }
+
+    /**
+     * Command that checks whether a number is greater or equals to another number. See {@link CommandNumberBinaryPredicate}
+     * for more information.
+     */
+    public static final class CommandGreaterThanOrEquals extends CommandNumberBinaryPredicate {
+        @Override
+        public boolean test(BigDecimal lhs, BigDecimal rhs) {
+            return lhs.compareTo(rhs) >= 0;
+        }
+    }
+
+    /**
+     * Command that checks whether a number is lower than another number. See {@link CommandNumberBinaryPredicate}
+     * for more information.
+     */
+    public static final class CommandLowerThan extends CommandNumberBinaryPredicate {
+        @Override
+        public boolean test(BigDecimal lhs, BigDecimal rhs) {
+            return lhs.compareTo(rhs) < 0;
+        }
+    }
+
+    /**
+     * Command that checks whether a number is lower or equals to another number. See {@link CommandNumberBinaryPredicate}
+     * for more information.
+     */
+    public static final class CommandLowerThanOrEquals extends CommandNumberBinaryPredicate {
+        @Override
+        public boolean test(BigDecimal lhs, BigDecimal rhs) {
+            return lhs.compareTo(rhs) <= 0;
+        }
     }
 }

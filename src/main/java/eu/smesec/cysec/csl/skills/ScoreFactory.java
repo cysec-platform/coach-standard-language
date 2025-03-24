@@ -27,30 +27,14 @@ import java.util.Vector;
 public class ScoreFactory {
 
   public enum ScoreType {
-    VALUE, CAP;
+    VALUE, CAP
   }
 
-  public static class ScoreValue {
-
-    private ScoreType t;
-    private double value;
-
-    public ScoreValue(ScoreType t, double value) {
-      this.t = t;
-      this.value = value;
-    }
-
-    public ScoreType getScoretype() {
-      return t;
-    }
-
-    public double getValue() {
-      return value;
-    }
+  public record ScoreValue(ScoreType scoreType, double value) {
   }
 
   public static class Score {
-    private Map<String, List<ScoreValue>> scores = new HashMap<>();
+    private final Map<String, List<ScoreValue>> scores = new HashMap<>();
     private boolean hidden = false;
     private final String id;
 
@@ -76,14 +60,12 @@ public class ScoreFactory {
       }
     }
 
-
-
     public void revertQuestion(String id) {
       scores.put(id.toLowerCase(), new Vector<>());
     }
 
     private void addQuestionScore(String id, ScoreValue v) {
-      if(id==null) {
+      if(id == null) {
         id = "__NULL__";
       }
       synchronized (scores) {
@@ -112,15 +94,10 @@ public class ScoreFactory {
         for (List<ScoreValue> svl : scores.values()) {
           synchronized (svl) {
             for (ScoreValue sv : svl) {
-              switch (sv.getScoretype()) {
-                case VALUE:
-                  totalValue += sv.getValue();
-                  break;
-                case CAP:
-                  minCap = Math.min(minCap, sv.getValue());
-                  break;
-                default:
-                  new RuntimeException("Encountered unknown type of ScoreValue");
+              switch (sv.scoreType()) {
+                case VALUE -> totalValue += sv.value();
+                case CAP -> minCap = Math.min(minCap, sv.value());
+                default -> throw new RuntimeException("Encountered unknown type of ScoreValue");
               }
             }
           }
@@ -131,7 +108,7 @@ public class ScoreFactory {
 
   }
 
-  private Map<String, Score> scores = new HashMap<>();
+  private final Map<String, Score> scores = new HashMap<>();
 
   public Score getIntScore(String id) {
     synchronized (scores) {
@@ -151,7 +128,7 @@ public class ScoreFactory {
         }
       }
     }
-    return ret.toArray(new Score[ret.size()]);
+    return ret.toArray(Score[]::new);
   }
 
   public double getScore(String id) {

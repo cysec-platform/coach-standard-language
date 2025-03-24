@@ -26,6 +26,7 @@ import eu.smesec.cysec.csl.skills.BadgeFactory.Badge;
 import eu.smesec.cysec.csl.skills.RecommendationEventListener;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Level;
@@ -38,20 +39,20 @@ import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
 public class CySeCExecutorContextFactory {
 
   private static class Variable {
-    private Map<String, Atom> var = new HashMap<>();
-    private Atom lastval = null;
+    private final Map<String, Atom> var = new HashMap<>();
+    private Atom lastValue = null;
 
     public Atom setVariable(String context, Atom value) {
       Atom ret = getVariable(context);
       if (context != null) {
         var.put(context, value);
       }
-      lastval = value;
+      lastValue = value;
       return ret;
     }
 
     public Atom getVariable(String context) {
-      return var.get(context) == null ? lastval : var.get(context);
+      return var.get(context) == null ? lastValue : var.get(context);
     }
 
     public Collection<Atom> getAll() {
@@ -69,20 +70,21 @@ public class CySeCExecutorContextFactory {
    * the parent instead of itw own context.</p>
    */
   public static class CySeCExecutorContext implements ExecutorContext, Serializable {
+    @Serial
     private static final long serialVersionUID = 2365600923596387762L;
-    private List<String> executedNames = new Vector<>();
+    private final List<String> executedNames = new Vector<>();
     private Logger logger = Logger.getLogger(
             (new Throwable()).getStackTrace()[0].getClassName());
-    private ScoreFactory scores = new ScoreFactory();
+    private final ScoreFactory scores = new ScoreFactory();
     private final Object executorLock = new Object();
     private final Map<String, Variable> variables = new HashMap<>();
     private ExecutorContext parent = null;
-    private RecommendationFactory recommendations = new RecommendationFactory();
-    private BadgeFactory badges = new BadgeFactory();
+    private final RecommendationFactory recommendations = new RecommendationFactory();
+    private final BadgeFactory badges = new BadgeFactory();
     private String contextId;
-    private Map<String, Map<String, Atom>> subcoachVariableCache = new HashMap<>();
-    private Map<String, List<String>> subcoachActiveQuestionsCache = new HashMap<>();
-    private Map<String, RecommendationFactory> subcoachRecommendationsCache = new HashMap<>();
+    private final Map<String, Map<String, Atom>> subcoachVariableCache = new HashMap<>();
+    private final Map<String, List<String>> subcoachActiveQuestionsCache = new HashMap<>();
+    private final Map<String, RecommendationFactory> subcoachRecommendationsCache = new HashMap<>();
     private String activeInstance;
 
     public CySeCExecutorContext(String contextId, Logger log) {
@@ -125,9 +127,8 @@ public class CySeCExecutorContextFactory {
     }
 
     public RecommendationFactory.Recommendation getRecommendation (String id) {
-      if (parent != null && parent instanceof CySeCExecutorContext) {
-        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        return parentContext
+      if (parent != null && parent instanceof CySeCExecutorContext parentContext) {
+          return parentContext
                 .subcoachRecommendationsCache
                 .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
                 .getRecommendation(id);
@@ -137,9 +138,8 @@ public class CySeCExecutorContextFactory {
     }
 
     public RecommendationFactory.Recommendation[] getRecommendationList() {
-      if (parent != null && parent instanceof CySeCExecutorContext) {
-        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        return parentContext
+      if (parent != null && parent instanceof CySeCExecutorContext parentContext) {
+          return parentContext
                 .subcoachRecommendationsCache
                 .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
                 .getRecommendationList();
@@ -160,9 +160,8 @@ public class CySeCExecutorContextFactory {
     }
 
     public void addRecommendation (RecommendationFactory.Recommendation r){
-      if (parent != null && parent instanceof CySeCExecutorContext) {
-        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        parentContext
+      if (parent != null && parent instanceof CySeCExecutorContext parentContext) {
+          parentContext
                 .subcoachRecommendationsCache
                 .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
                 .addRecommendation(r);
@@ -171,10 +170,9 @@ public class CySeCExecutorContextFactory {
       }
     }
 
-    public RecommendationFactory.Recommendation removeRecommendation (String id){
-      if (parent != null && parent instanceof CySeCExecutorContext) {
-        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        return parentContext
+    public RecommendationFactory.Recommendation removeRecommendation(String id) {
+      if (parent != null && parent instanceof CySeCExecutorContext parentContext) {
+          return parentContext
                 .subcoachRecommendationsCache
                 .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
                 .removeRecommendation(id);
@@ -184,9 +182,8 @@ public class CySeCExecutorContextFactory {
     }
 
     public void setRecommendationListener(RecommendationEventListener listener) {
-      if (parent != null && parent instanceof CySeCExecutorContext) {
-        CySeCExecutorContext parentContext = (CySeCExecutorContext) parent;
-        parentContext
+      if (parent != null && parent instanceof CySeCExecutorContext parentContext) {
+          parentContext
                 .subcoachRecommendationsCache
                 .computeIfAbsent(activeInstance, f -> new RecommendationFactory())
                 .setListener(listener);
@@ -272,7 +269,7 @@ public class CySeCExecutorContextFactory {
         //ec.variables.remove(coachContext.getQuestionContext().getId());
         for(Variable variable : ec.variables.values()) {
           variable.var.remove(coachContext.getQuestionContext().getId());
-          variable.lastval = null;
+          variable.lastValue = null;
         }
 
         //

@@ -164,11 +164,9 @@ public class Atom {
     return id;
   }
 
-  // FIXME Java 14 Switch Expressions
   public String toString() {
-    String ret;
-    switch (type) {
-      case METHODE:
+    return switch(type) {
+      case METHODE -> {
         StringBuilder methodCall = new StringBuilder(id);
 
         // If no parameters are present, simply "method()"
@@ -186,23 +184,12 @@ public class Atom {
           }
           methodCall.append(" )");
         }
-        ret = methodCall.toString();
-        break;
-      case STRING:
-        ret = "\"" + id + "\"";
-        break;
-      case NULL:
-        ret = "NULL";
-        break;
-      case INTEGER:
-      case FLOAT:
-      case BOOL:
-        ret = id;
-        break;
-      default:
-        throw new IllegalArgumentException("type " + type + " cannot be printed (Not implemented)");
-    }
-    return ret;
+        yield methodCall.toString();
+      }
+      case STRING -> "\"" + id + "\"";
+      case INTEGER, FLOAT, BOOL -> id;
+      case NULL -> "NULL";
+    };
   }
 
   /**
@@ -215,13 +202,12 @@ public class Atom {
     if (eval.getType() != AtomType.BOOL) {
       throw new ExecutorException("Condition \"" + this + "\" does not evaluate to BOOL (is: " + eval + ")");
     }
-    if ("TRUE".equals(eval.getId())) {
-      return true;
-    } else if ("FALSE".equals(eval.getId())) {
-      return false;
-    } else {
-      // Technically cannot happen anymore, but better safe than sorry.
-      throw new ExecutorException("boolean value is illegal \"" + eval + "\" (OUCH! How did that happen)");
-    }
+    // Technically cannot happen anymore, but better safe than sorry.
+    return switch (eval.getId()) {
+      case "TRUE" -> true;
+      case "FALSE" -> false;
+      case null, default ->
+        throw new ExecutorException("boolean value is illegal \"" + eval + "\" (OUCH! How did that happen)");
+    };
   }
 }

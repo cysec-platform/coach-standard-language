@@ -248,7 +248,7 @@ public class TestArrayCommands extends AbstractTestCommands {
     Command.registerCommand("set", new CommandSetVar());
     Command.registerCommand("arrayAdd", new CommandArrayAdd());
     Command.registerCommand("arrayLength", new CommandArrayLength());
-    Command.registerCommand("greaterThanOrEq", new CommandGreaterThanOrEquals());
+    Command.registerCommand("greaterThanOrEq", new CommandNumberBinaryPredicate.CommandGreaterThanOrEquals());
     Command.registerCommand("equals", new CommandEquals());
     try {
       StringBuilder s = new StringBuilder();

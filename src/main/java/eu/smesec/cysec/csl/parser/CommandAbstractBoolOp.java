@@ -22,7 +22,7 @@ package eu.smesec.cysec.csl.parser;
 import java.util.List;
 import java.util.Vector;
 
-public abstract class CommandAbstractBoolOp extends Command {
+public sealed abstract class CommandAbstractBoolOp extends Command {
 
   @Override
   public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
@@ -42,4 +42,51 @@ public abstract class CommandAbstractBoolOp extends Command {
   }
 
   abstract boolean evaluate(List<Boolean> list, ExecutorContext context) throws ExecutorException;
+
+  /**
+   * {@code and(...args)} evaluates to {@link Atom#TRUE} if all arguments evaluate to {@link Atom#TRUE}.
+   */
+  public static final class CommandAnd extends CommandAbstractBoolOp {
+
+    @Override
+    boolean evaluate(List<Boolean> list, ExecutorContext context) {
+      return list.stream().allMatch(Boolean::booleanValue);
+    }
+  }
+
+  /**
+   * {@code or(...args)} evaluates to {@link Atom#TRUE} if at least one argument evaluates to {@link Atom#TRUE}.
+   */
+  public static final class CommandOr extends CommandAbstractBoolOp {
+
+    @Override
+    boolean evaluate(List<Boolean> list, ExecutorContext context) {
+      return list.stream().anyMatch(Boolean::booleanValue);
+    }
+  }
+
+  /**
+   * {@code not(arg)} evaluates to {@link Atom#TRUE} if its argument evaluates to {@link Atom#FALSE}.
+   */
+  public static final class CommandNot extends CommandAbstractBoolOp {
+
+    @Override
+    boolean evaluate(List<Boolean> list, ExecutorContext context) throws ExecutorException {
+      if(list.size() != 1) {
+        throw new ExecutorException("NOT supports only one parameter");
+      }
+      return !list.get(0);
+    }
+  }
+
+  /**
+   * {@code xor(...args)} evaluates to {@link Atom#TRUE} if exactly one argument evaluates to {@link Atom#TRUE}.
+   */
+  public static final class CommandXor extends CommandAbstractBoolOp {
+
+    @Override
+    boolean evaluate(List<Boolean> list, ExecutorContext context) {
+      return list.stream().filter(Boolean::booleanValue).count() == 1L;
+    }
+  }
 }
