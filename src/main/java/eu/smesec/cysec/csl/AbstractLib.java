@@ -19,19 +19,16 @@
  */
 package eu.smesec.cysec.csl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.smesec.cysec.csl.skills.RecommendationFactory;
 import eu.smesec.cysec.platform.bridge.Command;
 import eu.smesec.cysec.platform.bridge.Commands;
 import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-import eu.smesec.cysec.platform.bridge.generated.Answer;
-import eu.smesec.cysec.platform.bridge.generated.Block;
-import eu.smesec.cysec.platform.bridge.generated.Metadata;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-import eu.smesec.cysec.platform.bridge.generated.QuestionType;
-import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
-import eu.smesec.cysec.platform.bridge.generated.Questions;
+import eu.smesec.cysec.platform.bridge.generated.*;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
 import eu.smesec.cysec.csl.parser.ExecutorContext;
 import eu.smesec.cysec.csl.parser.ExecutorException;
@@ -103,6 +100,9 @@ public abstract class AbstractLib implements CoachLibrary {
         if (instance.equals(activeInstance)) return;
         activeInstance = instance;
         executorContext.clearVariables();
+        if (executorContext instanceof CySeCExecutorContextFactory.CySeCExecutorContext) {
+            ((CySeCExecutorContextFactory.CySeCExecutorContext) executorContext).setActiveInstance(instance);
+        }
     }
 
     @Override
@@ -202,6 +202,7 @@ public abstract class AbstractLib implements CoachLibrary {
 
         // If this is a subcoach we have to update the variables cache in the parent coach
         if (!fqcn.isTopLevel() && executorContext.getParent() != null) {
+            executorContext.setVariable("instanceName", Atom.fromString(fqcn.getName()), null);
             executorContext.getParent().updateSubcoachVariablesCache(fqcn.getCoachId(), fqcn.getName(), executorContext.getVariables(null));
         }
 
@@ -310,8 +311,32 @@ public abstract class AbstractLib implements CoachLibrary {
                         ScoreFactory.Score::getId,
                         ScoreFactory.Score::getValue));
 
-        // Add all subcoach varaibles into JSP model
+        // Add a mapping from question ID to FQCN into the JSP model
+        // This is needed to correctly link to questions in recommendations
+        try {
+            Map<String, String> questionFqcnMapping = cal.getActiveQuestionsWithFqcn().stream()
+                    .map(tuple -> new Tuple<>(tuple.getFirst().toString(), tuple.getSecond().getId()))
+                    .collect(Collectors.toMap(Tuple::getSecond, Tuple::getFirst, (a, b) -> a));
+            String json = new ObjectMapper().writeValueAsString(questionFqcnMapping);
+            values.put("questionFqcnMappingJson", json);
+        } catch (CacheException | JsonProcessingException e) {
+            logger.severe("There was an error while fetching all questions: " + e.getMessage());
+        }
+
+        // Add all subcoach variables into JSP model
         values.put("subcoachVariables", executorContext.getSubcoachVariablesCache());
+
+        // Add recommendations to JSP model
+        if (executorContext instanceof CySeCExecutorContextFactory.CySeCExecutorContext) {
+            CySeCExecutorContextFactory.CySeCExecutorContext cySeCExecutorContext = (CySeCExecutorContextFactory.CySeCExecutorContext) executorContext;
+            List<RecommendationFactory.Recommendation> recommendations = cySeCExecutorContext.getRecommendationListIncludingSubcoaches();
+            try {
+                String json = new ObjectMapper().writeValueAsString(recommendations);
+                values.put("recommendationsJson",  json);
+            } catch (JsonProcessingException e) {
+                logger.severe("There was an error while trying to JSON-serialize the recommendation: " + e.getMessage());
+            }
+        }
 
         values.put(prop.getProperty("library.skills.endurance"), endurance.get());
         return values;
