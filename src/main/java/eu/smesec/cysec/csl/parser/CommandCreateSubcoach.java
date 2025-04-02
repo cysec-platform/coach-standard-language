@@ -25,33 +25,38 @@ import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * Invokes the creation of a new coach instance on the platform
+ * Invokes the creation of a new coach instance on the platform.
  *
  * <p>The coach with the given ID must exist in the coach directory of the platform,
  * otherwise the command throws an ExecutorException.
  *
  * <p>Syntax: createSubcoach("coachId", "sub-id")</p>
  * <p>Example: createSubcoach("lib-subcoach-backup", "www.test.ch")</p>
+ *
+ * An optional third argument can be specified that specifies the parent argument.
+ * Defaults no NULL.
+ * <br>
+ * Always returns null.
  */
 public class CommandCreateSubcoach extends Command {
 
   @Override
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    // expects 2-3 parameters
     checkNumParams(aList, 2, 3);
 
     // evaluate parameters
-    Atom coachID = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "coachID");
-    Atom fileIdentifier = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
+    Atom coachID = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "coachID");
+    Atom fileIdentifier = checkAtomType(aList.get(1), Atom.AtomType.STRING, true, coachContext, "fileIdentifier");
     Atom parentArgument;
     if (aList.size() == 3) {
-      parentArgument = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "parentArgument");
+      parentArgument = checkAtomType(aList.get(2), Atom.AtomType.STRING, true, coachContext, "parentArgument");
     } else {
       parentArgument = Atom.NULL_ATOM;
     }
@@ -59,7 +64,7 @@ public class CommandCreateSubcoach extends Command {
     try {
       Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
       if (subcoach == null) {
-        throw new ExecutorException("Coach id " + coachID.getId() +" does not exist");
+        throw new ExecutorException("Coach id " + coachID.getId() + " does not exist");
       }
       // Append current coach id to segment: e.g lib-company.lib-subcoach-backup
       Set<String> segment = new HashSet<>();
@@ -89,7 +94,6 @@ public class CommandCreateSubcoach extends Command {
       }
     }
 
-    return null;
+    return Atom.NULL_ATOM;
   }
-
 }

@@ -21,14 +21,13 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.BadgeFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Revokes the current badgeClass of a badge class in {@link BadgeFactory}. This method may only be executed after a Badge is awarded using {@link CommandAwardBadge}.
  * If no Badge with the given ID or class exist, Executor throws an exception.
  *
- * <p>Syntax: revokeBadge( badgeName);</p>
+ * <p>Syntax: revokeBadge(badgeName);</p>
  *  <p>Example: revokeBadge("ServerSavior");</p>
  *
  * @see CommandAddBadge
@@ -39,21 +38,21 @@ import java.util.List;
 public class CommandRevokeBadge extends Command {
   @Override
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    checkNumParams(aList, 1, 1);
+    // expects 1 parameter
+    checkNumParams(aList, 1);
 
     // evaluate parameters
-    Atom badgeName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName" );
+    Atom badgeName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "badge name");
 
     // execute command
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     BadgeFactory.Badge badge = c.getBadge(badgeName.getId());
     if (badge == null) {
-      throw new ExecutorException("Badge id "+badgeName.getId()+" doesn't exist");
+      throw new ExecutorException("Badge id " + badgeName.getId() + " doesn't exist");
     } else {
       badge.revokeAwardedBadge();
     }
 
     return Atom.NULL_ATOM;
   }
-
 }

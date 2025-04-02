@@ -19,25 +19,27 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import eu.smesec.cysec.platform.bridge.execptions.CacheException;
+import eu.smesec.cysec.platform.bridge.generated.Answer;
+import eu.smesec.cysec.platform.bridge.generated.Question;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-import eu.smesec.cysec.platform.bridge.generated.Answer;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-
+/**
+ * {@code isSelected(answerId)} checks whether the given answer ID is selected or not.
+ */
 public class CommandIsSelected extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 3 parameters: name, context of var and value
+    // expects 1 parameter: answer id
     checkNumParams(aList, 1);
 
     // evaluate parameters
-    Atom varContent = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varContent");
+    Atom queriedAnswerId = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "answer id");
 
     Answer answer = null;
     try {
@@ -47,13 +49,10 @@ public class CommandIsSelected extends Command {
       //Problem: question id might contain "o" thus splitting into more than 2 parts!
       String regex = "[^0-9]*[q]\\d+";
       Pattern pattern = Pattern.compile(regex);
-      Matcher match = pattern.matcher(varContent.getId());
+      Matcher match = pattern.matcher(queriedAnswerId.getId());
 
       if(match.find()) {
-        String questionId = varContent.getId().substring(match.start(), match.end());
-
-        // disassemble option into question and option by splitting with "o": q10o1
-        answer = coachContext.getCal().getAnswer(coachContext.getFqcn().toString(), questionId);
+        String questionId = queriedAnswerId.getId().substring(match.start(), match.end());
 
         // Check if question is hidden and if so immediately return false since answers of hidden questions cannot be selected
         if (coachContext.getCoach().getQuestions().getQuestion().stream()
@@ -61,35 +60,36 @@ public class CommandIsSelected extends Command {
                 .findFirst()
                 .map(Question::isHidden)
                 .orElseThrow(() -> new ExecutorException("Question id " + questionId + " doesn't exist"))) {
-          return new Atom(Atom.AtomType.BOOL, "FALSE", null);
+          return Atom.FALSE;
         }
 
-      } else throw new ExecutorException("question id doesn't match pattern [^0-9]*[q]\\d+: " + varContent.getId());
+        // find answer value for the parsed question id (company-q10o4 resulted in q10)
+        answer = coachContext.getCal().getAnswer(coachContext.getFqcn().toString(), questionId);
+      } else {
+        throw new ExecutorException("question id doesn't match pattern [^0-9]*[q]\\d+: " + queriedAnswerId.getId());
+      }
 
     } catch (CacheException e) {
-      coachContext.getLogger().log(Level.SEVERE, String.format("Error loading answer %s", varContent.getId()));
+      coachContext.getLogger().log(Level.SEVERE, String.format("Error loading answer %s", queriedAnswerId.getId()), e);
     }
 
     // determine provided option is selected
-    String boolResult;
-    String ans=null;
+    Atom result;
+    String actualAnswerText;
     if(answer != null) {
-      String vc=varContent.getId();
-      ans=" "+(answer.getAidList() == null?answer.getText():answer.getAidList())+" ";
+      String queriedAnswerText = queriedAnswerId.getId();
+      actualAnswerText = " " + (answer.getAidList() == null ? answer.getText() : answer.getAidList()) + " ";
 
-      // don't use ans.contains to avoid unintended matches (e.g. q10HTTP should not match when q10HTTPS is choosen)
-      if(Arrays.stream(ans.split(" ")).anyMatch(it -> it.equals(vc))) {
-        boolResult = "TRUE";
-      } else {
-        boolResult = "FALSE";
-      }
+      // don't use ans.contains directly to avoid unintended matches (e.g. q10HTTP should not match when q10HTTPS is choosen)
+      result = Atom.fromBoolean(
+              Arrays.asList(actualAnswerText.split(" ")).contains(queriedAnswerText)
+      );
     } else {
-      ans="<UNSET>";
-      boolResult = "FALSE";
+      actualAnswerText = "<UNSET>";
+      result = Atom.FALSE;
     }
-    coachContext.getLogger().info(String.format("isSelected(%s) == currently:%s ==> %s", varContent.getId(), ans, boolResult));
+    coachContext.getLogger().info(String.format("isSelected(%s) == currently:%s ==> %s", queriedAnswerId.getId(), actualAnswerText, result.getId()));
 
-    return new Atom(Atom.AtomType.BOOL, boolResult, null);
+    return result;
   }
-
 }

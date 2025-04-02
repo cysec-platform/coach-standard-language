@@ -26,38 +26,29 @@ import eu.smesec.cysec.platform.bridge.generated.Answer;
 import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.platform.bridge.generated.QuestionType;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
 /**
- * Set an answer for another question by passing the question id as first parameter and the decired value
- * as second parameter.
+ * {@code setAnswer("qid", "answer")} sets the answer(s) for another question.
+ * <br>
+ * <b>Special note on Astar questions:</b>
  * <br><br>
- * <b>Astar questions:</b>
- * <br><br>
- * To select multiple values pass the option ids space seperated. Note that the answer value will
+ * To select multiple answers at once, pass the Option IDs seperated by Spaces. Note that the answer value will
  * <b>overwrite</b> any existing values (so already selected options are not respected).
  */
 public class CommandSetAnswer extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 2 parameters: name and value of an answer
+    // expects 2 parameters: question id and answer id
     checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom questionId = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "questionID");
-    Atom answerValue = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext,
-        "answerValue");
+    Atom questionId = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "question ID");
+    Atom answerValue = checkAtomType(aList.get(1), AtomType.STRING, true, coachContext, "answer id(s)");
 
-    if (answerValue.getType() != AtomType.STRING || questionId.getType() != AtomType.STRING) {
-      // TODO is type string really enogh for answer values?
-      throw new ExecutorException("Invalid types for parameters: Provide [0] String and [1] String");
-    }
-
-    String value = answerValue.getId(); // use getId over toString since toString adds unnecessary " around the value
     String qid = questionId.getId();
+    String value = answerValue.getId(); // use getId over toString since toString adds unnecessary " around the value
 
     // determine provided option is selected
     ILibCal cal = coachContext.getCal();
@@ -95,10 +86,9 @@ public class CommandSetAnswer extends Command {
       }
 
     } catch (CacheException e) {
-      throw new ExecutorException("error while setting answer of question");
+      throw new ExecutorException("Error while setting answer of question");
     }
 
     return Atom.NULL_ATOM;
   }
-
 }

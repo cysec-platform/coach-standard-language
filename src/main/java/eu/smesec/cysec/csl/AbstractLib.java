@@ -202,7 +202,7 @@ public abstract class AbstractLib implements CoachLibrary {
 
         // If this is a subcoach we have to update the variables cache in the parent coach
         if (!fqcn.isTopLevel() && executorContext.getParent() != null) {
-            executorContext.setVariable("instanceName", new Atom(Atom.AtomType.STRING, fqcn.getName(), null), null);
+            executorContext.setVariable("instanceName", Atom.fromString(fqcn.getName()), null);
             executorContext.getParent().updateSubcoachVariablesCache(fqcn.getCoachId(), fqcn.getName(), executorContext.getVariables(null));
         }
 

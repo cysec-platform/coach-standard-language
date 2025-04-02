@@ -21,10 +21,13 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * {@link null()} returns the empty string.
+ */
 public class CommandBlank extends Command {
 
+  @Override
   public Atom execute(List<Atom> a, CoachContext coachContext) {
-    return new Atom(Atom.AtomType.STRING,"",null);
+    return Atom.fromString("");
   }
-
 }

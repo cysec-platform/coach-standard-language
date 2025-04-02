@@ -21,29 +21,29 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.platform.bridge.generated.Dictionary;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * A command that replaces the provided key with the referenced entry in the coach dictionary
+ * {@code tn(dictionaryKey)} evaluates to the entry's translation in the coach dictionary.
  */
 public class CommandDictionaryLookup extends Command {
 
     @Override
     public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-        checkNumParams(aList,1);
+        // expects 1 parameter
+        checkNumParams(aList, 1);
 
         // determine key of the entry to search in the dictionary
-        Atom a = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext,null) ;
+        Atom dictionaryKey = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext,"dictionary key");
 
         // handle empty id (return null)
-        final String key = a.getId();
+        String key = dictionaryKey.getId();
         if (key == null || key.isEmpty()) {
             return Atom.NULL_ATOM;
         }
 
         // handle non-existent dictionary
-        final Dictionary dictionary = coachContext.getCoach().getDictionary();
+        Dictionary dictionary = coachContext.getCoach().getDictionary();
         if (dictionary == null || dictionary.getEntry() == null) {
             return Atom.NULL_ATOM;
         }
@@ -52,7 +52,7 @@ public class CommandDictionaryLookup extends Command {
         return dictionary.getEntry().stream()
                 .filter(e -> key.equals(e.getKey()))
                 .findFirst()
-                .map(e -> new Atom(Atom.AtomType.STRING, e.getValue(), null))
+                .map(e -> Atom.fromString(e.getValue()))
                 .orElse(Atom.NULL_ATOM);
     }
 }

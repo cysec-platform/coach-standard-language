@@ -24,10 +24,12 @@ import eu.smesec.cysec.platform.bridge.generated.Metadata;
 
 import java.util.List;
 
+/**
+ * {@code getParentArgument()} returns the parent argument given to this subcoach.
+ */
 public class CommandGetParentArgument extends Command {
 
   public Atom execute(List<Atom> a, CoachContext coachContext) {
-
     try {
       Metadata parentMetadata = coachContext.getCal().getMetadata(coachContext.getFqcn(), "subcoach-data");
       if (parentMetadata != null) {
@@ -36,13 +38,12 @@ public class CommandGetParentArgument extends Command {
                 .filter(mval -> mval.getKey().equals("parent-argument"))
                 .findFirst()
                 .map(mval -> mval.getStringValueOrBinaryValue().getValue())
-                .map(argument -> new Atom(Atom.AtomType.STRING, argument, null))
-                .orElse(new Atom(Atom.AtomType.STRING,"",null));
+                .map(Atom::fromString)
+                .orElse(Atom.fromString(""));
       }
     } catch (CacheException e) {
       coachContext.getLogger().severe("There was an error while executing command 'getParentArgument': " + e.getMessage());
     }
-    return new Atom(Atom.AtomType.STRING,"",null);
+    return Atom.fromString("");
   }
-
 }

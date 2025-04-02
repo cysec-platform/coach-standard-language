@@ -20,7 +20,7 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
-import eu.smesec.cysec.platform.bridge.generated.Question;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,34 +33,39 @@ import java.util.List;
 public class CommandEquals extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
     // Two parameters expected: Two atoms of any type meant to compare
     checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom atom1 = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING,AtomType.INTEGER,AtomType.FLOAT,AtomType.BOOL,AtomType.NULL), true, coachContext, "leftValue" );
-    Atom atom2 = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING,AtomType.INTEGER,AtomType.FLOAT,AtomType.BOOL,AtomType.NULL), true, coachContext, "rightValue" );
+    Atom lhs = checkAtomType(
+      aList.get(0),
+      Arrays.asList(Atom.AtomType.INTEGER, Atom.AtomType.FLOAT, Atom.AtomType.BOOL, Atom.AtomType.STRING, Atom.AtomType.NULL),
+      true,
+      coachContext,
+      "leftValue"
+    );
+    Atom rhs = checkAtomType(
+      aList.get(1),
+      Arrays.asList(Atom.AtomType.INTEGER, Atom.AtomType.FLOAT, Atom.AtomType.BOOL, Atom.AtomType.STRING, Atom.AtomType.NULL),
+      true,
+      coachContext,
+      "rightValue"
+    );
 
-    // Check equivalence
-    if(atom1.getType().equals(atom2.getType())) {
-      if(AtomType.NULL.equals(atom1.getType())) {
-        // Return TRUE if both atoms are of a NULL type
+    // Check that types are equal.
+    if (lhs.getType() == rhs.getType()) {
+      // Nulls are always equal.
+      if (lhs.getType() == AtomType.NULL) {
         return Atom.TRUE;
-      } else if( atom1.getType()!=AtomType.METHODE ) {
-        if(atom1.getId().equals(atom2.getId())) {
-          // Both atoms are of same type and value
-          return Atom.TRUE;
-        } else {
-          // The atoms are of the same type but contain different values
-          return Atom.FALSE;
-        }
-      } else {
-        return Atom.FALSE;
       }
-    } else {
-      // types are inequal
-      return Atom.FALSE;
-    }
-  }
 
+      // All other values check equality through their id.
+      if (rhs.getId().equals(lhs.getId())) {
+        return Atom.TRUE;
+      }
+    }
+
+    // Either the types were unequal, or their ids were unequal.
+    return Atom.FALSE;
+  }
 }

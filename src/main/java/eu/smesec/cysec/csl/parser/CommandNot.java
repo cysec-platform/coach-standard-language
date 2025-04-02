@@ -21,14 +21,16 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * {@code not(arg)} evaluates to {@link Atom#TRUE} if its argument evaluates to {@link Atom#FALSE}.
+ */
 public class CommandNot extends CommandAbstractBoolOp {
 
   @Override
   boolean evaluate(List<Boolean> list, ExecutorContext context) throws ExecutorException {
-    if(list.size()!=1) {
+    if(list.size() != 1) {
       throw new ExecutorException("NOT supports only one parameter");
     }
-    return ! list.get(0);
+    return !list.get(0);
   }
-
 }

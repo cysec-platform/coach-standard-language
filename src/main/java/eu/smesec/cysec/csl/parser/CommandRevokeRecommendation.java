@@ -21,7 +21,6 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,7 +37,7 @@ public class CommandRevokeRecommendation extends Command {
     checkNumParams(aList, 1);
 
     // evaluate parameters
-    Atom recommendationName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "recommendationName" );
+    Atom recommendationName = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "recommendationName");
 
     CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
     RecommendationFactory.Recommendation recommendation = c.getRecommendation(recommendationName.getId());
@@ -51,5 +50,4 @@ public class CommandRevokeRecommendation extends Command {
 
     return Atom.NULL_ATOM;
   }
-
 }

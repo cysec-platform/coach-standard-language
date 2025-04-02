@@ -21,20 +21,22 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * {@code print([arg])} prints the given value to the internal logger, or an empty message if no argument is given.
+ */
 public class CommandPrint extends Command {
 
     @Override
     public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
+        // expects 0-1 parameters
+        checkNumParams(list, 0, 1);
 
-        if(list.size() == 0) {
+        if (list.isEmpty()) {
             coachContext.getLogger().info("");
-
         } else {
             coachContext.getLogger().info(list.get(0).getId());
-
         }
 
-        return new Atom(Atom.AtomType.NULL, null, null);
+        return Atom.NULL_ATOM;
     }
-
 }

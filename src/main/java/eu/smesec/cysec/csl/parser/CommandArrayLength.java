@@ -20,34 +20,24 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
-import java.util.Arrays;
+
 import java.util.List;
 
+/**
+ * {@code arrayLength(array)} returns the length of the array specified in the name.
+ */
 public class CommandArrayLength extends CommandAbstractList {
 
   @Override
-  /**
-   * Returns the size of the specified array as Integer.
-   *
-   * <p>This command has one mandatory parameter:
-   *   <ul>
-   *     <li>(arrayList; String)The array to append to.</li>
-   *   </ul>
-   * </p>
-   * @returns Always true
-   */
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    // expects 2 parameter
-    checkNumParams(aList, 1, 1);
+    // expects 1 parameter
+    checkNumParams(aList, 1);
 
     // evaluate parameters
-    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext,
-        "arrayList");
+    Atom array = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "array");
 
-    List<String> tempList = stringToList(
-        coachContext.getContext().getVariable(arr.getId(), null).getId());
+    List<String> list = stringToList(coachContext.getContext().getVariable(array.getId(), null).getId());
 
-    return new Atom(AtomType.INTEGER, "" + tempList.size(), null);
+    return Atom.fromInteger(list.size());
   }
-
 }

@@ -19,8 +19,8 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class Atom {
 
@@ -28,22 +28,64 @@ public class Atom {
   public static final Atom TRUE = new Atom(AtomType.BOOL, "TRUE", null);
   public static final Atom FALSE = new Atom(AtomType.BOOL, "FALSE", null);
 
-  public enum AtomType {METHODE, INTEGER, FLOAT, BOOL, STRING, NULL;}
+  public enum AtomType {METHODE, INTEGER, FLOAT, BOOL, STRING, NULL}
 
-  private AtomType type = null;
-  private String id = null;
-  private List<Atom> parameters = new Vector<>();
+  private final AtomType type;
+  private final String id;
+  private final List<Atom> parameters;
   private int parentPointer = 0;
 
-  public Atom(AtomType type, String id, List<Atom> parameters) {
+  private Atom(AtomType type, String id, List<Atom> parameters) {
     this.type = type;
     this.id = id;
     this.parameters = parameters;
   }
 
-  public Atom(AtomType type, String id, List<Atom> parameters, int parent) {
-    this(type,id,parameters);
-    this.parentPointer = parent;
+  /**
+   * Create an Atom representing a method call with the given parameters.
+   * <p>
+   * This method does not actually verify the command name, use {@link #validateCommand(String)}
+   * for that purpose.
+   */
+  public static Atom fromCommand(String commandName, List<Atom> parameters) {
+    return new Atom(AtomType.METHODE, commandName, parameters);
+  }
+
+  /**
+   * Create an Atom representing the given integer value.
+   * Note that we only store its String representation, so the value
+   * has to be recovered when needed.
+   */
+  public static Atom fromInteger(int value) {
+    return new Atom(AtomType.INTEGER, "" + value, null);
+  }
+
+  /**
+   * Create an Atom representing the given double floating-point value.
+   * Note that we only store its String representation, so the value
+   * has to be recovered when needed.
+   */
+  public static Atom fromFloat(double value) {
+    return new Atom(AtomType.FLOAT, "" + value, null);
+  }
+
+  /**
+   * Returns either {@link Atom#TRUE} or {@link Atom#FALSE} depending
+   * on the value of the boolean.
+   * <p>
+   * This factory method ensures that those two are the only possible boolean
+   * atoms in existence.
+   */
+  public static Atom fromBoolean(boolean b) {
+    if(b) return Atom.TRUE;
+    else return Atom.FALSE;
+  }
+
+  /**
+   * Create a String Atom from the given String.
+   */
+  public static Atom fromString(String s) {
+    return new Atom(Atom.AtomType.STRING, s, null);
   }
 
   private ExecutorContext getExecutorContext(CoachContext cc) {
@@ -60,68 +102,94 @@ public class Atom {
     return execute(coachContext, getExecutorContext(coachContext));
   }
 
+  /**
+   * Executes this Atom if it represents a method call, looking up the appropriate command.
+   * If this is not a method call Atom, returns itself unchanged.
+   *
+   * @throws ExecutorException if a method name is unknown, or the evaluation fails otherwise.
+   */
   private Atom execute(CoachContext coachContext, ExecutorContext context) throws ExecutorException {
     if (type == AtomType.METHODE) {
       // execute here
       Command command = Command.getCommand(id);
       if (command != null) {
+        int numberOfNormalizedParams = command.getNumberOfNormalizedParams();
 
         // normalize parameter list as far as we can
-        List<Atom> pl = new Vector<>();
+        List<Atom> pl = new ArrayList<>(parameters.size());
         int i = 0;
         for (Atom a : parameters) {
           i++;
-          if (a.getType() == AtomType.METHODE && (i <= command.getNumberOfNormalizedParams() || command.getNumberOfNormalizedParams() == -1)) {
+          // Execute the parameter up to the limit of normalized parameters
+          if (a.getType() == AtomType.METHODE && i <= numberOfNormalizedParams) {
             a = a.execute(coachContext);
           }
           pl.add(a);
         }
 
         // execute command
+        // FIXME: getExecutorContext(coachContext) is equivalent to the context parameter we have. Redundant?
         return command.execute(pl, coachContext, getExecutorContext(coachContext));
       } else {
-        throw new ExecutorException("Found unknown methode \"" + id + "\"");
+        throw new ExecutorException("Tried executing unknown method: \"" + id + "\"");
       }
     } else {
       return this;
     }
   }
 
+  /**
+   * Check whether the given name could be resolved to a {@link Command}.
+   */
   public static boolean validateCommand(String name) {
     return Command.getCommand(name) != null;
   }
 
+  /**
+   * Replaces the parent pointer for this Atom, returning the old one.
+   */
   public int setParent(int parentPointer) {
     int ret = this.parentPointer;
     this.parentPointer = parentPointer;
     return ret;
   }
 
+  /** The type of this Atom. */
   public AtomType getType() {
     return type;
   }
 
+  /** The String id of this Atom, or {@code null} in the case of {@link Atom#NULL_ATOM}. */
   public String getId() {
     return id;
   }
 
+  // FIXME Java 14 Switch Expressions
   public String toString() {
-    String ret = "";
+    String ret;
     switch (type) {
       case METHODE:
-        ret += id + "( ";
-        for (Atom a : parameters) {
-          ret += a.toString() + ", ";
-        }
-        if (parameters.size() >= 1) {
-          ret = ret.substring(0, ret.length() - 2) + " )";
+        StringBuilder methodCall = new StringBuilder(id);
+
+        // If no parameters are present, simply "method()"
+        if(parameters.isEmpty()) {
+          methodCall.append("()");
         } else {
-          // in case of no atoms
-          ret = ret.substring(0, ret.length() - 1) + ")";
+          // Parameters are present, so we do "method( arg1, arg2, arg3 )"
+          methodCall.append("( ");
+          boolean first = true;
+          for (Atom a : parameters) {
+            if(!first)
+              methodCall.append(", ");
+            methodCall.append(a.toString());
+            first = false;
+          }
+          methodCall.append(" )");
         }
+        ret = methodCall.toString();
         break;
       case STRING:
-        ret += "\"" + id + "\"";
+        ret = "\"" + id + "\"";
         break;
       case NULL:
         ret = "NULL";
@@ -129,29 +197,31 @@ public class Atom {
       case INTEGER:
       case FLOAT:
       case BOOL:
-        ret += id;
+        ret = id;
         break;
       default:
-        throw new NullPointerException("type " + type + " cannot be printed (Not implemented)");
+        throw new IllegalArgumentException("type " + type + " cannot be printed (Not implemented)");
     }
     return ret;
   }
 
+  /**
+   * Evaluates this Atom and returns {@code true} if it results in the boolean atom {@link Atom#TRUE}.
+   *
+   * @throws ExecutorException if this is not a boolean atom (or a method that didn't return a boolean atom)
+   */
   public boolean isTrue(CoachContext coachContext) throws ExecutorException {
-    Atom eval = this;
-    if (getType() == AtomType.METHODE) {
-      eval = execute(coachContext);
-    }
+    Atom eval = this.execute(coachContext);
     if (eval.getType() != AtomType.BOOL) {
-      throw new ExecutorException("condition \"" + this.toString() + "\" does not evaluate to BOOL (is:" + eval + ")");
+      throw new ExecutorException("Condition \"" + this + "\" does not evaluate to BOOL (is: " + eval + ")");
     }
     if ("TRUE".equals(eval.getId())) {
       return true;
     } else if ("FALSE".equals(eval.getId())) {
       return false;
     } else {
-      throw new ExecutorException("boolean value is illegal \"" + eval.toString() + "\" (OUCH! How did that happen)");
+      // Technically cannot happen anymore, but better safe than sorry.
+      throw new ExecutorException("boolean value is illegal \"" + eval + "\" (OUCH! How did that happen)");
     }
   }
-
 }

@@ -21,16 +21,13 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * {@code and(...args)} evaluates to {@link Atom#TRUE} if all arguments evaluate to {@link Atom#TRUE}.
+ */
 public class CommandAnd extends CommandAbstractBoolOp {
 
   @Override
   boolean evaluate(List<Boolean> list, ExecutorContext context) {
-    for ( boolean b:list ) {
-      if(!b) {
-        return false;
-      }
-    }
-    return true;
+    return list.stream().allMatch(Boolean::booleanValue);
   }
-
 }

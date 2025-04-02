@@ -24,31 +24,21 @@ import java.util.Vector;
 
 public abstract class CommandAbstractBoolOp extends Command {
 
-  private final static Atom TRUE = new Atom(Atom.AtomType.BOOL, "TRUE", null);
-  private final static Atom FALSE = new Atom(Atom.AtomType.BOOL, "FALSE", null);
-
   @Override
   public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException {
-    if (list == null || list.size() < 1) {
+    if (list == null || list.isEmpty()) {
       throw new ExecutorException("boolean operations require at least one argument");
     }
     List<Boolean> blist = new Vector<>();
-    for (Atom a : list) {
-      String old = a.toString();
-      try{
-        if (a.getType() == Atom.AtomType.METHODE) {
-          a = a.execute(coachContext);
-        }
-        blist.add(a.isTrue(coachContext));
+    for (Atom atom : list) {
+        try {
+        // Check whether the atom is or evaluates to TRUE.
+        blist.add(atom.isTrue(coachContext));
       } catch(ExecutorException e) {
-        throw new ExecutorException("Exception while evaluating parameter "+old+"in boolean op "+getCommandName(),e);
+        throw new ExecutorException("Exception while evaluating parameter " + atom + " in boolean op " + getCommandName(), e);
       }
     }
-    if (evaluate(blist, coachContext.getContext())) {
-      return TRUE;
-    } else {
-      return FALSE;
-    }
+    return Atom.fromBoolean(evaluate(blist, coachContext.getContext()));
   }
 
   abstract boolean evaluate(List<Boolean> list, ExecutorContext context) throws ExecutorException;

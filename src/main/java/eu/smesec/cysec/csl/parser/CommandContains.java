@@ -20,21 +20,22 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
-import java.util.Arrays;
+
 import java.util.List;
 
+/**
+ * {@code contains(haystack, needle)} checks whether the given needle is within the haystack strign.
+ */
 public class CommandContains extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-
-    // expects 2 or 3 parameters
-    checkNumParams(aList, 2,2);
+    // expects 2 parameters
+    checkNumParams(aList, 2);
 
     // evaluate parameters
-    Atom varHaystack = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "content");
-    Atom varNeedle = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "content");
+    Atom haystack = checkAtomType(aList.get(0), AtomType.STRING, true, coachContext, "haystack");
+    Atom needle = checkAtomType(aList.get(1), AtomType.STRING, true, coachContext, "needle");
 
-    return (varHaystack.getId().contains(varNeedle.getId())?Atom.TRUE:Atom.FALSE);
+    return Atom.fromBoolean(haystack.getId().contains(needle.getId()));
   }
-
 }

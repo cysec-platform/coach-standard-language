@@ -48,7 +48,7 @@ public class CySeCLineAtom {
   }
 
   public Atom execute(CoachContext coachContext) throws ExecutorException {
-    Atom lastResult = new Atom(Atom.AtomType.BOOL, "TRUE", new Vector<>());
+    Atom lastResult = Atom.TRUE;
     for (Atom a : getStatements()) {
       lastResult = a.execute(coachContext);
     }

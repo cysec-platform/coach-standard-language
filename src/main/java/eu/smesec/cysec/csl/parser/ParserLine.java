@@ -168,6 +168,7 @@ public class ParserLine {
         && ABNF_QUOTED_SPECIALS.contains(snoopBytes(2).substring(1, 2));
   }
 
+  // FIXME: This method does not read anything, it simply returns a boolean that is ignored. Most likely not intended?
   private boolean readBuffer(long num) {
     // make sure that we have sufficient bytes in the buffer
 
@@ -442,14 +443,14 @@ public class ParserLine {
     Matcher REGEX_FLOAT = Pattern.compile("^([-+]?\\d*\\.\\d+)").matcher(buffer);
     if (REGEX_FLOAT.find()) {
       // get float
-      String id = "" + Double.valueOf(REGEX_FLOAT.group(1));
+      double value = Double.parseDouble(REGEX_FLOAT.group(1));
       skipBytes(REGEX_FLOAT.group(1).length());
-      return new Atom(Atom.AtomType.FLOAT, id, null);
+      return Atom.fromFloat(value);
     } else if (REGEX_INTEGER.find()) {
       // get integer
-      String id = "" + Integer.valueOf(REGEX_INTEGER.group(1));
+      int value = Integer.parseInt(REGEX_INTEGER.group(1));
       skipBytes(REGEX_INTEGER.group(1).length());
-      return new Atom(Atom.AtomType.INTEGER, id, null);
+      return Atom.fromInteger(value);
     } else {
       throw new ParserException("Exception while getting numerical atom", this);
     }
@@ -462,10 +463,10 @@ public class ParserLine {
       // get string
       String s = getQuotedString();
       // collate value
-      ret = new Atom(Atom.AtomType.STRING, s, null);
+      ret = Atom.fromString(s);
     } else if ("TRUE".equals(snoopBytes(4)) || "FALSE".equals(snoopBytes(5))) {
       // get boolean
-      ret = new Atom(Atom.AtomType.BOOL, getATag().equals("TRUE") ? "TRUE" : "FALSE", null);
+      ret = Atom.fromBoolean(getATag().equals("TRUE"));
     } else if ("-+.0123456789".contains(snoopBytes(1))) {
       // get numerical
       ret = getNumericalAtom();
@@ -512,9 +513,8 @@ public class ParserLine {
         skipBytes(1);
         skipNoFunc();
 
-        ret = new Atom(Atom.AtomType.METHODE, commandName, parameters);
+        ret = Atom.fromCommand(commandName, parameters);
         ret.setParent(parentPointer);
-
       }
     } else {
       throw new ParserUnexpectedTokenException(this);

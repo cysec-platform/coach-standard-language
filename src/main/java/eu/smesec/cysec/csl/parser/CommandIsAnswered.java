@@ -24,9 +24,14 @@ import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Answer;
 import eu.smesec.cysec.platform.bridge.generated.Question;
 
-import java.util.Arrays;
 import java.util.List;
 
+/**
+ * {@code isAnswered(questionId)} checks whether the given question ID has been answered.
+ * Hidden questions get treated as unanswered.
+ *
+ * @see CommandIsSelected
+ */
 public class CommandIsAnswered extends Command {
 
   public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
@@ -35,36 +40,28 @@ public class CommandIsAnswered extends Command {
     checkNumParams(aList, 1);
 
     // evaluate parameters
-    Atom varContent = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varContent");
+    Atom questionId = checkAtomType(aList.get(0), Atom.AtomType.STRING, true, coachContext, "question ID");
 
     // Check if the question is even visible. If the question is hidden there's no way that it can be answered
     if (coachContext.getCoach().getQuestions().getQuestion().stream()
-            .filter(q -> q.getId().equals(varContent.getId()))
+            .filter(q -> q.getId().equals(questionId.getId()))
             .findFirst()
             .map(Question::isHidden)
-            .orElseThrow(() -> new ExecutorException("Question id " + varContent.getId() + " doesn't exist"))) {
-      return new Atom(Atom.AtomType.BOOL, "FALSE", null);
+            .orElseThrow(() -> new ExecutorException("Question id " + questionId.getId() + " doesn't exist"))) {
+      return Atom.FALSE;
     }
 
     // determine provided option is selected
     ILibCal cal = coachContext.getCal();
-    Answer answer = null;
+    Answer answer;
     try {
-      // Attention: Use question ID instead of question! getAnswer accepts Object.
+      // Attention: Use the inner Id of the questionId Atom. getAnswer accepts Object, unfortunately.
       // Answer object in CoachContext is answer of evaluated question, isAnswered may be executed for another question
       // which is not in the current context.
-      answer = cal.getAnswer(coachContext.getFqcn().toString(), varContent.getId());
+      answer = cal.getAnswer(coachContext.getFqcn().toString(), questionId.getId());
     } catch (CacheException e) {
-      throw new NullPointerException();
+      throw new NullPointerException("Could not get isAnswered state for: " + questionId.getId());
     }
-    String boolResult;
-    if (answer != null) {
-      boolResult = "TRUE";
-    } else {
-      boolResult = "FALSE";
-    }
-
-    return new Atom(Atom.AtomType.BOOL, boolResult, null);
+    return Atom.fromBoolean(answer != null);
   }
-
 }
