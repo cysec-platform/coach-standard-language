@@ -33,9 +33,7 @@ import eu.smesec.cysec.csl.parser.ExecutorException;
 import eu.smesec.cysec.csl.parser.ParserException;
 import eu.smesec.cysec.csl.parser.ParserLine;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -50,6 +48,9 @@ public class LogicRunner {
     private String logicFQDN;
     private String logicMetadataKey;
     private String logicMvalueKey;
+
+    // The listing cache is a simple caching mechanism for the AST of CSL listings
+    private final Map<String, List<CySeCLineAtom>> listingCache;
 
     public LogicRunner(Logger logger, ILibCal cal, AbstractLib library, List<Metadata> metadataList) {
         this.cal = cal;
@@ -66,6 +67,12 @@ public class LogicRunner {
         logicPre = Optional.ofNullable(logicMvalues.get(library.prop.getProperty("coach.mvalue.logicPreQuestion")));
         logicPost = Optional.ofNullable(logicMvalues.get(library.prop.getProperty("coach.mvalue.logicPostQuestion")));
         logicOnBegin = Optional.ofNullable(logicMvalues.get(library.prop.getProperty("coach.mvalue.logicOnBegin")));
+
+        // The listing cache must be synchronized because there might be multiple users accessing the map at the same time
+        listingCache = Collections.synchronizedMap(new LinkedHashMap<>(1000, 0.75f, false) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<String, List<CySeCLineAtom>> eldest) { return size() > 1000; }
+        });
     }
 
     public void runOnBegin(FQCN fqcn) throws ParserException, ExecutorException {
@@ -119,8 +126,20 @@ public class LogicRunner {
         if(logicComposition.isEmpty()) {
             logger.info("No logic to run");
         } else {
-            logger.info("Running logic: " + logicComposition);
-            List<CySeCLineAtom> lines = new ParserLine(logicComposition).getCySeCListing();
+            logger.info("Running logic (FQCN: " + fqcn + ", QID: " + question.getId() + ")");
+            logger.fine("Logic source code being run: " + logicComposition);
+
+            // Fetch listing form cache or compute it if not in cache already
+            List<CySeCLineAtom> lines;
+            if (listingCache.containsKey(logicComposition)) {
+                logger.fine("Cache hit for logic composition (FQCN: " + fqcn + ", QID: " + question.getId() + ")");
+                lines = listingCache.get(logicComposition);
+            } else {
+                logger.fine("No cache hit for logic composition (FQCN: " + fqcn + ", QID: " + question.getId() + "), computing now...");
+                lines = new ParserLine(logicComposition).getCySeCListing();
+                listingCache.put(logicComposition, lines);
+            }
+
             ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext(library.getQuestionnaire().getId());
             CoachContext coachContext = new CoachContext(
                     context,
