@@ -93,7 +93,7 @@ public class CySeCExecutorContextFactory {
     }
 
     public void printVariables(Logger logger) {
-      variables.forEach((key, value) -> logger.info(String.format("%s : %s", key, Arrays.toString(value.getAll().toArray()))));
+      variables.forEach((key, value) -> logger.fine(String.format("%s : %s", key, Arrays.toString(value.getAll().toArray()))));
     }
 
     public void reset() {

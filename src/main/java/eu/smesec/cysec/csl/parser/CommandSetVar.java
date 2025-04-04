@@ -46,7 +46,7 @@ public class CommandSetVar extends Command {
 
     // set the score
     coachContext.getContext().setVariable(varName.getId(), varContent, varContext == Atom.NULL_ATOM ? null : varContext.getId());
-    coachContext.getLogger().info(String.format("Set variable %s to %s in context %s", varName.getId(), varContent.getId(), varContent.getId()));
+    coachContext.getLogger().fine(String.format("Set variable %s to %s in context %s", varName.getId(), varContent.getId(), varContent.getId()));
 
     return Atom.NULL_ATOM;
   }

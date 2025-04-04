@@ -156,7 +156,7 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
      * @param metadata The metadata object to save/update
      */
     public void createMetadata(FQCN fqcn, Metadata metadata) {
-        logger.info(String.format("Creating metadata: %s on %s", metadata.getKey(), fqcn.toString()));
+        logger.fine(String.format("Creating metadata: %s on %s", metadata.getKey(), fqcn.toString()));
         try {
             cal.setMetadata(fqcn, metadata);
         } catch (CacheException e) {
@@ -171,11 +171,11 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
      * @param key the fqdn of the metadata object
      */
     public void deleteMetadata(FQCN fqcn, String key) {
-        logger.info(String.format("Removing metadata: %s from %s", key, fqcn.toString()));
+        logger.fine(String.format("Removing metadata: %s from %s", key, fqcn.toString()));
         try {
             Metadata metadata = cal.getMetadata(fqcn, key);
             if (metadata != null) {
-                logger.info(String.format("Found metadata: %s", metadata.getKey()));
+                logger.fine(String.format("Found metadata: %s", metadata.getKey()));
                 cal.deleteMetadata(fqcn, metadata.getKey());
             }
         } catch (CacheException e) {
@@ -191,7 +191,7 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
      * @return an Optional with the Answer object
      */
     public Optional<Answer> getAnswer(FQCN fqcn, String questionId) {
-        logger.info(String.format("Looking for answer: %s in %s", questionId, fqcn.toString()));
+        logger.fine(String.format("Looking for answer: %s in %s", questionId, fqcn.toString()));
         Answer answer;
         try {
             // always retrieve answers from your own answer file
@@ -234,13 +234,13 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
         for(ScoreFactory.Score score : context.getScores()) {
             String value = String.valueOf(score.getValue());
             scoreMvalues.add(MetadataUtils.createMvalueStr(score.getId(), value));
-            logger.info(String.format("Saving Skill ([%s]: %s to Metadata", score.getId(), value));
+            logger.fine(String.format("Saving Skill ([%s]: %s to Metadata", score.getId(), value));
         }
         // don't save uu score in skills, belongs to rating
         scoreMvalues.remove(context.getScore(library.prop.getProperty("library.skills.uu")));
         scoreMvalues.remove(context.getScore(library.prop.getProperty("library.skills.uuMax")));
-        logger.info(String.format("Saving Skill state ([Endurance]: %s) to file", library.endurance.toString()));
-        logger.info(String.format("Saving Skill ([Endurance]: %d) to file", library.endurance.get()));
+        logger.fine(String.format("Saving Skill state ([Endurance]: %s) to file", library.endurance.toString()));
+        logger.fine(String.format("Saving Skill ([Endurance]: %d) to file", library.endurance.get()));
         // manually add endurance, as it is tracked separately
         scoreMvalues.add(MetadataUtils.createMvalueStr(MV_ENDURANCE, String.valueOf(library.endurance.get())));
         scoreMvalues.add(MetadataUtils.createMvalueStr(MV_ENDURANCE_STATE, library.endurance.toString()));

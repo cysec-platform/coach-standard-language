@@ -36,7 +36,7 @@ public abstract class CommandAbstractScore extends Command {
 
     // set the score
     score(scoreName.getId(), coachContext.getQuestionContext().getId(), Double.valueOf(scoreValue.getId()), coachContext.getContext());
-    coachContext.getLogger().info( String.format("Adding %s to score %s in context %s", scoreValue.getId(), scoreName.getId(), coachContext.getContext()));
+    coachContext.getLogger().fine( String.format("Adding %s to score %s in context %s", scoreValue.getId(), scoreName.getId(), coachContext.getContext()));
 
     return Atom.NULL_ATOM;
   }

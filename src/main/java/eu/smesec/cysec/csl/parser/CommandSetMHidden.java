@@ -47,7 +47,7 @@ public class CommandSetMHidden extends Command {
     Atom varLowId = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "lowID");
     Atom varHighId = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "highID");
     boolean varContentBool = Boolean.valueOf(checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.BOOL), true, coachContext,"hideState").getId());
-    coachContext.getLogger().info(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), varContentBool));
+    coachContext.getLogger().fine(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), varContentBool));
 
     // Update question hidden status
     int cnt = 0;
@@ -58,7 +58,7 @@ public class CommandSetMHidden extends Command {
           && varHighId.getId().compareTo(question.getId()) > 0
           && question.isHidden()!=varContentBool) {
         question.setHidden(varContentBool);
-        coachContext.getLogger().info(String.format("  question %s is new set to hidden=%s (%d/%d)", question.getId(), varContentBool?"HIDDEN":"VISIBLE",varLowId.getId().compareTo(question.getId()),varHighId.getId().compareTo(question.getId())));
+        coachContext.getLogger().fine(String.format("  question %s is new set to hidden=%s (%d/%d)", question.getId(), varContentBool?"HIDDEN":"VISIBLE",varLowId.getId().compareTo(question.getId()),varHighId.getId().compareTo(question.getId())));
         cnt++;
       }
     }

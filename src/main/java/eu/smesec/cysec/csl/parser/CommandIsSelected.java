@@ -87,7 +87,7 @@ public class CommandIsSelected extends Command {
       ans="<UNSET>";
       boolResult = "FALSE";
     }
-    coachContext.getLogger().info(String.format("isSelected(%s) == currently:%s ==> %s", varContent.getId(), ans, boolResult));
+    coachContext.getLogger().fine(String.format("isSelected(%s) == currently:%s ==> %s", varContent.getId(), ans, boolResult));
 
     return new Atom(Atom.AtomType.BOOL, boolResult, null);
   }
