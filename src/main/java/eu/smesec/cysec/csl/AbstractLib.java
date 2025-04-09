@@ -191,6 +191,11 @@ public abstract class AbstractLib implements CoachLibrary {
         try {
             logicRunner.runLogic(question, fqcn);
 
+            // If this is a subcoach we have to update the variables cache in the parent coach
+            if (!fqcn.isTopLevel() && executorContext.getParent() != null) {
+                executorContext.setVariable("instanceName", new Atom(Atom.AtomType.STRING, fqcn.getName(), null), null);
+                executorContext.getParent().updateSubcoachVariablesCache(fqcn.getCoachId(), fqcn.getName(), executorContext.getVariables(null));
+            }
         } catch(Exception e) {
             logger.log(Level.SEVERE, "Error during execution of question logic", e);
         }
@@ -199,12 +204,6 @@ public abstract class AbstractLib implements CoachLibrary {
         persistanceManager.saveSkills(fqcn);
 
         updateActiveQuestions(fqcn);
-
-        // If this is a subcoach we have to update the variables cache in the parent coach
-        if (!fqcn.isTopLevel() && executorContext.getParent() != null) {
-            executorContext.setVariable("instanceName", new Atom(Atom.AtomType.STRING, fqcn.getName(), null), null);
-            executorContext.getParent().updateSubcoachVariablesCache(fqcn.getCoachId(), fqcn.getName(), executorContext.getVariables(null));
-        }
 
         List<Command> commands = new ArrayList<>();
 
@@ -357,6 +356,7 @@ public abstract class AbstractLib implements CoachLibrary {
     @Override
     public List<Command> onBegin(FQCN fqcn) {
         getLogger().info("Running onBegin routine for " + fqcn.toString());
+        setActiveInstance(fqcn.getName());
         List<Command> commands = new ArrayList<>();
 
         Command updateActiveQuestions = new Command(Commands.UPDATE_ACTIVE_QUESTIONS.toString(),
@@ -364,33 +364,20 @@ public abstract class AbstractLib implements CoachLibrary {
         commands.add(updateActiveQuestions);
         commands.add(new Command(Commands.LOAD_BLOCK.toString(), new String[]{"b1"}));
 
+        // Clear subcoach variables cache
+        executorContext.getSubcoachVariablesCache().clear();
+
         try {
             logicRunner.runOnBegin(fqcn);
+
+            // If this is a subcoach we have to update the variables cache in the parent coach after executing logic
+            if (!fqcn.isTopLevel() && executorContext.getParent() != null) {
+                executorContext.setVariable("instanceName", new Atom(Atom.AtomType.STRING, fqcn.getName(), null), null);
+                executorContext.getParent().updateSubcoachVariablesCache(fqcn.getCoachId(), fqcn.getName(), executorContext.getVariables(null));
+            }
         } catch (ParserException | ExecutorException e) {
             logger.log(Level.SEVERE, "Error running logic" ,e);
         }
-
-        // Instantiate all sub-coaches
-        questionnaire.getQuestions()
-                .getQuestion()
-                .stream()
-                .filter(q -> Objects.equals(q.getType(), QuestionType.SUBCOACH))
-                .forEach(q -> {
-                    try {
-                        Questionnaire subcoach = cal.getCoach(q.getSubcoachId());
-                        CoachLibrary subcoachLibrary = cal.getLibraries(subcoach.getId()).get(0);
-                        Metadata parentArgument = MetadataBuilder
-                                .newInstance(subcoachLibrary)
-                                .setMvalue("parent-argument", q.getParentArgument())
-                                .buildCustom("subcoach-data");
-                        cal.instantiateSubCoach(subcoach, Set.of(q.getInstanceName()), parentArgument);
-                    } catch (CacheException e) {
-                        logger.severe("Error while instantiating sub-coaches: " + e.getMessage());
-                    }
-                });
-
-        // Clear subcoach variables cache
-        executorContext.getSubcoachVariablesCache().clear();
 
         // Save max skill values
         String strengthScore = String.valueOf(executorContext.getScore(prop.getProperty("library.skills.strength")).getValue());

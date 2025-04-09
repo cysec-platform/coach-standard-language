@@ -152,10 +152,19 @@ public class CySeCExecutorContextFactory {
       if (parent != null && parent instanceof CySeCExecutorContext) {
         return Arrays.asList(getRecommendationList());
       } else {
-        return Stream.concat(Stream.of(recommendations), subcoachRecommendationsCache.values().stream())
+        // The following code returns the recommendations of all subcoaches.
+        // Since all the subcoaches contain all the recommendations there are many duplicates. We deduplicate by only
+        // selecting one of each recommendation making sure that the chosen recommendation is an "active" one if
+        // there's an active one amongst the recommendation with the same ID.
+        RecommendationFactory.Tag active = new RecommendationFactory.Tag("active", new RecommendationFactory.TagCategory("_meta", "#000000"));
+        return new ArrayList<>(Stream.concat(Stream.of(recommendations), subcoachRecommendationsCache.values().stream())
                 .flatMap(r -> Arrays.stream(r.getRecommendationList()))
-                .distinct()
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(RecommendationFactory.Recommendation::getId, r -> r, (a, b) -> {
+                  if (a.getTags().contains(active)) return a;
+                  if (b.getTags().contains(active)) return b;
+                  return a;
+                })).values());
+
       }
     }
 
