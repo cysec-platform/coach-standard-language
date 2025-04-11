@@ -356,6 +356,10 @@ public class CySeCExecutorContextFactory {
     public void setActiveInstance(String activeInstance) {
       this.activeInstance = activeInstance;
     }
+
+    public Map<String, RecommendationFactory> getSubcoachRecommendationsCache() {
+      return subcoachRecommendationsCache;
+    }
   }
 
   // Since the context exists once per classloader, the map isn't necessary as there will always be a 1:1 relation
