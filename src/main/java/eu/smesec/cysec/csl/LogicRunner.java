@@ -34,45 +34,39 @@ import eu.smesec.cysec.csl.parser.ParserException;
 import eu.smesec.cysec.csl.parser.ParserLine;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class LogicRunner {
-    Optional<MetadataUtils.SimpleMvalue> logicPre;
-    Optional<MetadataUtils.SimpleMvalue> logicPost;
-    Optional<MetadataUtils.SimpleMvalue> logicOnBegin;
-    private ILibCal cal;
-    private Logger logger;
+    private final ILibCal cal;
+    private final Logger logger;
     // TODO: Replace with PersistenceManager
-    private AbstractLib library;
-    private String logicFQDN;
-    private String logicMetadataKey;
-    private String logicMvalueKey;
+    private final AbstractLib library;
+    private final String logicMetadataKey;
+    private final String logicMvalueKey;
 
-    // The listing cache is a simple caching mechanism for the AST of CSL listings
-    private final Map<String, List<CySeCLineAtom>> listingCache;
+    private final List<CySeCLineAtom> logicPreAst = new ArrayList<>();
+    private final List<CySeCLineAtom> logicPostAst = new ArrayList<>();
+    private final List<CySeCLineAtom> logicOnBeginAst = new ArrayList<>();
+    private final Map<String, List<CySeCLineAtom>> questionsAst;
+
+    private final CompletableFuture<Void> parseTask;
 
     public LogicRunner(Logger logger, ILibCal cal, AbstractLib library, List<Metadata> metadataList) {
         this.cal = cal;
         this.library = library;
         this.logger = logger;
-        logicMetadataKey = library.prop.getProperty("coach.metadata.logic");
-        logicMvalueKey = library.prop.getProperty("coach.mvalue.logic");
-        logicFQDN = logicMetadataKey + "." + logicMvalueKey;
-        List<Mvalue> logicMvalueList = metadataList.stream()
-                .filter(metadata -> metadata.getKey().startsWith(logicMetadataKey))
-                .flatMap(metadata -> metadata.getMvalue().stream())
-                .collect(Collectors.toList());
-        Map<String, MetadataUtils.SimpleMvalue> logicMvalues = MetadataUtils.parseMvalues(logicMvalueList);
-        logicPre = Optional.ofNullable(logicMvalues.get(library.prop.getProperty("coach.mvalue.logicPreQuestion")));
-        logicPost = Optional.ofNullable(logicMvalues.get(library.prop.getProperty("coach.mvalue.logicPostQuestion")));
-        logicOnBegin = Optional.ofNullable(logicMvalues.get(library.prop.getProperty("coach.mvalue.logicOnBegin")));
-
-        // The listing cache must be synchronized because there might be multiple users accessing the map at the same time
-        listingCache = Collections.synchronizedMap(new LinkedHashMap<>(1000, 0.75f, false) {
+        logicMetadataKey = AbstractLib.prop.getProperty("coach.metadata.logic");
+        logicMvalueKey = AbstractLib.prop.getProperty("coach.mvalue.logic");
+        questionsAst = Collections.synchronizedMap(new LinkedHashMap<>(1000, 0.75f, false) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<String, List<CySeCLineAtom>> eldest) { return size() > 1000; }
         });
+
+        // Parse the logic of the coach, this is done async because it can take a few seconds to parse
+        parseTask = CompletableFuture.runAsync(() -> parseLogic(metadataList));
     }
 
     public void runOnBegin(FQCN fqcn) throws ParserException, ExecutorException {
@@ -81,7 +75,7 @@ public class LogicRunner {
         Question fakeQuestion = new Question();
         fakeQuestion.setId("qOnBegin");
 
-        runLogic(fakeQuestion, logicOnBegin, fqcn);
+        runAst(fakeQuestion, logicOnBeginAst, fqcn);
     }
 
     /**
@@ -93,64 +87,95 @@ public class LogicRunner {
      * @throws ExecutorException If there is an error running the logic
      */
     public void runLogic(Question question, FQCN fqcn) throws ParserException, ExecutorException {
-        logger.info("Extracting logic from question");
-        Map<String, MetadataUtils.SimpleMvalue> map = MetadataUtils.parseMvalues(
-                question.getMetadata().stream()
-                        .filter(metadata -> metadata.getKey().equals(logicMetadataKey))
-                        .flatMap(metadata -> metadata.getMvalue()
-                                .stream())
-                        .collect(Collectors.toList())
-        );
+        // First, we build up a complete ast containing pre, post and question logic
+        List<CySeCLineAtom> ast = new ArrayList<>(logicPreAst);
+        ast.addAll(questionsAst.getOrDefault(question.getId(), new ArrayList<>()));
+        ast.addAll(logicPostAst);
 
-        Optional<MetadataUtils.SimpleMvalue> logic = Optional.ofNullable(map.get(logicMvalueKey));
-        runLogic(question, logic, fqcn);
+        // Then we can run it
+        runAst(question, ast, fqcn);
     }
 
     /**
-     * Combines pre, post and question logic and runs its value
-     *
-     * <p>Logic doesn't run if it is a blank line, otherwise ParserError occurs</p>
-     *
-     * @param question The question object
-     * @param logic the logic
-     * @param fqcn The fqcn of the coach
-     * @throws ParserException   If the composed logic line is malformed
-     * @throws ExecutorException If there is an error running the logic
+     * This method actually runs the AST. It waits for the parsing to finish and then creates a coach context and
+     * executes the AST in this context.
+     * @param question The question that whose logic is being run
+     * @param ast the AST to execute
+     * @param fqcn the FQCN of the coach instance
+     * @throws ExecutorException
      */
-    public void runLogic(Question question, Optional<MetadataUtils.SimpleMvalue> logic, FQCN fqcn) throws ParserException, ExecutorException {
-        String logicComposition = "";
-        if (logicPre.isPresent()) logicComposition += logicPre.get().getValue();
-        if (logic.isPresent()) logicComposition += logic.get().getValue();
-        if (logicPost.isPresent()) logicComposition += logicPost.get().getValue();
+    private void runAst(Question question, List<CySeCLineAtom> ast, FQCN fqcn) throws ExecutorException {
+        // Make sure paring has finished, otherwise we cannot run the logic
+        parseTask.join();
 
-        if(logicComposition.isEmpty()) {
-            logger.info("No logic to run");
-        } else {
-            logger.info("Running logic (FQCN: " + fqcn + ", QID: " + question.getId() + ")");
-            logger.fine("Logic source code being run: " + logicComposition);
+        ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext(library.getQuestionnaire().getId());
+        CoachContext coachContext = new CoachContext(
+                context,
+                cal,
+                question,
+                library.getPersistanceManager().getAnswer(fqcn, question.getId()),
+                library.getQuestionnaire(),
+                fqcn);
+        coachContext.setLogger(logger);
+        context.executeQuestion(ast, coachContext);
+    }
 
-            // Fetch listing form cache or compute it if not in cache already
-            List<CySeCLineAtom> lines;
-            if (listingCache.containsKey(logicComposition)) {
-                logger.fine("Cache hit for logic composition (FQCN: " + fqcn + ", QID: " + question.getId() + ")");
-                lines = listingCache.get(logicComposition);
-            } else {
-                logger.fine("No cache hit for logic composition (FQCN: " + fqcn + ", QID: " + question.getId() + "), computing now...");
-                lines = new ParserLine(logicComposition).getCySeCListing();
-                listingCache.put(logicComposition, lines);
+    /**
+     * This method parses the logic of the coach into AST, so it's ready to execute when needed.
+     * The coach contains pre-question logic, post-question logic, onBegin-logic and question-specific logic.
+     * All of those are parsed and stored in a map.
+     * @param metadataList contains the metadata of the questionnaire, which in turn contains the CSL code
+     */
+    private void parseLogic(List<Metadata> metadataList) {
+        try {
+            // Parse pre, post and on-begin logic
+            logger.info("Parsing pre, post and onBegin logic of coach " +  library.getId());
+            List<Mvalue> logicMvalueList = metadataList.stream()
+                    .filter(metadata -> metadata.getKey().startsWith(logicMetadataKey))
+                    .flatMap(metadata -> metadata.getMvalue().stream())
+                    .collect(Collectors.toList());
+            Function<String, String> logicExtractor = metadataKey -> Optional
+                    .of(MetadataUtils.parseMvalues(logicMvalueList).get(AbstractLib.prop.getProperty(metadataKey)))
+                    .map(MetadataUtils.SimpleMvalue::getValue)
+                    .orElse("");
+            logicPreAst.addAll(getAstOfCode(logicExtractor.apply("coach.mvalue.logicPreQuestion")));
+            logicPostAst.addAll(getAstOfCode(logicExtractor.apply("coach.mvalue.logicPostQuestion")));
+            logicOnBeginAst.addAll(getAstOfCode(logicExtractor.apply("coach.mvalue.logicOnBegin")));
+
+            // Parse question logic
+            logger.info("Parsing questions logic of coach " + library.getId());
+
+            for (Question question : library.getQuestionnaire().getQuestions().getQuestion()) {
+                logger.fine("Parsing question logic of question with QID" + question.getId());
+                Map<String, MetadataUtils.SimpleMvalue> map = MetadataUtils.parseMvalues(
+                        question.getMetadata().stream()
+                                .filter(metadata -> metadata.getKey().equals(logicMetadataKey))
+                                .flatMap(metadata -> metadata.getMvalue()
+                                        .stream())
+                                .collect(Collectors.toList())
+                );
+                Optional<MetadataUtils.SimpleMvalue> logic = Optional.ofNullable(map.get(logicMvalueKey));
+                if (logic.isPresent()) {
+                    List<CySeCLineAtom> ast = getAstOfCode(logic.get().getValue());
+                    questionsAst.put(question.getId(), ast);
+                }
             }
 
-            ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext(library.getQuestionnaire().getId());
-            CoachContext coachContext = new CoachContext(
-                    context,
-                    cal,
-                    question,
-                    library.getPersistanceManager().getAnswer(fqcn, question.getId()),
-                    library.getQuestionnaire(),
-                    fqcn);
-            coachContext.setLogger(logger);
-            context.executeQuestion(lines, coachContext);
+            logger.info("Finished parsing of coach " + library.getId());
+        } catch (ParserException e) {
+            logger.severe("Error parsing CSL: " + e.getMessage());
+            throw new RuntimeException(e);
         }
+    }
 
+    /**
+     * Parses CSL logic from source code to AST
+     * @param code the source code to parse
+     * @return AST of the passed code
+     * @throws ParserException if something goes wrong
+     */
+    private List<CySeCLineAtom> getAstOfCode(String code) throws ParserException {
+        if (code == null) return new ArrayList<>();
+        return new ParserLine(code).getCySeCListing();
     }
 }
