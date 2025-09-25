@@ -19,30 +19,6 @@
  */
 package eu.smesec.cysec.csl.demo;
 
-import eu.smesec.cysec.platform.bridge.FQCN;
-import eu.smesec.cysec.platform.bridge.ILibCal;
-import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-import eu.smesec.cysec.platform.bridge.generated.Answer;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
-import eu.smesec.cysec.csl.AbstractLib;
-import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
-import eu.smesec.cysec.csl.parser.ExecutorContext;
-import eu.smesec.cysec.csl.PersistanceManager;
-import eu.smesec.cysec.csl.skills.ChangeType;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.util.logging.Logger;
-
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
@@ -53,6 +29,28 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import eu.smesec.cysec.csl.AbstractLib;
+import eu.smesec.cysec.csl.PersistanceManager;
+import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
+import eu.smesec.cysec.csl.parser.ExecutorContext;
+import eu.smesec.cysec.csl.skills.ChangeType;
+import eu.smesec.cysec.platform.bridge.FQCN;
+import eu.smesec.cysec.platform.bridge.ILibCal;
+import eu.smesec.cysec.platform.bridge.execptions.CacheException;
+import eu.smesec.cysec.platform.bridge.generated.Answer;
+import eu.smesec.cysec.platform.bridge.generated.Question;
+import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class TestIntegrateParser {
     private ILibCal libcal;
@@ -65,6 +63,7 @@ public class TestIntegrateParser {
     private PersistanceManager pm;
     private Answer answer;
     private FQCN fqcn;
+
     @Before
     public void setup() {
         library = new MockLibrary();
@@ -89,8 +88,6 @@ public class TestIntegrateParser {
         // Inject spy object in context
         ((CySeCExecutorContextFactory.CySeCExecutorContext) context).setBadgeListener(pm);
         ((CySeCExecutorContextFactory.CySeCExecutorContext) context).setRecommendationListener(pm);
-
-
     }
 
     @After
@@ -167,12 +164,14 @@ public class TestIntegrateParser {
         }
 
         assertTrue(context.getScore("myBeginScore").getValue() == 99);
-
     }
 
     @Test
     public void testAwardBadge() {
-        Question question = coach.getQuestions().getQuestion().stream().filter(question1 -> question1.getId().equals("user-q30")).findFirst().get();
+        Question question = coach.getQuestions().getQuestion().stream()
+                .filter(question1 -> question1.getId().equals("user-q30"))
+                .findFirst()
+                .get();
         question.setId("user-q30");
         Answer answer = new Answer();
         answer.setText("user-q30o1");
@@ -182,10 +181,7 @@ public class TestIntegrateParser {
         library.onResponseChange(question, answer, fqcn);
 
         // Make sure badge was assigned
-        Assert.assertEquals(
-                ((CySeCExecutorContextFactory.CySeCExecutorContext) context).getBadgeList().length,
-                1
-        );
+        Assert.assertEquals(((CySeCExecutorContextFactory.CySeCExecutorContext) context).getBadgeList().length, 1);
 
         // verify notification was sent
         verify(pm, times(1)).badgeChanged(anyString(), anyString(), any(ChangeType.class));
@@ -193,7 +189,10 @@ public class TestIntegrateParser {
 
     @Test
     public void testAwardRecommendation() {
-        Question question = coach.getQuestions().getQuestion().stream().filter(question1 -> question1.getId().equals("user-q40")).findFirst().get();
+        Question question = coach.getQuestions().getQuestion().stream()
+                .filter(question1 -> question1.getId().equals("user-q40"))
+                .findFirst()
+                .get();
 
         Answer answer = new Answer();
         answer.setText("user-q40o1");
@@ -203,10 +202,7 @@ public class TestIntegrateParser {
         library.onResponseChange(question, answer, fqcn);
 
         // Make sure badge was assigned
-        Assert.assertEquals(
-                ((CySeCExecutorContextFactory.CySeCExecutorContext) context).getBadgeList().length,
-                1
-        );
+        Assert.assertEquals(((CySeCExecutorContextFactory.CySeCExecutorContext) context).getBadgeList().length, 1);
 
         // verify notification was sent
         verify(pm, times(1)).recommendationChanged(anyString(), any(ChangeType.class));
@@ -214,7 +210,10 @@ public class TestIntegrateParser {
 
     @Test
     public void testSetNext() throws CacheException {
-        Question question = coach.getQuestions().getQuestion().stream().filter(question1 -> question1.getId().equals("user-q11")).findFirst().get();
+        Question question = coach.getQuestions().getQuestion().stream()
+                .filter(question1 -> question1.getId().equals("user-q11"))
+                .findFirst()
+                .get();
         answer = new Answer();
         answer.setText("user-q11o2");
         answer.setQid(question.getId());
@@ -224,14 +223,16 @@ public class TestIntegrateParser {
         library.onResponseChange(question, answer, fqcn);
 
         // verify variable was set
-        assertEquals("user-q160", context.getVariable("_coach.nextPage", question.getId()).getId());
+        assertEquals(
+                "user-q160",
+                context.getVariable("_coach.nextPage", question.getId()).getId());
 
         // modify selection
         answer.setText("user-q11o1");
         library.onResponseChange(question, answer, fqcn);
 
-        assertEquals("user-q30", context.getVariable("_coach.nextPage", question.getId()).getId());
+        assertEquals(
+                "user-q30",
+                context.getVariable("_coach.nextPage", question.getId()).getId());
     }
-
-
 }

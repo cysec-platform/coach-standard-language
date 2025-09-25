@@ -39,7 +39,15 @@ public class RecommendationFactory {
         private String urlLink = "#";
         private List<Tag> tags = new ArrayList<>();
 
-        public Recommendation(String id, int order, String urlImg, String altImg, String title, String description, String textLink, String urlLink) {
+        public Recommendation(
+                String id,
+                int order,
+                String urlImg,
+                String altImg,
+                String title,
+                String description,
+                String textLink,
+                String urlLink) {
             this.id = id;
             this.order = order;
             this.urlImg = urlImg;
@@ -50,7 +58,16 @@ public class RecommendationFactory {
             this.urlLink = urlLink;
         }
 
-        public Recommendation(String id, int order, String urlImg, String altImg, String title, String description, String textLink, String urlLink, List<Tag> tags) {
+        public Recommendation(
+                String id,
+                int order,
+                String urlImg,
+                String altImg,
+                String title,
+                String description,
+                String textLink,
+                String urlLink,
+                List<Tag> tags) {
             this(id, order, urlImg, altImg, title, description, textLink, urlLink);
             this.tags = tags;
         }
@@ -92,7 +109,8 @@ public class RecommendationFactory {
         }
 
         private String objStr() {
-            return "" + id + ":" + order + ":" + urlImg + ":" + altImg + ":" + title + ":" + description + ":" + textLink + ":" + urlLink + "|";
+            return "" + id + ":" + order + ":" + urlImg + ":" + altImg + ":" + title + ":" + description + ":"
+                    + textLink + ":" + urlLink + "|";
         }
 
         @Override
@@ -107,7 +125,6 @@ public class RecommendationFactory {
             }
             return objStr().equals(((Recommendation) (o)).objStr());
         }
-
     }
 
     public static class TagCategory {
@@ -166,8 +183,7 @@ public class RecommendationFactory {
             String label = tagString.substring(0, firstSepPos);
             String restOfString = tagString.substring(firstSepPos + 1);
 
-            return TagCategory.parse(restOfString)
-                    .map(category -> new Tag(label, category));
+            return TagCategory.parse(restOfString).map(category -> new Tag(label, category));
         }
 
         public String getLabel() {
@@ -252,7 +268,8 @@ public class RecommendationFactory {
                 // Add recommendation to map before notifying listener
                 recommendations.put(recommendation.getId(), recommendation);
                 if (listener != null) {
-                    listener.recommendationChanged(recommendation.getId(), ret == null ? ChangeType.ADDED : ChangeType.CHANGED);
+                    listener.recommendationChanged(
+                            recommendation.getId(), ret == null ? ChangeType.ADDED : ChangeType.CHANGED);
                 }
             }
             return ret;
@@ -278,5 +295,4 @@ public class RecommendationFactory {
             recommendations.clear();
         }
     }
-
 }

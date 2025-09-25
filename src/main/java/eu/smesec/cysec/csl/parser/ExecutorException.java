@@ -29,31 +29,31 @@ import java.io.IOException;
  * @see ParserException
  */
 public class ExecutorException extends IOException {
-  // reason is a detailed string that marks the spot that caused the parser to throw the exception
-  private String reason;
-  private ExecutorException daisy = null;
+    // reason is a detailed string that marks the spot that caused the parser to throw the exception
+    private String reason;
+    private ExecutorException daisy = null;
 
-  public ExecutorException(String reason) {
-    super(reason);
-    this.reason = reason;
-  }
-
-  public ExecutorException(String reason, ExecutorException daisy) {
-    this(reason);
-    this.daisy = daisy;
-  }
-
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    if (daisy != null) {
-      sb.append(daisy.toString());
-      sb.append(reason + System.lineSeparator());
+    public ExecutorException(String reason) {
+        super(reason);
+        this.reason = reason;
     }
-    sb.append("Executor throws exception: " + reason);
-    return sb.toString();
-  }
 
-  public String getReason() {
-    return reason;
-  }
+    public ExecutorException(String reason, ExecutorException daisy) {
+        this(reason);
+        this.daisy = daisy;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (daisy != null) {
+            sb.append(daisy.toString());
+            sb.append(reason + System.lineSeparator());
+        }
+        sb.append("Executor throws exception: " + reason);
+        return sb.toString();
+    }
+
+    public String getReason() {
+        return reason;
+    }
 }

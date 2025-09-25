@@ -19,4 +19,8 @@
  */
 package eu.smesec.cysec.csl.skills;
 
-public enum ChangeType {ADDED, CHANGED, REMOVED };
+public enum ChangeType {
+    ADDED,
+    CHANGED,
+    REMOVED
+};

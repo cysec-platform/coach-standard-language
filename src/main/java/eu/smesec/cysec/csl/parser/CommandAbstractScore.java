@@ -25,22 +25,34 @@ import java.util.List;
 
 public abstract class CommandAbstractScore extends Command {
 
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 3 parameters: origin question id, score name and value
-    checkNumParams(aList, 2);
+        // expects 3 parameters: origin question id, score name and value
+        checkNumParams(aList, 2);
 
-    // evaluate parameters
-    Atom scoreName = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "scoreName");
-    Atom scoreValue = checkAtomType(aList.get(1), Arrays.asList(new AtomType[]{AtomType.INTEGER, AtomType.FLOAT}), true, coachContext, "scoreValue");
+        // evaluate parameters
+        Atom scoreName = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "scoreName");
+        Atom scoreValue = checkAtomType(
+                aList.get(1),
+                Arrays.asList(new AtomType[] {AtomType.INTEGER, AtomType.FLOAT}),
+                true,
+                coachContext,
+                "scoreValue");
 
-    // set the score
-    score(scoreName.getId(), coachContext.getQuestionContext().getId(), Double.valueOf(scoreValue.getId()), coachContext.getContext());
-    coachContext.getLogger().fine( String.format("Adding %s to score %s in context %s", scoreValue.getId(), scoreName.getId(), coachContext.getContext()));
+        // set the score
+        score(
+                scoreName.getId(),
+                coachContext.getQuestionContext().getId(),
+                Double.valueOf(scoreValue.getId()),
+                coachContext.getContext());
+        coachContext
+                .getLogger()
+                .fine(String.format(
+                        "Adding %s to score %s in context %s",
+                        scoreValue.getId(), scoreName.getId(), coachContext.getContext()));
 
-    return Atom.NULL_ATOM;
-  }
+        return Atom.NULL_ATOM;
+    }
 
-  abstract void score(String scoreId, String questionId, double value, ExecutorContext context);
-
+    abstract void score(String scoreId, String questionId, double value, ExecutorContext context);
 }

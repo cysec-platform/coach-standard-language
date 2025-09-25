@@ -37,8 +37,8 @@ public final class SelectOptionBuilderImpl {
     }
 
     public SelectOptionBuilderImpl setNext(String next) {
-       this.nextQid = next;
-       return this;
+        this.nextQid = next;
+        return this;
     }
 
     public SelectOptionBuilderImpl setScore(int score) {

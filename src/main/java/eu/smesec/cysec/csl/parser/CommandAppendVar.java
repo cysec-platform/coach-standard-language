@@ -25,20 +25,36 @@ import java.util.List;
 
 public class CommandAppendVar extends Command {
 
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 2 or 3 parameters
-    checkNumParams(aList, 2,2);
+        // expects 2 or 3 parameters
+        checkNumParams(aList, 2, 2);
 
-    // evaluate parameters
-    Atom varName = aList.get(0).execute(coachContext);
-    Atom varContent = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "content");
+        // evaluate parameters
+        Atom varName = aList.get(0).execute(coachContext);
+        Atom varContent =
+                checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "content");
 
-    // set the variable
-    coachContext.getContext().setVariable(varName.getId(),new Atom(AtomType.STRING,coachContext.getContext().getVariable(varName.getId(),null).getId()+varContent.getId(),null), null);
-    coachContext.getLogger().fine(String.format("Set variable %s to %s in context %s", varName.getId(), varContent.getId(), varContent.getId()));
+        // set the variable
+        coachContext
+                .getContext()
+                .setVariable(
+                        varName.getId(),
+                        new Atom(
+                                AtomType.STRING,
+                                coachContext
+                                                .getContext()
+                                                .getVariable(varName.getId(), null)
+                                                .getId()
+                                        + varContent.getId(),
+                                null),
+                        null);
+        coachContext
+                .getLogger()
+                .fine(String.format(
+                        "Set variable %s to %s in context %s",
+                        varName.getId(), varContent.getId(), varContent.getId()));
 
-    return Atom.NULL_ATOM;
-  }
-
+        return Atom.NULL_ATOM;
+    }
 }

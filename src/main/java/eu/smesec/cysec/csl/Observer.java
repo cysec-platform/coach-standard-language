@@ -21,7 +21,6 @@ package eu.smesec.cysec.csl;
 
 import eu.smesec.cysec.csl.questions.LibQuestion;
 import eu.smesec.cysec.csl.questions.Modifier;
-
 import java.util.Collection;
 import java.util.function.BiConsumer;
 

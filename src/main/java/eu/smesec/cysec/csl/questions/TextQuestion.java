@@ -19,10 +19,9 @@
  */
 package eu.smesec.cysec.csl.questions;
 
+import eu.smesec.cysec.csl.AbstractLib;
 import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
-import eu.smesec.cysec.csl.AbstractLib;
-
 import java.util.Optional;
 
 public class TextQuestion extends LibQuestion {

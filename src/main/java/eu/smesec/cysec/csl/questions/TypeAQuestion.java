@@ -19,10 +19,8 @@
  */
 package eu.smesec.cysec.csl.questions;
 
-import eu.smesec.cysec.platform.bridge.generated.Option;
-import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.csl.AbstractLib;
-
+import eu.smesec.cysec.platform.bridge.generated.Question;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +37,6 @@ public class TypeAQuestion extends AstarQuestion {
      */
     public TypeAQuestion(Question question, AbstractLib lib) {
         super(question, lib);
-
     }
 
     public TypeAQuestion(String id, String nextQid, boolean hide, Collection<LibSelectOption> options) {
@@ -49,7 +46,6 @@ public class TypeAQuestion extends AstarQuestion {
     public TypeAQuestion(String id, String nextQid, Collection<LibSelectOption> options) {
         this(id, nextQid, false, options);
     }
-
 
     @Override
     protected Modifier updateState(String optionId, String qid) {
@@ -82,7 +78,8 @@ public class TypeAQuestion extends AstarQuestion {
     @Override
     public Optional<String> getSuccessor() {
         // there should only
-        //next = getOptions().values().stream().filter(option -> option.isSelected()).findFirst().map(LibSelectOption::getId);
+        // next = getOptions().values().stream().filter(option ->
+        // option.isSelected()).findFirst().map(LibSelectOption::getId);
         return Optional.ofNullable(getNextQid());
     }
 

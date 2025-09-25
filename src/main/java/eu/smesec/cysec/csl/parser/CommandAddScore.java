@@ -34,15 +34,13 @@ package eu.smesec.cysec.csl.parser;
  */
 public class CommandAddScore extends CommandAbstractScore {
 
-  @Override
-  void score(String scoreId, String questionId, double value, ExecutorContext context) {
-    context.getScore(scoreId).add(questionId, value);
+    @Override
+    void score(String scoreId, String questionId, double value, ExecutorContext context) {
+        context.getScore(scoreId).add(questionId, value);
 
-    // TODO: Decide if all questions should contribute to parent score
-    /*if(context.getParent() != null) {
-      context.getParent().getScore(scoreId).add(questionId, value);
-    }*/
-  }
-
+        // TODO: Decide if all questions should contribute to parent score
+        /*if(context.getParent() != null) {
+          context.getParent().getScore(scoreId).add(questionId, value);
+        }*/
+    }
 }
-

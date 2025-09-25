@@ -25,29 +25,29 @@ import java.util.List;
 
 public class CommandArrayElements extends CommandAbstractList {
 
-  @Override
-  /**
-   * Checks if an array has the specified size.
-   *
-   * <p>This command has two mandatory parameter:
-   *   <ul>
-   *     <li>(arrayList; String)The array to append to.</li>
-   *     <li>(arrayLength; String)The element to be appended.</li>
-   *   </ul>
-   * </p>
-   * @returns Always true
-   */
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    // expects 2 parameter
-    checkNumParams(aList, 2,2);
+    @Override
+    /**
+     * Checks if an array has the specified size.
+     *
+     * <p>This command has two mandatory parameter:
+     *   <ul>
+     *     <li>(arrayList; String)The array to append to.</li>
+     *     <li>(arrayLength; String)The element to be appended.</li>
+     *   </ul>
+     * </p>
+     * @returns Always true
+     */
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        // expects 2 parameter
+        checkNumParams(aList, 2, 2);
 
-    // evaluate parameters
-    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "arrayList" );
-    Atom noelem = checkAtomType(aList.get(1), Arrays.asList(AtomType.INTEGER), true, coachContext, "arrayLength" );
+        // evaluate parameters
+        Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "arrayList");
+        Atom noelem = checkAtomType(aList.get(1), Arrays.asList(AtomType.INTEGER), true, coachContext, "arrayLength");
 
-    List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
+        List<String> tempList = stringToList(
+                coachContext.getContext().getVariable(arr.getId(), null).getId());
 
-    return tempList.size()==Integer.valueOf(noelem.getId())?Atom.TRUE:Atom.FALSE;
-  }
-
+        return tempList.size() == Integer.valueOf(noelem.getId()) ? Atom.TRUE : Atom.FALSE;
+    }
 }

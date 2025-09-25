@@ -19,10 +19,9 @@
  */
 package eu.smesec.cysec.csl.demo.questions;
 
-import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.csl.AbstractLib;
 import eu.smesec.cysec.csl.questions.LikertQuestion;
-
+import eu.smesec.cysec.platform.bridge.generated.Question;
 import java.util.Collections;
 
 public class Q60 extends LikertQuestion {
@@ -32,5 +31,4 @@ public class Q60 extends LikertQuestion {
 
         init((modifier, optionId) -> {}, Collections.EMPTY_LIST);
     }
-
 }

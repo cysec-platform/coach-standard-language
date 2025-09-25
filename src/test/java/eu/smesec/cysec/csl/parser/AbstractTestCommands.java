@@ -19,13 +19,6 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory.CySeCExecutorContext;
@@ -44,44 +37,42 @@ import org.junit.Before;
 import org.mockito.Mockito;
 
 public class AbstractTestCommands {
-  public CoachContext coachContext;
-  public CySeCExecutorContext context;
-  public Questionnaire coach;
-  public ILibCal cal;
-  public Question question;
-  public Answer answer;
-  public FQCN fqcn = FQCN.fromString("lib-user");
+    public CoachContext coachContext;
+    public CySeCExecutorContext context;
+    public Questionnaire coach;
+    public ILibCal cal;
+    public Question question;
+    public Answer answer;
+    public FQCN fqcn = FQCN.fromString("lib-user");
 
-  @Before
-  public void setup() throws Exception{
-    cal = Mockito.mock(ILibCal.class);
-    context = CySeCExecutorContextFactory.getExecutorContext("test");
-    answer = new Answer();
-    answer.setQid("user-q20");
-    answer.setText("user-q20o1");
-    question = new Question();
-    question.setId("user-q20");
-    question.setHidden(false);
-    Questions questions = new Questions();
-    questions.getQuestion().add(question);
-    Dictionary dictionary = new Dictionary();
-    final DictionaryEntry dictionaryEntry = new DictionaryEntry();
-    dictionaryEntry.setKey("key-abc");
-    dictionaryEntry.setValue("Value ABC");
-    dictionary.getEntry().add(dictionaryEntry);
-    coach = Mockito.mock(Questionnaire.class);
-    when(coach.getQuestions()).thenReturn(questions);
-    when(coach.getDictionary()).thenReturn(dictionary);
-    coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answer), coach, fqcn);
-    // pass global logger
-    coachContext.setLogger(Logger.getGlobal());
-  }
+    @Before
+    public void setup() throws Exception {
+        cal = Mockito.mock(ILibCal.class);
+        context = CySeCExecutorContextFactory.getExecutorContext("test");
+        answer = new Answer();
+        answer.setQid("user-q20");
+        answer.setText("user-q20o1");
+        question = new Question();
+        question.setId("user-q20");
+        question.setHidden(false);
+        Questions questions = new Questions();
+        questions.getQuestion().add(question);
+        Dictionary dictionary = new Dictionary();
+        final DictionaryEntry dictionaryEntry = new DictionaryEntry();
+        dictionaryEntry.setKey("key-abc");
+        dictionaryEntry.setValue("Value ABC");
+        dictionary.getEntry().add(dictionaryEntry);
+        coach = Mockito.mock(Questionnaire.class);
+        when(coach.getQuestions()).thenReturn(questions);
+        when(coach.getDictionary()).thenReturn(dictionary);
+        coachContext = new CoachContext(context, cal, question, Optional.ofNullable(answer), coach, fqcn);
+        // pass global logger
+        coachContext.setLogger(Logger.getGlobal());
+    }
 
-  @After
-  public void tearDown() {
-    context.reset();
-    coachContext = null;
-
-  }
-
+    @After
+    public void tearDown() {
+        context.reset();
+        coachContext = null;
+    }
 }

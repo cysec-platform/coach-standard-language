@@ -19,12 +19,6 @@
  */
 package eu.smesec.cysec.csl;
 
-import eu.smesec.cysec.platform.bridge.FQCN;
-import eu.smesec.cysec.platform.bridge.ILibCal;
-import eu.smesec.cysec.platform.bridge.generated.Metadata;
-import eu.smesec.cysec.platform.bridge.generated.Mvalue;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
 import eu.smesec.cysec.csl.parser.CoachContext;
 import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
 import eu.smesec.cysec.csl.parser.CySeCLineAtom;
@@ -32,7 +26,12 @@ import eu.smesec.cysec.csl.parser.ExecutorContext;
 import eu.smesec.cysec.csl.parser.ExecutorException;
 import eu.smesec.cysec.csl.parser.ParserException;
 import eu.smesec.cysec.csl.parser.ParserLine;
-
+import eu.smesec.cysec.platform.bridge.FQCN;
+import eu.smesec.cysec.platform.bridge.ILibCal;
+import eu.smesec.cysec.platform.bridge.generated.Metadata;
+import eu.smesec.cysec.platform.bridge.generated.Mvalue;
+import eu.smesec.cysec.platform.bridge.generated.Question;
+import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -62,10 +61,13 @@ public class LogicRunner {
         logicMvalueKey = AbstractLib.prop.getProperty("coach.mvalue.logic");
         questionsAst = Collections.synchronizedMap(new LinkedHashMap<>(1000, 0.75f, false) {
             @Override
-            protected boolean removeEldestEntry(Map.Entry<String, List<CySeCLineAtom>> eldest) { return size() > 1000; }
+            protected boolean removeEldestEntry(Map.Entry<String, List<CySeCLineAtom>> eldest) {
+                return size() > 1000;
+            }
         });
 
-        // Parse the logic of the coach, this is done async because it can take a few seconds to parse
+        // Parse the logic of the coach, this is done async because it can take a few seconds to
+        // parse
         parseTask = CompletableFuture.runAsync(() -> parseLogic(metadataList));
     }
 
@@ -108,7 +110,8 @@ public class LogicRunner {
         // Make sure paring has finished, otherwise we cannot run the logic
         parseTask.join();
 
-        ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext(library.getQuestionnaire().getId());
+        ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext(
+                library.getQuestionnaire().getId());
         CoachContext coachContext = new CoachContext(
                 context,
                 cal,
@@ -129,13 +132,13 @@ public class LogicRunner {
     private void parseLogic(List<Metadata> metadataList) {
         try {
             // Parse pre, post and on-begin logic
-            logger.info("Parsing pre, post and onBegin logic of coach " +  library.getId());
+            logger.info("Parsing pre, post and onBegin logic of coach " + library.getId());
             List<Mvalue> logicMvalueList = metadataList.stream()
                     .filter(metadata -> metadata.getKey().startsWith(logicMetadataKey))
                     .flatMap(metadata -> metadata.getMvalue().stream())
                     .collect(Collectors.toList());
-            Function<String, String> logicExtractor = metadataKey -> Optional
-                    .of(MetadataUtils.parseMvalues(logicMvalueList).get(AbstractLib.prop.getProperty(metadataKey)))
+            Function<String, String> logicExtractor = metadataKey -> Optional.of(
+                            MetadataUtils.parseMvalues(logicMvalueList).get(AbstractLib.prop.getProperty(metadataKey)))
                     .map(MetadataUtils.SimpleMvalue::getValue)
                     .orElse("");
             logicPreAst.addAll(getAstOfCode(logicExtractor.apply("coach.mvalue.logicPreQuestion")));
@@ -147,13 +150,10 @@ public class LogicRunner {
 
             for (Question question : library.getQuestionnaire().getQuestions().getQuestion()) {
                 logger.fine("Parsing question logic of question with QID" + question.getId());
-                Map<String, MetadataUtils.SimpleMvalue> map = MetadataUtils.parseMvalues(
-                        question.getMetadata().stream()
-                                .filter(metadata -> metadata.getKey().equals(logicMetadataKey))
-                                .flatMap(metadata -> metadata.getMvalue()
-                                        .stream())
-                                .collect(Collectors.toList())
-                );
+                Map<String, MetadataUtils.SimpleMvalue> map = MetadataUtils.parseMvalues(question.getMetadata().stream()
+                        .filter(metadata -> metadata.getKey().equals(logicMetadataKey))
+                        .flatMap(metadata -> metadata.getMvalue().stream())
+                        .collect(Collectors.toList()));
                 Optional<MetadataUtils.SimpleMvalue> logic = Optional.ofNullable(map.get(logicMvalueKey));
                 if (logic.isPresent()) {
                     List<CySeCLineAtom> ast = getAstOfCode(logic.get().getValue());

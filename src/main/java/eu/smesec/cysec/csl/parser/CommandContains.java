@@ -25,16 +25,15 @@ import java.util.List;
 
 public class CommandContains extends Command {
 
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 2 or 3 parameters
-    checkNumParams(aList, 2,2);
+        // expects 2 or 3 parameters
+        checkNumParams(aList, 2, 2);
 
-    // evaluate parameters
-    Atom varHaystack = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "content");
-    Atom varNeedle = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "content");
+        // evaluate parameters
+        Atom varHaystack = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "content");
+        Atom varNeedle = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "content");
 
-    return (varHaystack.getId().contains(varNeedle.getId())?Atom.TRUE:Atom.FALSE);
-  }
-
+        return (varHaystack.getId().contains(varNeedle.getId()) ? Atom.TRUE : Atom.FALSE);
+    }
 }

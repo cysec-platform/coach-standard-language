@@ -19,10 +19,9 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-public class ParserNullLineException extends ParserException{
+public class ParserNullLineException extends ParserException {
 
-  public ParserNullLineException(ParserLine l) {
-    super("Parser line input was <null>",l);
-  }
-
+    public ParserNullLineException(ParserLine l) {
+        super("Parser line input was <null>", l);
+    }
 }

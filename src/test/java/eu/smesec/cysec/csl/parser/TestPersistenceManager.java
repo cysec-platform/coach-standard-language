@@ -19,12 +19,18 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-import eu.smesec.cysec.platform.bridge.ILibCal;
-import eu.smesec.cysec.platform.bridge.CoachLibrary;
-import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import eu.smesec.cysec.csl.AbstractLib;
 import eu.smesec.cysec.csl.PersistanceManager;
 import eu.smesec.cysec.csl.demo.MockLibrary;
+import eu.smesec.cysec.platform.bridge.CoachLibrary;
+import eu.smesec.cysec.platform.bridge.ILibCal;
+import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
+import java.util.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,41 +40,44 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.logging.Logger;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({CySeCExecutorContextFactory.class})
 public class TestPersistenceManager {
     private PersistanceManager persistanceManager;
+
     @Mock
     private CoachLibrary library;
+
     @Mock
     private Questionnaire coach;
+
     private AbstractLib lib;
+
     @Mock
     private ILibCal cal;
+
     private Logger logger = Logger.getGlobal();
+
     @Mock
     private CySeCExecutorContextFactory.CySeCExecutorContext context;
+
     private String contextId = "lib-sub-A";
+
     @Mock
     private CySeCExecutorContextFactory.CySeCExecutorContext parent;
+
     private String parentContextId = "lib-top";
+
     @Mock
     private CySeCExecutorContextFactory.CySeCExecutorContext grandfather;
-    private String grandfatherContextId = "lib-root";
 
+    private String grandfatherContextId = "lib-root";
 
     @Before
     public void setup() {
         PowerMockito.mockStatic(CySeCExecutorContextFactory.class);
-        Mockito.when(CySeCExecutorContextFactory.getExecutorContext(anyString())).thenReturn(context);
+        Mockito.when(CySeCExecutorContextFactory.getExecutorContext(anyString()))
+                .thenReturn(context);
 
         lib = new MockLibrary();
         lib.setQuestionnaire(coach);
@@ -83,9 +92,7 @@ public class TestPersistenceManager {
     }
 
     @Test
-    public void tearDown(){
-
-    }
+    public void tearDown() {}
 
     @Test
     public void testResolveFqcn() {
@@ -110,6 +117,4 @@ public class TestPersistenceManager {
         assertNotNull(fqcn);
         assertEquals(expected, fqcn);
     }
-
-
 }

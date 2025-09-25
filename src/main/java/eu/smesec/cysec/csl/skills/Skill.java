@@ -35,11 +35,16 @@ public abstract class Skill {
     public int get() {
         return Math.max(0, Math.min(this.maxValue, this.value));
     }
-    public void setValue(int value) { this.value = value; }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
 
     public void add(int value) {
         this.value += value;
     }
 
-    public int getMaxValue() { return maxValue; }
+    public int getMaxValue() {
+        return maxValue;
+    }
 }

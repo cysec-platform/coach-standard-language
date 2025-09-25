@@ -20,7 +20,6 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.platform.bridge.generated.Dictionary;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,10 +30,10 @@ public class CommandDictionaryLookup extends Command {
 
     @Override
     public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-        checkNumParams(aList,1);
+        checkNumParams(aList, 1);
 
         // determine key of the entry to search in the dictionary
-        Atom a = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext,null) ;
+        Atom a = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, null);
 
         // handle empty id (return null)
         final String key = a.getId();

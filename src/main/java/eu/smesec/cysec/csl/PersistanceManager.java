@@ -19,6 +19,18 @@
  */
 package eu.smesec.cysec.csl;
 
+import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.MV_ENDURANCE;
+import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.MV_ENDURANCE_STATE;
+import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.MV_MICRO_SCORE;
+
+import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
+import eu.smesec.cysec.csl.parser.ExecutorContext;
+import eu.smesec.cysec.csl.skills.BadgeEventListener;
+import eu.smesec.cysec.csl.skills.BadgeFactory;
+import eu.smesec.cysec.csl.skills.ChangeType;
+import eu.smesec.cysec.csl.skills.RecommendationEventListener;
+import eu.smesec.cysec.csl.skills.RecommendationFactory;
+import eu.smesec.cysec.csl.skills.ScoreFactory;
 import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.ILibCal;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
@@ -26,25 +38,12 @@ import eu.smesec.cysec.platform.bridge.generated.Answer;
 import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.platform.bridge.generated.Mvalue;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
-import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
-import eu.smesec.cysec.csl.parser.ExecutorContext;
-import eu.smesec.cysec.csl.skills.RecommendationFactory;
-import eu.smesec.cysec.csl.skills.BadgeEventListener;
-import eu.smesec.cysec.csl.skills.BadgeFactory;
-import eu.smesec.cysec.csl.skills.ChangeType;
-import eu.smesec.cysec.csl.skills.RecommendationEventListener;
-import eu.smesec.cysec.csl.skills.ScoreFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.MV_ENDURANCE;
-import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.MV_ENDURANCE_STATE;
-import static eu.smesec.cysec.platform.bridge.md.MetadataUtils.MV_MICRO_SCORE;
 
 /**
  * Manages calls to the ILibCal interface to persist data in the platforms intenal cache.
@@ -67,7 +66,8 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
         this.cal = cal;
         this.logger = logger;
         library = lib;
-        context = CySeCExecutorContextFactory.getExecutorContext(library.getQuestionnaire().getId());
+        context = CySeCExecutorContextFactory.getExecutorContext(
+                library.getQuestionnaire().getId());
         context.setBadgeListener(this);
         context.setRecommendationListener(this);
     }
@@ -85,11 +85,11 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
         String fqcn = fqcnLoop();
         String[] parts = fqcn.split("\\.");
         String customFqcn = "";
-//        if (trimLength == 0) return parts[0];
-        //String s = Arrays.stream(parts).limit(trimLength).reduce("", (s1, s2) -> s1 + "." + s2);
-        for(int i = 0; i < trimLength; i++) {
+        //        if (trimLength == 0) return parts[0];
+        // String s = Arrays.stream(parts).limit(trimLength).reduce("", (s1, s2) -> s1 + "." + s2);
+        for (int i = 0; i < trimLength; i++) {
             customFqcn += parts[i];
-            if(i != (trimLength - 1)) customFqcn += ".";
+            if (i != (trimLength - 1)) customFqcn += ".";
         }
         return customFqcn;
     }
@@ -104,7 +104,7 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
         // Set context ID in case coach is root level
         String fqcn = context.getContextId();
         ExecutorContext parent = context.getParent();
-        if(context.getParent() != null) {
+        if (context.getParent() != null) {
             // coach is on top level
             while (parent != null) {
                 fqcn = parent.getContextId() + "." + fqcn;
@@ -203,22 +203,21 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
         return Optional.ofNullable(answer);
     }
 
-
     @Override
     public void badgeChanged(String badgeId, String classId, ChangeType change) {
-        if(change.equals(ChangeType.ADDED)) {
+        if (change.equals(ChangeType.ADDED)) {
             BadgeFactory.Badge baseBadge = context.getBadge(badgeId);
             baseBadge.setListener(this);
             BadgeFactory.BadgeClass badgeClass = baseBadge.getAwardedBadgeClass();
             createMetadata(FQCN.fromString(ROOT_COACH), buildBadge(badgeId, badgeClass));
-        } else if(change.equals(ChangeType.CHANGED)) {
+        } else if (change.equals(ChangeType.CHANGED)) {
             // delete old and create new one
-            deleteMetadata(FQCN.fromString(ROOT_COACH), MetadataUtils.MD_BADGES+ "." + badgeId);
+            deleteMetadata(FQCN.fromString(ROOT_COACH), MetadataUtils.MD_BADGES + "." + badgeId);
             BadgeFactory.Badge baseBadge = context.getBadge(badgeId);
             BadgeFactory.BadgeClass badge = baseBadge.getAwardedBadgeClass();
             Metadata metadata = buildBadge(badgeId, badge);
             createMetadata(FQCN.fromString(ROOT_COACH), metadata);
-        }  else {
+        } else {
             deleteMetadata(FQCN.fromString(ROOT_COACH), MetadataUtils.MD_BADGES + "." + badgeId);
         }
     }
@@ -231,7 +230,7 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
     public void saveSkills(FQCN fqcn) {
         // persist Skills to XML
         List<Mvalue> scoreMvalues = new ArrayList<>();
-        for(ScoreFactory.Score score : context.getScores()) {
+        for (ScoreFactory.Score score : context.getScores()) {
             String value = String.valueOf(score.getValue());
             scoreMvalues.add(MetadataUtils.createMvalueStr(score.getId(), value));
             logger.fine(String.format("Saving Skill ([%s]: %s to Metadata", score.getId(), value));
@@ -255,15 +254,20 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
      */
     public void saveRating(FQCN fqcn) {
         // Score/micro_score equals the UU score
-        String scoreValue = String.valueOf(context.getScore(library.prop.getProperty("library.skills.uu")).getValue());
-        String scoreValueMax = String.valueOf(context.getScore(library.prop.getProperty("library.skills.uuMax")).getValue());
+        String scoreValue = String.valueOf(
+                context.getScore(library.prop.getProperty("library.skills.uu")).getValue());
+        String scoreValueMax = String.valueOf(context.getScore(library.prop.getProperty("library.skills.uuMax"))
+                .getValue());
         // Update Score and Grade
         try {
             // always save rating (score, grade) in own answer file
-            cal.setMetadata(fqcn, MetadataUtils.createMetadata(MetadataUtils.MD_RATING, Arrays.asList(
-                    MetadataUtils.createMvalueStr(MV_MICRO_SCORE, String.valueOf(scoreValue)),
-                    MetadataUtils.createMvalueStr(MetadataUtils.MV_MICRO_GRADE, library.getGrade())
-            )));
+            cal.setMetadata(
+                    fqcn,
+                    MetadataUtils.createMetadata(
+                            MetadataUtils.MD_RATING,
+                            Arrays.asList(
+                                    MetadataUtils.createMvalueStr(MV_MICRO_SCORE, String.valueOf(scoreValue)),
+                                    MetadataUtils.createMvalueStr(MetadataUtils.MV_MICRO_GRADE, library.getGrade()))));
         } catch (CacheException e) {
             logger.log(Level.SEVERE, "Error saving rating", e);
         }
@@ -272,17 +276,17 @@ public class PersistanceManager implements BadgeEventListener, RecommendationEve
 
     @Override
     public void recommendationChanged(String recommendationId, ChangeType change) {
-        if(change.equals(ChangeType.ADDED)) {
+        if (change.equals(ChangeType.ADDED)) {
             RecommendationFactory.Recommendation recommendation = context.getRecommendation(recommendationId);
             Metadata metadata = buildRecommendation(recommendation);
             createMetadata(FQCN.fromString(ROOT_COACH), metadata);
-        } else if(change.equals(ChangeType.CHANGED)) {
+        } else if (change.equals(ChangeType.CHANGED)) {
             // delete old and create new one
             deleteMetadata(FQCN.fromString(ROOT_COACH), MetadataUtils.MD_RECOMMENDED + "." + recommendationId);
             RecommendationFactory.Recommendation recommendation = context.getRecommendation(recommendationId);
             Metadata metadata = buildRecommendation(recommendation);
             createMetadata(FQCN.fromString(ROOT_COACH), metadata);
-        }  else {
+        } else {
             deleteMetadata(FQCN.fromString(ROOT_COACH), MetadataUtils.MD_RECOMMENDED + "." + recommendationId);
         }
     }

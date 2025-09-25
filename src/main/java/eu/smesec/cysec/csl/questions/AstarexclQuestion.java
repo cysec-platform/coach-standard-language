@@ -19,10 +19,8 @@
  */
 package eu.smesec.cysec.csl.questions;
 
-import eu.smesec.cysec.platform.bridge.generated.Option;
-import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.csl.AbstractLib;
-
+import eu.smesec.cysec.platform.bridge.generated.Question;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +51,6 @@ public class AstarexclQuestion extends AstarQuestion {
         this(id, nextQid, false, options);
     }
 
-
     @Override
     protected Modifier updateState(String optionId, String qid) {
         LibSelectOption o = getOptions().get(optionId);
@@ -64,17 +61,17 @@ public class AstarexclQuestion extends AstarQuestion {
 
         // Same behaviour for all option when deselected
         if (o.isSelected()) {
-//            nextQid = nextQidDefault;
+            //            nextQid = nextQidDefault;
             return Modifier.UNSELECTED;
         } else {
             // Case option none
-            if(o.getId().equals(OptionNone.getId())) {
+            if (o.getId().equals(OptionNone.getId())) {
                 // deselect all other
                 getOptions().forEach((key, option) -> option.setSelected(false));
-                o.setSelected(true);// only oNone active
+                o.setSelected(true); // only oNone active
             } else {
                 // Case regular option
-                OptionNone.setSelected(false);// throw out oNone
+                OptionNone.setSelected(false); // throw out oNone
                 o.setSelected(true);
             }
             return Modifier.SELECTED;
@@ -86,7 +83,7 @@ public class AstarexclQuestion extends AstarQuestion {
         Optional<String> next = Optional.empty();
         List<String> nextMap = new LinkedList<>();
         LibSelectOption optionNone = getOptions().get(getId() + "oNone");
-        if(optionNone.isSelected()) {
+        if (optionNone.isSelected()) {
             // Option none is selected, return its next or default
             return (optionNone.getNextQid() == null)
                     ? Optional.ofNullable(getDefaultNextQid())
@@ -106,10 +103,9 @@ public class AstarexclQuestion extends AstarQuestion {
                 }
             }
             // return multiple options as string or default nextQid
-            return nextMap.size() > 0 ? Optional.of(nextMap.stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining(","))) : Optional.ofNullable(getDefaultNextQid());
+            return nextMap.size() > 0
+                    ? Optional.of(nextMap.stream().map(Object::toString).collect(Collectors.joining(",")))
+                    : Optional.ofNullable(getDefaultNextQid());
         }
     }
 }
-

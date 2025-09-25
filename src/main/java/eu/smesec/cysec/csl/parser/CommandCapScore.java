@@ -41,11 +41,8 @@ package eu.smesec.cysec.csl.parser;
  */
 public class CommandCapScore extends CommandAbstractScore {
 
-  @Override
-  void score(String scoreId, String questionId, double value, ExecutorContext context) {
-    context.getScore(scoreId).cap(questionId, value);
-  }
-
-
+    @Override
+    void score(String scoreId, String questionId, double value, ExecutorContext context) {
+        context.getScore(scoreId).cap(questionId, value);
+    }
 }
-

@@ -19,10 +19,9 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-public class ParserUnexpectedTokenException extends ParserException{
+public class ParserUnexpectedTokenException extends ParserException {
 
-  public ParserUnexpectedTokenException(ParserLine l) {
-    super("Got unexpected token",l);
-  }
-
+    public ParserUnexpectedTokenException(ParserLine l) {
+        super("Got unexpected token", l);
+    }
 }

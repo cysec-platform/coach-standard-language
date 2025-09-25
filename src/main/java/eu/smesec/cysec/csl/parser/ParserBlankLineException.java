@@ -19,10 +19,9 @@
  */
 package eu.smesec.cysec.csl.parser;
 
-public class ParserBlankLineException extends ParserException{
+public class ParserBlankLineException extends ParserException {
 
-  public ParserBlankLineException(ParserLine l) {
-    super("Got unexpected blank line",l);
-  }
-
+    public ParserBlankLineException(ParserLine l) {
+        super("Got unexpected blank line", l);
+    }
 }

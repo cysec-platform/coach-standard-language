@@ -23,32 +23,40 @@ import java.util.List;
 
 public class CommandSetVar extends Command {
 
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 2 or 3 parameters
-    checkNumParams(aList, 2,3);
+        // expects 2 or 3 parameters
+        checkNumParams(aList, 2, 3);
 
-    // evaluate parameters
-    Atom varName = aList.get(0).execute(coachContext);
-    Atom varContext = aList.get(1).execute(coachContext);
-    Atom varContent = null;
-    if (aList.size() == 2) {
-      varContext = new Atom(Atom.AtomType.STRING, coachContext.getQuestionContext().getId(), null);
-      varContent = aList.get(1).execute(coachContext);
-    } else {
-      varContent = aList.get(2).execute(coachContext);
+        // evaluate parameters
+        Atom varName = aList.get(0).execute(coachContext);
+        Atom varContext = aList.get(1).execute(coachContext);
+        Atom varContent = null;
+        if (aList.size() == 2) {
+            varContext = new Atom(
+                    Atom.AtomType.STRING, coachContext.getQuestionContext().getId(), null);
+            varContent = aList.get(1).execute(coachContext);
+        } else {
+            varContent = aList.get(2).execute(coachContext);
+        }
+
+        // assert type of parameters
+        if (varName.getType() != Atom.AtomType.STRING
+                || (varContext.getType() != Atom.AtomType.STRING && varContext != Atom.NULL_ATOM)) {
+            throw new ExecutorException(
+                    "Invalid types for parameters: Provide [0] String, [1] String and [2] ANY or [0] String and [2] ANY");
+        }
+
+        // set the score
+        coachContext
+                .getContext()
+                .setVariable(varName.getId(), varContent, varContext == Atom.NULL_ATOM ? null : varContext.getId());
+        coachContext
+                .getLogger()
+                .fine(String.format(
+                        "Set variable %s to %s in context %s",
+                        varName.getId(), varContent.getId(), varContent.getId()));
+
+        return Atom.NULL_ATOM;
     }
-
-    // assert type of parameters
-    if (varName.getType() != Atom.AtomType.STRING || (varContext.getType() != Atom.AtomType.STRING && varContext != Atom.NULL_ATOM)) {
-      throw new ExecutorException("Invalid types for parameters: Provide [0] String, [1] String and [2] ANY or [0] String and [2] ANY");
-    }
-
-    // set the score
-    coachContext.getContext().setVariable(varName.getId(), varContent, varContext == Atom.NULL_ATOM ? null : varContext.getId());
-    coachContext.getLogger().fine(String.format("Set variable %s to %s in context %s", varName.getId(), varContent.getId(), varContent.getId()));
-
-    return Atom.NULL_ATOM;
-  }
-
 }

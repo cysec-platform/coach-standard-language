@@ -19,11 +19,10 @@
  */
 package eu.smesec.cysec.csl.questions;
 
+import eu.smesec.cysec.csl.AbstractLib;
 import eu.smesec.cysec.platform.bridge.generated.Option;
 import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
-import eu.smesec.cysec.csl.AbstractLib;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -52,7 +51,8 @@ public class AstarQuestion extends LibQuestion {
             LibSelectOption product = SelectOptionBuilderImpl.newInstance()
                     .setId(option.getId())
                     .setScore(getOptionScore(option.getId()))
-                    .setNext(getOptionNext(option.getId())).build();
+                    .setNext(getOptionNext(option.getId()))
+                    .build();
             options.put(option.getId(), product);
         }
     }
@@ -82,7 +82,6 @@ public class AstarQuestion extends LibQuestion {
         this(id, nextQid, false, options);
     }
 
-
     @Override
     protected Modifier updateState(String optionId, String qid) {
         LibSelectOption o = options.get(optionId);
@@ -90,16 +89,16 @@ public class AstarQuestion extends LibQuestion {
             throw new IllegalArgumentException("Cannot find option " + optionId + " in question " + this.getId());
         }
 
-        if (o.isSelected()) {// deselected
-//            nextQid = nextQidDefault;
+        if (o.isSelected()) { // deselected
+            //            nextQid = nextQidDefault;
             o.setSelected(false);
             return Modifier.UNSELECTED;
-        } else {//selected
-//            String nqid = o.getNextQid();
+        } else { // selected
+            //            String nqid = o.getNextQid();
             o.setSelected(true);
-//            if (nqid != null) {
-//                nextQid = nqid;
-//            }
+            //            if (nqid != null) {
+            //                nextQid = nqid;
+            //            }
             return Modifier.SELECTED;
         }
     }
@@ -158,8 +157,8 @@ public class AstarQuestion extends LibQuestion {
         }
 
         // return multiple options as string or default nextQid
-        return nextMap.size() > 0 ? Optional.of(nextMap.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(","))) : next;
+        return nextMap.size() > 0
+                ? Optional.of(nextMap.stream().map(Object::toString).collect(Collectors.joining(",")))
+                : next;
     }
 }

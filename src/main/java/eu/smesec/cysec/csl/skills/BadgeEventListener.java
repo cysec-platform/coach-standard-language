@@ -21,6 +21,5 @@ package eu.smesec.cysec.csl.skills;
 
 public interface BadgeEventListener {
 
-  void badgeChanged(String badgeId, String classId, ChangeType change);
-
+    void badgeChanged(String badgeId, String classId, ChangeType change);
 }

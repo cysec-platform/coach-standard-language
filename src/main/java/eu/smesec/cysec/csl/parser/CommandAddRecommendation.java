@@ -20,7 +20,6 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -40,23 +39,26 @@ public class CommandAddRecommendation extends Command {
         checkNumParams(aList, 8, 9);
 
         // evaluate parameters
-        Atom recommendationName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "recommendationName");
+        Atom recommendationName = checkAtomType(
+                aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "recommendationName");
         Atom order = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.INTEGER), true, coachContext, "order");
         Atom urlImg = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "urlImg");
         Atom altImg = checkAtomType(aList.get(3), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "altImg");
         Atom title = checkAtomType(aList.get(4), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "title");
-        Atom description = checkAtomType(aList.get(5), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "description");
-        Atom textLink = checkAtomType(aList.get(6), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "textLink");
+        Atom description =
+                checkAtomType(aList.get(5), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "description");
+        Atom textLink =
+                checkAtomType(aList.get(6), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "textLink");
         Atom urlLink = checkAtomType(aList.get(7), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "urlLink");
 
         // execute command
-        CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
+        CySeCExecutorContextFactory.CySeCExecutorContext c =
+                (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
 
         // Check if the user passed tags
         if (aList.size() == 9) {
             Atom tags = checkAtomType(aList.get(8), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "tags");
-            List<RecommendationFactory.Tag> parsedTags = CommandArrayElements.stringToList(tags.getId())
-                    .stream()
+            List<RecommendationFactory.Tag> parsedTags = CommandArrayElements.stringToList(tags.getId()).stream()
                     .map(RecommendationFactory.Tag::parse)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
@@ -70,10 +72,17 @@ public class CommandAddRecommendation extends Command {
                     description.getId(),
                     textLink.getId(),
                     urlLink.getId(),
-                    parsedTags
-            ));
+                    parsedTags));
         } else {
-            c.addRecommendation(new RecommendationFactory.Recommendation(recommendationName.getId(), Integer.valueOf(order.getId()), urlImg.getId(), altImg.getId(), title.getId(), description.getId(), textLink.getId(), urlLink.getId()));
+            c.addRecommendation(new RecommendationFactory.Recommendation(
+                    recommendationName.getId(),
+                    Integer.valueOf(order.getId()),
+                    urlImg.getId(),
+                    altImg.getId(),
+                    title.getId(),
+                    description.getId(),
+                    textLink.getId(),
+                    urlLink.getId()));
         }
 
         return null;

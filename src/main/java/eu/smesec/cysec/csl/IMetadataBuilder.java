@@ -19,8 +19,8 @@
  */
 package eu.smesec.cysec.csl;
 
-import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.csl.parser.CommandAddBadge;
+import eu.smesec.cysec.platform.bridge.generated.Metadata;
 
 /**
  * Interface for the helper class to provide concise access to create (Badge and Recommendation ) Metadata.

@@ -20,7 +20,6 @@
 package eu.smesec.cysec.csl.skills;
 
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
-
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Map;
@@ -63,18 +62,18 @@ public class Endurance extends Skill {
     public void restore(MetadataUtils.SimpleMvalue endurance) {
         // Only continue if endurance mvalue exists
         // Upon first saving of skills, missing object will be created.
-        if(endurance != null) {
+        if (endurance != null) {
             // Security precaution: make sure its cleared before reading new values
             entries.clear();
             String arrayString = endurance.getValue();
             // Strip leading [ and trailing ] from string
-            if(!arrayString.isEmpty()) {
-                String[] values = arrayString.substring(1, arrayString.length() - 1).split(",");
-                Stream.of(values)
-                        .forEach(entry -> {
-                            String[] keyValuePair = entry.split("=");
-                            addEntry(Long.valueOf(keyValuePair[0].trim()), Integer.valueOf(keyValuePair[1].trim()));
-                        });
+            if (!arrayString.isEmpty()) {
+                String[] values =
+                        arrayString.substring(1, arrayString.length() - 1).split(",");
+                Stream.of(values).forEach(entry -> {
+                    String[] keyValuePair = entry.split("=");
+                    addEntry(Long.valueOf(keyValuePair[0].trim()), Integer.valueOf(keyValuePair[1].trim()));
+                });
             }
         }
     }

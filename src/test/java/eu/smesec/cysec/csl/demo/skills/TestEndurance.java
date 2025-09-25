@@ -19,18 +19,17 @@
  */
 package eu.smesec.cysec.csl.demo.skills;
 
+import eu.smesec.cysec.csl.skills.Endurance;
 import eu.smesec.cysec.platform.bridge.generated.Mvalue;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
-import eu.smesec.cysec.csl.skills.Endurance;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TestEndurance {
     private Endurance endurance;

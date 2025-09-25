@@ -38,31 +38,48 @@ import java.util.List;
  */
 public class CommandSetMHidden extends Command {
 
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // Three parameters expected: Lower name (inclusive), higher value (exclusive) and hiding value
-    checkNumParams(aList, 3);
+        // Three parameters expected: Lower name (inclusive), higher value (exclusive) and hiding
+        // value
+        checkNumParams(aList, 3);
 
-    // evaluate parameters
-    Atom varLowId = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "lowID");
-    Atom varHighId = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "highID");
-    boolean varContentBool = Boolean.valueOf(checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.BOOL), true, coachContext,"hideState").getId());
-    coachContext.getLogger().fine(String.format("Set questions in range from %s to %s to hidden=%s", varLowId.getId(), varHighId.getId(), varContentBool));
+        // evaluate parameters
+        Atom varLowId = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "lowID");
+        Atom varHighId = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "highID");
+        boolean varContentBool = Boolean.valueOf(
+                checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.BOOL), true, coachContext, "hideState")
+                        .getId());
+        coachContext
+                .getLogger()
+                .fine(String.format(
+                        "Set questions in range from %s to %s to hidden=%s",
+                        varLowId.getId(), varHighId.getId(), varContentBool));
 
-    // Update question hidden status
-    int cnt = 0;
-    for (Question question : coachContext.getCoach().getQuestions().getQuestion()) {
-      //coachContext.getLogger().info(String.format("    low:  %s?=%s=%s", varLowId.getId(),question.getId(), varLowId.getId().compareTo(question.getId())));
-      //coachContext.getLogger().info(String.format("    high: %s?=%s=%s", varHighId.getId(),question.getId(), varHighId.getId().compareTo(question.getId())));
-      if (varLowId.getId().compareTo(question.getId()) <= 0
-          && varHighId.getId().compareTo(question.getId()) > 0
-          && question.isHidden()!=varContentBool) {
-        question.setHidden(varContentBool);
-        coachContext.getLogger().fine(String.format("  question %s is new set to hidden=%s (%d/%d)", question.getId(), varContentBool?"HIDDEN":"VISIBLE",varLowId.getId().compareTo(question.getId()),varHighId.getId().compareTo(question.getId())));
-        cnt++;
-      }
+        // Update question hidden status
+        int cnt = 0;
+        for (Question question : coachContext.getCoach().getQuestions().getQuestion()) {
+            // coachContext.getLogger().info(String.format("    low:  %s?=%s=%s",
+            // varLowId.getId(),question.getId(),
+            // varLowId.getId().compareTo(question.getId())));
+            // coachContext.getLogger().info(String.format("    high: %s?=%s=%s",
+            // varHighId.getId(),question.getId(),
+            // varHighId.getId().compareTo(question.getId())));
+            if (varLowId.getId().compareTo(question.getId()) <= 0
+                    && varHighId.getId().compareTo(question.getId()) > 0
+                    && question.isHidden() != varContentBool) {
+                question.setHidden(varContentBool);
+                coachContext
+                        .getLogger()
+                        .fine(String.format(
+                                "  question %s is new set to hidden=%s (%d/%d)",
+                                question.getId(),
+                                varContentBool ? "HIDDEN" : "VISIBLE",
+                                varLowId.getId().compareTo(question.getId()),
+                                varHighId.getId().compareTo(question.getId())));
+                cnt++;
+            }
+        }
+        return new Atom(AtomType.INTEGER, "" + cnt, null);
     }
-    return new Atom(AtomType.INTEGER, "" + cnt, null);
-  }
-
 }

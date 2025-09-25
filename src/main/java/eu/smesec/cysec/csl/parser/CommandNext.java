@@ -19,10 +19,10 @@
  */
 package eu.smesec.cysec.csl.parser;
 
+import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
+
 import java.util.Arrays;
 import java.util.List;
-
-import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
 
 /**
  * This command signals the platform to display a certain question instead of the next one in sequence.
@@ -37,23 +37,28 @@ import static eu.smesec.cysec.csl.parser.Atom.NULL_ATOM;
  */
 public class CommandNext extends Command {
 
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 1 parameter: next page string
-    checkNumParams(aList, 1);
+        // expects 1 parameter: next page string
+        checkNumParams(aList, 1);
 
-    // evaluate parameters
-    Atom varContent = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varContent");
+        // evaluate parameters
+        Atom varContent =
+                checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "varContent");
 
-    // assert type of parameters
-    if (varContent.getType() != Atom.AtomType.STRING) {
-      throw new ExecutorException("Invalid types for parameters: Provide [0] String");
+        // assert type of parameters
+        if (varContent.getType() != Atom.AtomType.STRING) {
+            throw new ExecutorException("Invalid types for parameters: Provide [0] String");
+        }
+
+        // set the next page
+        coachContext
+                .getContext()
+                .setVariable(
+                        "_coach.nextPage",
+                        varContent,
+                        coachContext.getQuestionContext().getId());
+
+        return NULL_ATOM;
     }
-
-    // set the next page
-    coachContext.getContext().setVariable("_coach.nextPage", varContent, coachContext.getQuestionContext().getId());
-
-    return NULL_ATOM;
-  }
-
 }

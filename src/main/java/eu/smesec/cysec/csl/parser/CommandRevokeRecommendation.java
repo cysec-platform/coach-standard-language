@@ -20,7 +20,6 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,23 +32,26 @@ import java.util.List;
  * @see CommandAddRecommendation
  */
 public class CommandRevokeRecommendation extends Command {
-  @Override
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    checkNumParams(aList, 1);
+    @Override
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        checkNumParams(aList, 1);
 
-    // evaluate parameters
-    Atom recommendationName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "recommendationName" );
+        // evaluate parameters
+        Atom recommendationName = checkAtomType(
+                aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "recommendationName");
 
-    CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
-    RecommendationFactory.Recommendation recommendation = c.getRecommendation(recommendationName.getId());
-    if (recommendation == null) {
-      // no operation
-      //throw new ExecutorException("Recommendation id "+ recommendationName.getId()+" doesn't exist");
-    } else {
-        c.removeRecommendation(recommendationName.getId());
+        CySeCExecutorContextFactory.CySeCExecutorContext c =
+                (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
+        RecommendationFactory.Recommendation recommendation = c.getRecommendation(recommendationName.getId());
+        if (recommendation == null) {
+            // no operation
+            // throw new ExecutorException("Recommendation id "+ recommendationName.getId()+"
+            // doesn't
+            // exist");
+        } else {
+            c.removeRecommendation(recommendationName.getId());
+        }
+
+        return Atom.NULL_ATOM;
     }
-
-    return Atom.NULL_ATOM;
-  }
-
 }

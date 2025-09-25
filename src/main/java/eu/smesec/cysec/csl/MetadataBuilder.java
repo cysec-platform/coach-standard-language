@@ -23,7 +23,6 @@ import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.platform.bridge.generated.Mvalue;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,40 +95,39 @@ public final class MetadataBuilder implements IMetadataBuilder {
         return this;
     }
 
-    public MetadataBuilder setMvalue(String key, String value){
+    public MetadataBuilder setMvalue(String key, String value) {
         mvalues.add(MetadataUtils.createMvalueStr(key, value));
         return this;
     }
 
     public Metadata buildCustom(String mdKey) {
         return MetadataUtils.createMetadata(mdKey, mvalues);
-
     }
 
     @Override
     public Metadata buildBadge() {
-        return MetadataUtils.createMetadata(MetadataUtils.MD_BADGES + "." + id,
+        return MetadataUtils.createMetadata(
+                MetadataUtils.MD_BADGES + "." + id,
                 Arrays.asList(
                         MetadataUtils.createMvalueStr(MetadataUtils.MV_NAME, name),
                         MetadataUtils.createMvalueStr(MetadataUtils.MV_ID, id),
                         MetadataUtils.createMvalueStr(MetadataUtils.MV_CLASS, clazz),
                         MetadataUtils.createMvalueStr(MetadataUtils.MV_IMAGE, image),
                         MetadataUtils.createMvalueStr(MetadataUtils.MV_LINK, link),
-                        MetadataUtils.createMvalueStr(MetadataUtils.MV_DESCRIPTION, description))
-                );
+                        MetadataUtils.createMvalueStr(MetadataUtils.MV_DESCRIPTION, description)));
     }
 
     @Override
     public Metadata buildRecommendation() {
-        return MetadataUtils.createMetadata(MetadataUtils.MD_RECOMMENDED + "." + id,
-            Arrays.asList(
-                MetadataUtils.createMvalueStr(MetadataUtils.MV_NAME, name),
-                MetadataUtils.createMvalueStr(MetadataUtils.MV_ID, id),
-                MetadataUtils.createMvalueStr(MetadataUtils.MV_DESCRIPTION, description),
-                MetadataUtils.createMvalueStr(MetadataUtils.MV_ORDER, order),
-                MetadataUtils.createMvalueStr(MetadataUtils.MV_GENERAL, general),
-                MetadataUtils.createMvalueStr(MetadataUtils.MV_LINK, link),
-                MetadataUtils.createMvalueStr(MetadataUtils.MV_IMAGE, image)
-            ));
+        return MetadataUtils.createMetadata(
+                MetadataUtils.MD_RECOMMENDED + "." + id,
+                Arrays.asList(
+                        MetadataUtils.createMvalueStr(MetadataUtils.MV_NAME, name),
+                        MetadataUtils.createMvalueStr(MetadataUtils.MV_ID, id),
+                        MetadataUtils.createMvalueStr(MetadataUtils.MV_DESCRIPTION, description),
+                        MetadataUtils.createMvalueStr(MetadataUtils.MV_ORDER, order),
+                        MetadataUtils.createMvalueStr(MetadataUtils.MV_GENERAL, general),
+                        MetadataUtils.createMvalueStr(MetadataUtils.MV_LINK, link),
+                        MetadataUtils.createMvalueStr(MetadataUtils.MV_IMAGE, image)));
     }
 }

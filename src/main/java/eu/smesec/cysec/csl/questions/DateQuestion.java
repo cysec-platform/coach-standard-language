@@ -19,13 +19,12 @@
  */
 package eu.smesec.cysec.csl.questions;
 
-import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.csl.AbstractLib;
+import eu.smesec.cysec.platform.bridge.generated.Question;
 
 public class DateQuestion extends TextQuestion {
 
     public DateQuestion(Question question, AbstractLib lib) {
         super(question, lib);
     }
-
 }

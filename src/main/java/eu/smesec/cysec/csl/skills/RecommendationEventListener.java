@@ -21,6 +21,5 @@ package eu.smesec.cysec.csl.skills;
 
 public interface RecommendationEventListener {
 
-  void recommendationChanged(String recommendationId, ChangeType change);
-
+    void recommendationChanged(String recommendationId, ChangeType change);
 }

@@ -23,38 +23,38 @@ import java.util.List;
 
 public class CommandIf extends Command {
 
-  public CommandIf() {
-    super();
-    numberOfNormalizedParams = 1;
-  }
-
-  @Override
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    checkNumParams(aList, 2, 3);
-
-    Atom cond = aList.get(0);
-
-    Atom ret = null;
-
-    boolean isTrue;
-    try {
-      isTrue = cond.isTrue(coachContext);
-    } catch(ExecutorException e) {
-      throw new ExecutorException("Error while executing if condition "+aList.get(0) ,e);
+    public CommandIf() {
+        super();
+        numberOfNormalizedParams = 1;
     }
-    if (isTrue) {
-      ret = aList.get(1).execute(coachContext);
-    } else {
-      if(aList.size()==3) {
-        ret = aList.get(2).execute(coachContext);
-      } else {
-        ret=null;
-      }
+
+    @Override
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        checkNumParams(aList, 2, 3);
+
+        Atom cond = aList.get(0);
+
+        Atom ret = null;
+
+        boolean isTrue;
+        try {
+            isTrue = cond.isTrue(coachContext);
+        } catch (ExecutorException e) {
+            throw new ExecutorException("Error while executing if condition " + aList.get(0), e);
+        }
+        if (isTrue) {
+            ret = aList.get(1).execute(coachContext);
+        } else {
+            if (aList.size() == 3) {
+                ret = aList.get(2).execute(coachContext);
+            } else {
+                ret = null;
+            }
+        }
+        if (ret != null) {
+            return ret;
+        } else {
+            return new Atom(Atom.AtomType.BOOL, "FALSE", null);
+        }
     }
-    if (ret != null) {
-      return ret;
-    } else {
-      return new Atom(Atom.AtomType.BOOL, "FALSE", null);
-    }
-  }
 }

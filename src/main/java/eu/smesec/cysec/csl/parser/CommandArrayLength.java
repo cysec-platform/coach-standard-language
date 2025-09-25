@@ -25,29 +25,27 @@ import java.util.List;
 
 public class CommandArrayLength extends CommandAbstractList {
 
-  @Override
-  /**
-   * Returns the size of the specified array as Integer.
-   *
-   * <p>This command has one mandatory parameter:
-   *   <ul>
-   *     <li>(arrayList; String)The array to append to.</li>
-   *   </ul>
-   * </p>
-   * @returns Always true
-   */
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    // expects 2 parameter
-    checkNumParams(aList, 1, 1);
+    @Override
+    /**
+     * Returns the size of the specified array as Integer.
+     *
+     * <p>This command has one mandatory parameter:
+     *   <ul>
+     *     <li>(arrayList; String)The array to append to.</li>
+     *   </ul>
+     * </p>
+     * @returns Always true
+     */
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        // expects 2 parameter
+        checkNumParams(aList, 1, 1);
 
-    // evaluate parameters
-    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext,
-        "arrayList");
+        // evaluate parameters
+        Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "arrayList");
 
-    List<String> tempList = stringToList(
-        coachContext.getContext().getVariable(arr.getId(), null).getId());
+        List<String> tempList = stringToList(
+                coachContext.getContext().getVariable(arr.getId(), null).getId());
 
-    return new Atom(AtomType.INTEGER, "" + tempList.size(), null);
-  }
-
+        return new Atom(AtomType.INTEGER, "" + tempList.size(), null);
+    }
 }

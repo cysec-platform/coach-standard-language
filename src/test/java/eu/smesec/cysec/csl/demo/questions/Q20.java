@@ -19,10 +19,9 @@
  */
 package eu.smesec.cysec.csl.demo.questions;
 
-import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.csl.AbstractLib;
 import eu.smesec.cysec.csl.questions.TypeAQuestion;
-
+import eu.smesec.cysec.platform.bridge.generated.Question;
 import java.util.Arrays;
 
 public class Q20 extends TypeAQuestion {
@@ -30,15 +29,16 @@ public class Q20 extends TypeAQuestion {
     public Q20(Question question, AbstractLib lib) {
         super(question, lib);
 
-        init((modifier, optionId) -> { // Enable if q10o1 selected
-            if (optionId.equals("q10o1")) {
-                lib.getLogger().fine(String.format("enabling %s", question.getId()));
-                setHide(false);
-            } else {
-                setHide(true);
-                lib.getLogger().fine(String.format("disabling %s", question.getId()));
-            }
-        }, Arrays.asList(("q10")));
+        init(
+                (modifier, optionId) -> { // Enable if q10o1 selected
+                    if (optionId.equals("q10o1")) {
+                        lib.getLogger().fine(String.format("enabling %s", question.getId()));
+                        setHide(false);
+                    } else {
+                        setHide(true);
+                        lib.getLogger().fine(String.format("disabling %s", question.getId()));
+                    }
+                },
+                Arrays.asList(("q10")));
     }
-
 }

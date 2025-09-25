@@ -24,7 +24,6 @@ import eu.smesec.cysec.platform.bridge.CoachLibrary;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.platform.bridge.generated.Questionnaire;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -42,54 +41,62 @@ import java.util.logging.Level;
  */
 public class CommandCreateSubcoach extends Command {
 
-  @Override
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    checkNumParams(aList, 2, 3);
+    @Override
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        checkNumParams(aList, 2, 3);
 
-    // evaluate parameters
-    Atom coachID = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "coachID");
-    Atom fileIdentifier = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
-    Atom parentArgument;
-    if (aList.size() == 3) {
-      parentArgument = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "parentArgument");
-    } else {
-      parentArgument = Atom.NULL_ATOM;
+        // evaluate parameters
+        Atom coachID = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "coachID");
+        Atom fileIdentifier =
+                checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
+        Atom parentArgument;
+        if (aList.size() == 3) {
+            parentArgument = checkAtomType(
+                    aList.get(2), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "parentArgument");
+        } else {
+            parentArgument = Atom.NULL_ATOM;
+        }
+
+        try {
+            Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
+            if (subcoach == null) {
+                throw new ExecutorException("Coach id " + coachID.getId() + " does not exist");
+            }
+            // Append current coach id to segment: e.g lib-company.lib-subcoach-backup
+            Set<String> segment = new HashSet<>();
+            segment.add(fileIdentifier.getId());
+            coachContext.getLogger().info("Creating subcoach " + subcoach.getId() + "" + fileIdentifier.getId());
+            // pass FQCN of parent. CoachContext contains the fqcn of the current coach, which is
+            // the
+            // parent.
+            CoachLibrary subcoachLibrary =
+                    coachContext.getCal().getLibraries(subcoach.getId()).get(0);
+            Metadata metadata = MetadataBuilder.newInstance(subcoachLibrary)
+                    .setMvalue("parent-argument", parentArgument.getId() == null ? "" : parentArgument.getId())
+                    .buildCustom("subcoach-data");
+            coachContext.getCal().instantiateSubCoach(subcoach, segment, metadata);
+
+            // set parent context of new subcoach
+            coachContext
+                    .getLogger()
+                    .info("Setting " + coachContext.getCoach().getId() + " as parent for " + subcoach.getId());
+
+            subcoachLibrary.setParent(coachContext.getContext());
+        } catch (CacheException e) {
+            coachContext.getLogger().log(Level.SEVERE, "Couldn't create subcoach via CAL", e);
+            // setup coach relation for already existing coaches
+            try {
+                Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
+                CoachLibrary subcoachLibrary =
+                        coachContext.getCal().getLibraries(subcoach.getId()).get(0);
+                subcoachLibrary.setParent(coachContext.getContext());
+            } catch (CacheException ex) {
+                coachContext
+                        .getLogger()
+                        .log(Level.SEVERE, "Error trying to setup parent relation for existing coach", e);
+            }
+        }
+
+        return null;
     }
-
-    try {
-      Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
-      if (subcoach == null) {
-        throw new ExecutorException("Coach id " + coachID.getId() +" does not exist");
-      }
-      // Append current coach id to segment: e.g lib-company.lib-subcoach-backup
-      Set<String> segment = new HashSet<>();
-      segment.add(fileIdentifier.getId());
-      coachContext.getLogger().info("Creating subcoach " + subcoach.getId() + "" + fileIdentifier.getId());
-      // pass FQCN of parent. CoachContext contains the fqcn of the current coach, which is the parent.
-      CoachLibrary subcoachLibrary = coachContext.getCal().getLibraries(subcoach.getId()).get(0);
-      Metadata metadata = MetadataBuilder
-              .newInstance(subcoachLibrary)
-              .setMvalue("parent-argument", parentArgument.getId() == null ? "" : parentArgument.getId())
-              .buildCustom("subcoach-data");
-      coachContext.getCal().instantiateSubCoach(subcoach, segment, metadata);
-
-      // set parent context of new subcoach
-      coachContext.getLogger().info("Setting " + coachContext.getCoach().getId() + " as parent for " + subcoach.getId());
-
-      subcoachLibrary.setParent(coachContext.getContext());
-    } catch (CacheException e) {
-      coachContext.getLogger().log(Level.SEVERE, "Couldn't create subcoach via CAL", e);
-      // setup coach relation for already existing coaches
-      try {
-        Questionnaire subcoach = coachContext.getCal().getCoach(coachID.getId());
-        CoachLibrary subcoachLibrary = coachContext.getCal().getLibraries(subcoach.getId()).get(0);
-        subcoachLibrary.setParent(coachContext.getContext());
-      } catch (CacheException ex) {
-        coachContext.getLogger().log(Level.SEVERE, "Error trying to setup parent relation for existing coach", e);
-      }
-    }
-
-    return null;
-  }
-
 }

@@ -21,46 +21,44 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class CommandArrayRemove extends CommandAbstractList {
 
-  @Override
-  /**
-   * Adds an element to an existing array.
-   *
-   * <p>This command has two mandatory parameter:
-   *   <ul>
-   *     <li>(arrayList; String)The array to append to.</li>
-   *     <li>(arrayElement; String)The element to be appended.</li>
-   *   </ul>
-   * </p>
-   * <p>This Command has one optional parameter:
-   *   <ul>
-   *     <li>(boolean; default false) Remove duplicated entries and sort.</li>
-   *   </ul>
-   * </p>
-   * @returns Always true
-   */
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    // expects 1 parameter
-    checkNumParams(aList, 2,3);
+    @Override
+    /**
+     * Adds an element to an existing array.
+     *
+     * <p>This command has two mandatory parameter:
+     *   <ul>
+     *     <li>(arrayList; String)The array to append to.</li>
+     *     <li>(arrayElement; String)The element to be appended.</li>
+     *   </ul>
+     * </p>
+     * <p>This Command has one optional parameter:
+     *   <ul>
+     *     <li>(boolean; default false) Remove duplicated entries and sort.</li>
+     *   </ul>
+     * </p>
+     * @returns Always true
+     */
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        // expects 1 parameter
+        checkNumParams(aList, 2, 3);
 
-    // evaluate parameters
-    Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "ArrayList" );
-    Atom elem = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "ArrayList" );
-    Atom unique = Atom.FALSE;
+        // evaluate parameters
+        Atom arr = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "ArrayList");
+        Atom elem = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING), true, coachContext, "ArrayList");
+        Atom unique = Atom.FALSE;
 
-    List<String> tempList = stringToList(coachContext.getContext().getVariable(arr.getId(),null ).getId());
-    tempList.remove(elem.getId());
+        List<String> tempList = stringToList(
+                coachContext.getContext().getVariable(arr.getId(), null).getId());
+        tempList.remove(elem.getId());
 
-    Atom result = new Atom(AtomType.STRING,listToString(tempList),null);
+        Atom result = new Atom(AtomType.STRING, listToString(tempList), null);
 
-    coachContext.getContext().setVariable(arr.getId(), result, null);
+        coachContext.getContext().setVariable(arr.getId(), result, null);
 
-    return Atom.TRUE;
-  }
-
+        return Atom.TRUE;
+    }
 }

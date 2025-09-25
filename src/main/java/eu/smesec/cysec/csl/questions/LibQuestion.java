@@ -19,15 +19,13 @@
  */
 package eu.smesec.cysec.csl.questions;
 
-import eu.smesec.cysec.platform.bridge.generated.Metadata;
-import eu.smesec.cysec.platform.bridge.generated.Mvalue;
-import eu.smesec.cysec.platform.bridge.generated.Option;
-import eu.smesec.cysec.platform.bridge.generated.Question;
-import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
 import eu.smesec.cysec.csl.AbstractLib;
 import eu.smesec.cysec.csl.INavigateable;
 import eu.smesec.cysec.csl.Observer;
-
+import eu.smesec.cysec.platform.bridge.generated.Metadata;
+import eu.smesec.cysec.platform.bridge.generated.Mvalue;
+import eu.smesec.cysec.platform.bridge.generated.Question;
+import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -132,8 +130,6 @@ public abstract class LibQuestion implements Observer, INavigateable {
         }
     }
 
-
-
     public Optional<MetadataUtils.SimpleMvalue> getLogic(String logicProperty) {
         MetadataUtils.SimpleMvalue logic = mvalueMap.get(logicProperty);
         return Optional.ofNullable(logic);
@@ -171,9 +167,9 @@ public abstract class LibQuestion implements Observer, INavigateable {
     public void init(BiConsumer<Modifier, String> action, Collection<String> questionIds) {
         this.action = action;
         for (String id : questionIds) {
-//            LibQuestion question = lib.getQuestion(id);
-//            Objects.requireNonNull(question, "No question with given ID found");
-//            question.register(this);
+            //            LibQuestion question = lib.getQuestion(id);
+            //            Objects.requireNonNull(question, "No question with given ID found");
+            //            question.register(this);
         }
     }
 }

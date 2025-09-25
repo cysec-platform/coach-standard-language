@@ -21,28 +21,27 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Metadata;
-
 import java.util.List;
 
 public class CommandGetParentArgument extends Command {
 
-  public Atom execute(List<Atom> a, CoachContext coachContext) {
+    public Atom execute(List<Atom> a, CoachContext coachContext) {
 
-    try {
-      Metadata parentMetadata = coachContext.getCal().getMetadata(coachContext.getFqcn(), "subcoach-data");
-      if (parentMetadata != null) {
-        return parentMetadata.getMvalue()
-                .stream()
-                .filter(mval -> mval.getKey().equals("parent-argument"))
-                .findFirst()
-                .map(mval -> mval.getStringValueOrBinaryValue().getValue())
-                .map(argument -> new Atom(Atom.AtomType.STRING, argument, null))
-                .orElse(new Atom(Atom.AtomType.STRING,"",null));
-      }
-    } catch (CacheException e) {
-      coachContext.getLogger().severe("There was an error while executing command 'getParentArgument': " + e.getMessage());
+        try {
+            Metadata parentMetadata = coachContext.getCal().getMetadata(coachContext.getFqcn(), "subcoach-data");
+            if (parentMetadata != null) {
+                return parentMetadata.getMvalue().stream()
+                        .filter(mval -> mval.getKey().equals("parent-argument"))
+                        .findFirst()
+                        .map(mval -> mval.getStringValueOrBinaryValue().getValue())
+                        .map(argument -> new Atom(Atom.AtomType.STRING, argument, null))
+                        .orElse(new Atom(Atom.AtomType.STRING, "", null));
+            }
+        } catch (CacheException e) {
+            coachContext
+                    .getLogger()
+                    .severe("There was an error while executing command 'getParentArgument': " + e.getMessage());
+        }
+        return new Atom(Atom.AtomType.STRING, "", null);
     }
-    return new Atom(Atom.AtomType.STRING,"",null);
-  }
-
 }

@@ -20,7 +20,6 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.platform.bridge.generated.Question;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,27 +34,31 @@ import java.util.List;
  */
 public class CommandSetHidden extends Command {
 
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 2 parameters: name and hidden state
-    checkNumParams(aList,2);
+        // expects 2 parameters: name and hidden state
+        checkNumParams(aList, 2);
 
-    // evaluate parameters
-    Atom questionID = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "questionID");
-    Atom varContentBool = checkAtomType(aList.get(1).execute(coachContext), Arrays.asList(Atom.AtomType.BOOL), true, coachContext, "hideState");
+        // evaluate parameters
+        Atom questionID =
+                checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "questionID");
+        Atom varContentBool = checkAtomType(
+                aList.get(1).execute(coachContext), Arrays.asList(Atom.AtomType.BOOL), true, coachContext, "hideState");
 
-    // Update question hidden status
-    Question question = coachContext.getCoach().getQuestions().getQuestion().stream()
-        .filter(question1 -> question1.getId().equals(questionID.getId()))
-        .findFirst()
-        .orElseThrow(
-            () -> new ExecutorException("Question id " + questionID.getId() + " doesn't exist"));
-    if(question.isHidden()!=Boolean.valueOf(varContentBool.getId())) {
-      coachContext.getLogger().fine(String.format("question %s is new set to hidden=%s (setHidden)", question.getId(), varContentBool.getId()));
-      question.setHidden(Boolean.valueOf(varContentBool.getId()));
+        // Update question hidden status
+        Question question = coachContext.getCoach().getQuestions().getQuestion().stream()
+                .filter(question1 -> question1.getId().equals(questionID.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ExecutorException("Question id " + questionID.getId() + " doesn't exist"));
+        if (question.isHidden() != Boolean.valueOf(varContentBool.getId())) {
+            coachContext
+                    .getLogger()
+                    .fine(String.format(
+                            "question %s is new set to hidden=%s (setHidden)",
+                            question.getId(), varContentBool.getId()));
+            question.setHidden(Boolean.valueOf(varContentBool.getId()));
+        }
+
+        return new Atom(Atom.AtomType.NULL, null, null);
     }
-
-    return new Atom(Atom.AtomType.NULL, null, null);
-  }
-
 }

@@ -20,7 +20,6 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.BadgeFactory;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,23 +36,24 @@ import java.util.List;
  *
  */
 public class CommandRevokeBadge extends Command {
-  @Override
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    checkNumParams(aList, 1, 1);
+    @Override
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        checkNumParams(aList, 1, 1);
 
-    // evaluate parameters
-    Atom badgeName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName" );
+        // evaluate parameters
+        Atom badgeName =
+                checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName");
 
-    // execute command
-    CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
-    BadgeFactory.Badge badge = c.getBadge(badgeName.getId());
-    if (badge == null) {
-      throw new ExecutorException("Badge id "+badgeName.getId()+" doesn't exist");
-    } else {
-      badge.revokeAwardedBadge();
+        // execute command
+        CySeCExecutorContextFactory.CySeCExecutorContext c =
+                (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
+        BadgeFactory.Badge badge = c.getBadge(badgeName.getId());
+        if (badge == null) {
+            throw new ExecutorException("Badge id " + badgeName.getId() + " doesn't exist");
+        } else {
+            badge.revokeAwardedBadge();
+        }
+
+        return Atom.NULL_ATOM;
     }
-
-    return Atom.NULL_ATOM;
-  }
-
 }

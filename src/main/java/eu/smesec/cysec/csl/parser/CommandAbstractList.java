@@ -22,58 +22,58 @@ package eu.smesec.cysec.csl.parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 import java.util.regex.Pattern;
 
 public abstract class CommandAbstractList extends Command {
 
-  public static final char[] ESCAPES = { '\\', ',' };
-  public static final char ESCAPE = '\\';
+    public static final char[] ESCAPES = {'\\', ','};
+    public static final char ESCAPE = '\\';
 
-  public static String escape(String s) {
-    for(char c:ESCAPES) {
-      String regex = Pattern.compile("[{}()\\[\\].+*?^$\\\\|]").matcher(""+c).replaceAll("\\\\$0");
-      //String regex = (new StringBuilder()).append(ESCAPE).append(c).toString();
-      String repl = (new StringBuilder()).append(ESCAPE).append(c).toString();
-      s=s.replace( regex,repl);
+    public static String escape(String s) {
+        for (char c : ESCAPES) {
+            String regex =
+                    Pattern.compile("[{}()\\[\\].+*?^$\\\\|]").matcher("" + c).replaceAll("\\\\$0");
+            // String regex = (new StringBuilder()).append(ESCAPE).append(c).toString();
+            String repl = (new StringBuilder()).append(ESCAPE).append(c).toString();
+            s = s.replace(regex, repl);
+        }
+        return s;
     }
-    return s;
-  }
 
-  public static String deescape(String s) {
-    for(char c:ESCAPES) {
-      // String regex = Pattern.compile("[{}()\\[\\].+*?^$\\\\|]").matcher((new StringBuilder()).append(ESCAPE).append(c).toString()).replaceAll("\\\\$0");
-      String regex = (new StringBuilder()).append(ESCAPE).append(c).toString();
-      String repl = ""+c;
-      s=s.replace( regex, repl);
+    public static String deescape(String s) {
+        for (char c : ESCAPES) {
+            // String regex = Pattern.compile("[{}()\\[\\].+*?^$\\\\|]").matcher((new
+            // StringBuilder()).append(ESCAPE).append(c).toString()).replaceAll("\\\\$0");
+            String regex = (new StringBuilder()).append(ESCAPE).append(c).toString();
+            String repl = "" + c;
+            s = s.replace(regex, repl);
+        }
+        return s;
     }
-    return s;
-  }
 
-  public static List<String> stringToList(String s) {
-    List<String> l = new ArrayList();
-    if(s==null) return l;
-    for(String st:Arrays.asList(s.split("(?<!\\\\), "))) {
-      l.add(deescape(st));
+    public static List<String> stringToList(String s) {
+        List<String> l = new ArrayList();
+        if (s == null) return l;
+        for (String st : Arrays.asList(s.split("(?<!\\\\), "))) {
+            l.add(deescape(st));
+        }
+        return l;
     }
-    return l;
-  }
 
-  public static String listToString(List<String> list) {
-    StringBuilder result = new StringBuilder();
-    boolean first = true;
-    for(String string : list) {
-      String t=escape(string);
-      if(first) {
-        result.append(t);
-        first=false;
-      } else {
-        result.append(", ").append(t);
-      }
+    public static String listToString(List<String> list) {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (String string : list) {
+            String t = escape(string);
+            if (first) {
+                result.append(t);
+                first = false;
+            } else {
+                result.append(", ").append(t);
+            }
+        }
+        return result.toString();
     }
-    return result.toString();
-  }
 
-  abstract public Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException;
-
+    public abstract Atom execute(List<Atom> list, CoachContext coachContext) throws ExecutorException;
 }

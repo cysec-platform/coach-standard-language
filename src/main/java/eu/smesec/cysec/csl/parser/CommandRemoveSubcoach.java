@@ -21,7 +21,6 @@ package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
-
 import java.util.*;
 import java.util.logging.Level;
 
@@ -32,23 +31,24 @@ import java.util.logging.Level;
  */
 public class CommandRemoveSubcoach extends Command {
 
-  @Override
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    checkNumParams(aList, 2);
+    @Override
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        checkNumParams(aList, 2);
 
-    // evaluate parameters
-    Atom coachID = checkAtomType(aList.get(0), List.of(Atom.AtomType.STRING), true, coachContext, "coachID");
-    Atom fileIdentifier = checkAtomType(aList.get(1), List.of(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
+        // evaluate parameters
+        Atom coachID = checkAtomType(aList.get(0), List.of(Atom.AtomType.STRING), true, coachContext, "coachID");
+        Atom fileIdentifier =
+                checkAtomType(aList.get(1), List.of(Atom.AtomType.STRING), true, coachContext, "fileIdentifier");
 
-    FQCN fqcn = FQCN.fromString(String.join(".", Arrays.asList(coachContext.getCoach().getId(), coachID.getId(), fileIdentifier.getId())));
+        FQCN fqcn = FQCN.fromString(String.join(
+                ".", Arrays.asList(coachContext.getCoach().getId(), coachID.getId(), fileIdentifier.getId())));
 
-    try {
-      coachContext.getCal().removeSubCoach(fqcn);
-    } catch (CacheException e) {
-      coachContext.getLogger().log(Level.SEVERE, "Error trying to remove sub-coach", e);
+        try {
+            coachContext.getCal().removeSubCoach(fqcn);
+        } catch (CacheException e) {
+            coachContext.getLogger().log(Level.SEVERE, "Error trying to remove sub-coach", e);
+        }
+
+        return null;
     }
-
-    return null;
-  }
-
 }

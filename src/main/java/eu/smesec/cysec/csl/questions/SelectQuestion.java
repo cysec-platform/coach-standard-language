@@ -19,9 +19,8 @@
  */
 package eu.smesec.cysec.csl.questions;
 
-import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.csl.AbstractLib;
-
+import eu.smesec.cysec.platform.bridge.generated.Question;
 import java.util.Arrays;
 
 /**
@@ -31,7 +30,6 @@ import java.util.Arrays;
 public class SelectQuestion extends AstarQuestion {
     private LibSelectOption optionYes;
     private LibSelectOption optionNo;
-
 
     /**
      * New constructor for question creation. It assumes that for all Type A questions, o1 is the "Yes"
@@ -43,7 +41,6 @@ public class SelectQuestion extends AstarQuestion {
         super(question, lib);
         optionYes = getOptions().get(question.getId() + "o1");
         optionNo = getOptions().get(question.getId() + "o2");
-
     }
 
     public SelectQuestion(String id, String nextQid, boolean hide, LibSelectOption yes, LibSelectOption no) {

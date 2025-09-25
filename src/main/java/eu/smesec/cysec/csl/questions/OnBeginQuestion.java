@@ -19,9 +19,8 @@
  */
 package eu.smesec.cysec.csl.questions;
 
-import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.csl.AbstractLib;
-
+import eu.smesec.cysec.platform.bridge.generated.Question;
 import java.util.Optional;
 
 public class OnBeginQuestion extends LibQuestion {

@@ -27,5 +27,4 @@ public class Strength extends Skill {
     public Strength(int maxValue) {
         super(maxValue);
     }
-
 }

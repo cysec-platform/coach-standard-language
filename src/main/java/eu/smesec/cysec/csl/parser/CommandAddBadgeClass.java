@@ -20,7 +20,6 @@
 package eu.smesec.cysec.csl.parser;
 
 import eu.smesec.cysec.csl.skills.BadgeFactory;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,28 +35,39 @@ import java.util.List;
  */
 public class CommandAddBadgeClass extends Command {
 
-  @Override
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
-    // expects 7 parameters
-    checkNumParams(aList,7);
+    @Override
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+        // expects 7 parameters
+        checkNumParams(aList, 7);
 
-    // evaluate parameters
-    Atom badgeName = checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName");
-    Atom badgeClassName = checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeClass");
-    Atom order = checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.INTEGER), true, coachContext,"BadgeOrder");
-    Atom urlImg = checkAtomType(aList.get(3), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "ImageURL");
-    Atom altImg = checkAtomType(aList.get(4), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"ImageAlternate" );
-    Atom description = checkAtomType(aList.get(5), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"Description");
-    Atom urlLink = checkAtomType(aList.get(6), Arrays.asList(Atom.AtomType.STRING), true, coachContext,"LinkURL");
+        // evaluate parameters
+        Atom badgeName =
+                checkAtomType(aList.get(0), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeName");
+        Atom badgeClassName =
+                checkAtomType(aList.get(1), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "BadgeClass");
+        Atom order =
+                checkAtomType(aList.get(2), Arrays.asList(Atom.AtomType.INTEGER), true, coachContext, "BadgeOrder");
+        Atom urlImg = checkAtomType(aList.get(3), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "ImageURL");
+        Atom altImg =
+                checkAtomType(aList.get(4), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "ImageAlternate");
+        Atom description =
+                checkAtomType(aList.get(5), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "Description");
+        Atom urlLink = checkAtomType(aList.get(6), Arrays.asList(Atom.AtomType.STRING), true, coachContext, "LinkURL");
 
-    CySeCExecutorContextFactory.CySeCExecutorContext c = (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
-    BadgeFactory.Badge b = c.getBadge(badgeName.getId());
-    if (b == null) {
-      throw new ExecutorException("Badge id "+badgeName.getId()+" is not known");
+        CySeCExecutorContextFactory.CySeCExecutorContext c =
+                (CySeCExecutorContextFactory.CySeCExecutorContext) (coachContext.getContext());
+        BadgeFactory.Badge b = c.getBadge(badgeName.getId());
+        if (b == null) {
+            throw new ExecutorException("Badge id " + badgeName.getId() + " is not known");
+        }
+        b.addBadgeClass(new BadgeFactory.BadgeClass(
+                badgeClassName.getId(),
+                Integer.valueOf(order.getId()),
+                urlImg.getId(),
+                altImg.getId(),
+                description.getId(),
+                urlLink.getId()));
+
+        return null;
     }
-    b.addBadgeClass(new BadgeFactory.BadgeClass(badgeClassName.getId(), Integer.valueOf(order.getId()), urlImg.getId(), altImg.getId(), description.getId(), urlLink.getId()));
-
-    return null;
-  }
-
 }

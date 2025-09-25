@@ -25,7 +25,6 @@ import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Answer;
 import eu.smesec.cysec.platform.bridge.generated.Question;
 import eu.smesec.cysec.platform.bridge.generated.QuestionType;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -41,64 +40,66 @@ import java.util.List;
  */
 public class CommandSetAnswer extends Command {
 
-  public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
+    public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {
 
-    // expects 2 parameters: name and value of an answer
-    checkNumParams(aList, 2);
+        // expects 2 parameters: name and value of an answer
+        checkNumParams(aList, 2);
 
-    // evaluate parameters
-    Atom questionId = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "questionID");
-    Atom answerValue = checkAtomType(aList.get(1), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext,
-        "answerValue");
+        // evaluate parameters
+        Atom questionId = checkAtomType(aList.get(0), Arrays.asList(AtomType.STRING), true, coachContext, "questionID");
+        Atom answerValue = checkAtomType(
+                aList.get(1), Arrays.asList(AtomType.STRING, AtomType.NULL), true, coachContext, "answerValue");
 
-    if (answerValue.getType() != AtomType.STRING || questionId.getType() != AtomType.STRING) {
-      // TODO is type string really enogh for answer values?
-      throw new ExecutorException("Invalid types for parameters: Provide [0] String and [1] String");
-    }
-
-    String value = answerValue.getId(); // use getId over toString since toString adds unnecessary " around the value
-    String qid = questionId.getId();
-
-    // determine provided option is selected
-    ILibCal cal = coachContext.getCal();
-
-    try {
-      Answer answer = cal.getAnswer(coachContext.getFqcn().toString(), qid);
-      Question question = coachContext.getCoach().getQuestions().getQuestion().stream()
-          .filter(q -> q.getId().equals(qid))
-          .findAny()
-          .orElseThrow(() -> new ExecutorException(String.format("question with id %s does not exist.", qid)));
-
-      if (answer != null) {
-        // update existing
-        if (EnumSet.of(QuestionType.ASTAR, QuestionType.ASTAREXCL).contains(question.getType())) {
-          answer.setAidList(value);
-          answer.setText(value.split(" ")[0]);
-        } else {
-          answer.setText(value);
+        if (answerValue.getType() != AtomType.STRING || questionId.getType() != AtomType.STRING) {
+            // TODO is type string really enogh for answer values?
+            throw new ExecutorException("Invalid types for parameters: Provide [0] String and [1] String");
         }
 
-        // FIXME call missing
-        // cal.updateAnswer(coachContext.getFqcn().getCoachId(), answer);
-      } else {
-        // create new answer
-        answer = new Answer();
-        answer.setQid(qid);
-        answer.setText(value);
+        String value = answerValue.getId(); // use getId over toString since toString adds unnecessary "
+        // around the
+        // value
+        String qid = questionId.getId();
 
-        if (EnumSet.of(QuestionType.ASTAR, QuestionType.ASTAREXCL).contains(question.getType())) {
-          answer.setAidList(value);
+        // determine provided option is selected
+        ILibCal cal = coachContext.getCal();
+
+        try {
+            Answer answer = cal.getAnswer(coachContext.getFqcn().toString(), qid);
+            Question question = coachContext.getCoach().getQuestions().getQuestion().stream()
+                    .filter(q -> q.getId().equals(qid))
+                    .findAny()
+                    .orElseThrow(
+                            () -> new ExecutorException(String.format("question with id %s does not exist.", qid)));
+
+            if (answer != null) {
+                // update existing
+                if (EnumSet.of(QuestionType.ASTAR, QuestionType.ASTAREXCL).contains(question.getType())) {
+                    answer.setAidList(value);
+                    answer.setText(value.split(" ")[0]);
+                } else {
+                    answer.setText(value);
+                }
+
+                // FIXME call missing
+                // cal.updateAnswer(coachContext.getFqcn().getCoachId(), answer);
+            } else {
+                // create new answer
+                answer = new Answer();
+                answer.setQid(qid);
+                answer.setText(value);
+
+                if (EnumSet.of(QuestionType.ASTAR, QuestionType.ASTAREXCL).contains(question.getType())) {
+                    answer.setAidList(value);
+                }
+
+                // FIXME call missing
+                // cal.createAnswer(coachContext.getFqcn().getCoachId(), answer);
+            }
+
+        } catch (CacheException e) {
+            throw new ExecutorException("error while setting answer of question");
         }
 
-        // FIXME call missing
-        // cal.createAnswer(coachContext.getFqcn().getCoachId(), answer);
-      }
-
-    } catch (CacheException e) {
-      throw new ExecutorException("error while setting answer of question");
+        return Atom.NULL_ATOM;
     }
-
-    return Atom.NULL_ATOM;
-  }
-
 }
