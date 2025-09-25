@@ -212,6 +212,23 @@
               <target>9</target>
             </configuration>
           </plugin>
+
+            <!-- Code formatter-->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.46.1</version>
+                <configuration>
+                    <java>
+                        <palantirJavaFormat>
+                            <version>2.73.0</version>
+                            <style>PALANTIR</style>
+                            <formatJavadoc>false
+                            </formatJavadoc>
+                        </palantirJavaFormat>
+                    </java>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
