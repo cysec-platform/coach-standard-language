@@ -32,11 +32,7 @@ import eu.smesec.cysec.csl.skills.Endurance;
 import eu.smesec.cysec.csl.skills.RecommendationFactory;
 import eu.smesec.cysec.csl.skills.ScoreFactory;
 import eu.smesec.cysec.csl.utils.Utils;
-import eu.smesec.cysec.platform.bridge.CoachLibrary;
-import eu.smesec.cysec.platform.bridge.Command;
-import eu.smesec.cysec.platform.bridge.Commands;
-import eu.smesec.cysec.platform.bridge.FQCN;
-import eu.smesec.cysec.platform.bridge.ILibCal;
+import eu.smesec.cysec.platform.bridge.*;
 import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.*;
 import eu.smesec.cysec.platform.bridge.md.MetadataUtils;
@@ -338,6 +334,19 @@ public abstract class AbstractLib implements CoachLibrary {
         } catch (CacheException | JsonProcessingException e) {
             logger.severe("There was an error while fetching all questions: " + e.getMessage());
         }
+
+        // Set the unanswered count so we can show a warning in the summary page if there's unanswered questions
+        try{
+            long unansweredCount = cal.getQuestionsAnsweredStates()
+                    .values()
+                    .stream()
+                    .filter(s -> s == QuestionAnswerState.UNANSWERED)
+                    .count();
+            values.put("systemUnansweredCount", unansweredCount);
+        } catch (CacheException e) {
+            logger.severe("There was an error while getting number of unanswered questions");
+        }
+
 
         // Add all subcoach variables into JSP model
         values.put("subcoachVariables", executorContext.getSubcoachVariablesCache());

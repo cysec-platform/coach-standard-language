@@ -284,9 +284,12 @@ public class CySeCExecutorContextFactory {
 
                 // this should clear previously set variables from that question
                 // ec.variables.remove(coachContext.getQuestionContext().getId());
-                for (Variable variable : ec.variables.values()) {
-                    variable.var.remove(coachContext.getQuestionContext().getId());
-                    variable.lastval = null;
+                for (Map.Entry<String, Variable> variable : ec.variables.entrySet()) {
+                    // Make sure system variables are not cleared since they are being set from outside
+                    if (variable.getKey().startsWith("__SYSTEM")) continue;
+
+                    variable.getValue().var.remove(coachContext.getQuestionContext().getId());
+                    variable.getValue().lastval = null;
                 }
 
                 //

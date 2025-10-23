@@ -19,15 +19,11 @@
  */
 package eu.smesec.cysec.csl;
 
-import eu.smesec.cysec.csl.parser.CoachContext;
-import eu.smesec.cysec.csl.parser.CySeCExecutorContextFactory;
-import eu.smesec.cysec.csl.parser.CySeCLineAtom;
-import eu.smesec.cysec.csl.parser.ExecutorContext;
-import eu.smesec.cysec.csl.parser.ExecutorException;
-import eu.smesec.cysec.csl.parser.ParserException;
-import eu.smesec.cysec.csl.parser.ParserLine;
+import eu.smesec.cysec.csl.parser.*;
 import eu.smesec.cysec.platform.bridge.FQCN;
 import eu.smesec.cysec.platform.bridge.ILibCal;
+import eu.smesec.cysec.platform.bridge.QuestionAnswerState;
+import eu.smesec.cysec.platform.bridge.execptions.CacheException;
 import eu.smesec.cysec.platform.bridge.generated.Metadata;
 import eu.smesec.cysec.platform.bridge.generated.Mvalue;
 import eu.smesec.cysec.platform.bridge.generated.Question;
@@ -112,6 +108,19 @@ public class LogicRunner {
 
         ExecutorContext context = CySeCExecutorContextFactory.getExecutorContext(
                 library.getQuestionnaire().getId());
+
+        // Set the unanswered question count system variable
+        try {
+            long unansweredCount = cal.getQuestionsAnsweredStates()
+                    .values()
+                    .stream()
+                    .filter(s -> s == QuestionAnswerState.UNANSWERED)
+                    .count();
+            context.setVariable("__SYSTEM_UNANSWERED_COUNT", new Atom(Atom.AtomType.INTEGER, Long.toString(unansweredCount), Collections.emptyList()), null);
+        } catch (CacheException e) {
+            throw new ExecutorException("There was an error setting system variables: " + e.getMessage());
+        }
+
         CoachContext coachContext = new CoachContext(
                 context,
                 cal,
