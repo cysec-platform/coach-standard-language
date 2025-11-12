@@ -24,13 +24,73 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This command modifies the display status of a question from hidden to show.
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">setHidden</h2>
+ *   </div>
  *
- * <p>Remember to add a condition to hide a question again, if it should not be displayed all the
- * time once it is unhidden</p>
+ *   <div class="command-signature">
+ *     <code><span class="return-type">NULL</span> setHidden(<span class="params">questionId: STRING, hiddenState: BOOL</span>)</code>
+ *   </div>
  *
- * <p>Syntax: setHidden(id, hidden);</p>
- * <p>Example: setHidden("q20", FALSE);</p>
+ *   <div class="command-description">
+ *     <p>This command sets the hidden state of a given question.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>questionId</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>ID of the question to set hidden state of</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>hiddenState</code></td>
+ *           <td><code>BOOL</code></td>
+ *           <td>Yes</td>
+ *           <td>The hidden state. TRUE means the question is hidden and FALSE means the question is visible.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>NULL</code> - The return value is not meaningful.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Basic Usage</h4>
+ *       <pre><code>setHidden("q1234", TRUE);</code></pre>
+ *       <p class="example-description">hides question q1234</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Advanced Usage</h4>
+ *       <pre><code>setHidden("q1234", not(someOtherCommand()));</code></pre>
+ *       <p class="example-description">Arbitrary BOOL-expression can be used</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>There's also setMHidden to hide a range of questions.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandSetHidden extends Command {
 
