@@ -24,14 +24,95 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Adds a new "empty" badge to the {@link BadgeFactory}. This method must be executed before any Badge classes may be assigned with {@link CommandAddBadgeClass}
- * <p>Syntax: addBadge( badgeName, order, urlImg, altImg, description,urlLink );</p>
- *  <p>Example: addBadge( "ServerSavior", 1, "assets/images/serversavior.svg", "", "Not assigned yet", "lib-backup,q20");</p>
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">addBadge</h2>
+ *   </div>
  *
- * @see CommandAddBadgeClass
- * @see CommandAwardBadge
- * @see CommandRevokeBadge
+ *   <div class="command-signature">
+ *     <code><span class="return-type">NULL</span> addBadge(<span class="params">badgeName: STRING, order: INTEGER, urlImg: STRING, altImg: STRING, description: STRING, urlLink: STRING</span>)</code>
+ *   </div>
  *
+ *   <div class="command-description">
+ *     <p>This command creates and adds a new "empty" badge definition to the <code>BadgeFactory</code>. A badge must be defined using this command before any badge classes can be added to it (using <code>addBadgeClass</code>) or awarded (using <code>awardBadge</code>).</p>
+ *     <p>The <code>badgeName</code> serves as a unique identifier for the badge.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>badgeName</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>A unique string identifier for the badge.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>order</code></td>
+ *           <td><code>INTEGER</code></td>
+ *           <td>Yes</td>
+ *           <td>An integer value used for sorting badges when displayed.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>urlImg</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The URL or path to the default image for the badge.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>altImg</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>Alternative text for the badge image, important for accessibility.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>description</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>A brief description of the badge, typically displayed when the badge is not yet assigned.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>urlLink</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>A URL or internal coach path providing more information about the badge, or "Not assigned yet".</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>NULL</code> - The return value is not meaningful.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Defining a new badge</h4>
+ *       <pre><code>addBadge("ServerSavior", 1, "assets/images/serversavior.svg", "Server Savior Badge", "Not assigned yet", "lib-backup,q20");</code></pre>
+ *       <p class="example-description">Creates a badge named "ServerSavior" with a default image, alt text, description, and link.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>All parameters must evaluate to the specified types. An <code>ExecutorException</code> will be thrown for invalid types or if a badge with the given <code>badgeName</code> already exists.</li>
+ *       <li>This command only defines the badge structure; it does not award any specific level (class) of the badge.</li>
+ *       <li>See also: <code>addBadgeClass</code>, <code>awardBadge</code>, <code>revokeBadge</code>.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandAddBadge extends Command {
 

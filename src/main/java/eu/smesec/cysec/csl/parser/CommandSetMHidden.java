@@ -25,16 +25,83 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This command modifies the display status of multiple question from hidden to show (or vice
- * versa).
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">setMHidden</h2>
+ *   </div>
  *
- * <p>Remember to add a condition to hide a question again, if it should not be displayed all the
- * time once it is unhidden.</p>
+ *   <div class="command-signature">
+ *     <code><span class="return-type">INTEGER</span> setMHidden(<span class="params">lowId: STRING, highId: STRING, hiddenState: BOOL</span>)</code>
+ *   </div>
  *
- * <p>Syntax: setMHidden(lowID, highID, hidden);</p>
- * <p>Example: setMHidden("q20", "q40", FALSE); // this updates all question ids starting with
- * "q20"
- * (inclusive) and "q40" (exclusive).</p>
+ *   <div class="command-description">
+ *     <p>This command modifies the display status (hidden or visible) for a range of questions identified by their IDs.</p>
+ *     <p>It takes a starting question ID (inclusive), an ending question ID (exclusive), and a boolean value to determine whether they should be hidden or shown. Question IDs are compared lexicographically.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>lowId</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The ID of the first question in the range (inclusive).</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>highId</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The ID of the question marking the end of the range (exclusive).</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>hiddenState</code></td>
+ *           <td><code>BOOL</code></td>
+ *           <td>Yes</td>
+ *           <td>The desired hidden state. <code>TRUE</code> to hide questions, <code>FALSE</code> to show them.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>INTEGER</code> - The number of questions whose hidden state was actually changed by the command.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Hiding a range of questions</h4>
+ *       <pre><code>setMHidden("q8200", "q8300", TRUE);</code></pre>
+ *       <p class="example-description">Hides all questions with IDs from "q8200" up to (but not including) "q8300".</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Showing a range of questions conditionally</h4>
+ *       <pre><code>equals(getParentArgument(), "https") : protocolSelection : {
+ *   setMHidden("q8600", "q8700", FALSE); // Show HTTP questions
+ * };</code></pre>
+ *       <p class="example-description">When the parent argument is "https", this statement shows questions from "q8600" to "q8700".</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>Question IDs are compared as strings. Ensure your IDs follow a consistent lexicographical order for proper range selection (e.g., "q10" < "q100" < "q11").</li>
+ *       <li>To prevent a question from being re-hidden/re-shown unexpectedly, ensure that the conditions around <code>setMHidden</code> (and <code>setHidden</code>) are carefully managed.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandSetMHidden extends Command {
 

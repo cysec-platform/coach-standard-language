@@ -30,13 +30,81 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * Set an answer for another question by passing the question id as first parameter and the decired value
- * as second parameter.
- * <br><br>
- * <b>Astar questions:</b>
- * <br><br>
- * To select multiple values pass the option ids space seperated. Note that the answer value will
- * <b>overwrite</b> any existing values (so already selected options are not respected).
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">setAnswer</h2>
+ *   </div>
+ *
+ *   <div class="command-signature">
+ *     <code><span class="return-type">NULL</span> setAnswer(<span class="params">questionId: STRING, answerValue: STRING|NULL</span>)</code>
+ *   </div>
+ *
+ *   <div class="command-description">
+ *     <p>This command allows setting an answer for a specific question programmatically.</p>
+ *     <p>It takes the ID of the question to answer and the value for that answer. For 'Astar' type questions (multiple-choice or select-many), multiple selected options can be provided as a space-separated string of option IDs. Note that this command will <b>overwrite</b> any existing answer values for the specified question.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>questionId</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The ID of the question for which to set the answer.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>answerValue</code></td>
+ *           <td><code>STRING</code> or <code>NULL</code></td>
+ *           <td>Yes</td>
+ *           <td>The value of the answer. For Astar questions, use space-separated option IDs. Use <code>NULL</code> to clear an answer.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>NULL</code> - The return value is not meaningful.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Setting a single-option answer</h4>
+ *       <pre><code>setAnswer("q30oEmailOption", "yes");</code></pre>
+ *       <p class="example-description">Sets the answer for question "q30oEmailOption" to "yes".</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Setting multiple options for an Astar question</h4>
+ *       <pre><code>setAnswer("q40oProtocols", "HTTP HTTPS FTP");</code></pre>
+ *       <p class="example-description">Selects HTTP, HTTPS, and FTP options for the "q40oProtocols" question.</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Clearing an answer</h4>
+ *       <pre><code>setAnswer("q50oChoice", NULL);</code></pre>
+ *       <p class="example-description">Clears the answer for question "q50oChoice".</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>Both <code>questionId</code> and <code>answerValue</code> must be of type <code>STRING</code> (or <code>NULL</code> for <code>answerValue</code>).</li>
+ *       <li>This command directly manipulates stored answers, which can trigger re-evaluation of coach logic.</li>
+ *       <li>Be cautious when using this command, as it overrides existing answers. Ensure this is the intended behavior.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandSetAnswer extends Command {
 

@@ -25,15 +25,69 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This command signals the platform to display a certain question instead of the next one in sequence.
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">setNext</h2>
+ *   </div>
  *
- * <p>Note: Don't forget to "unhide" the question beforehand, otherwise the sequence is in inconsistent state.
- * The ExecutorContext clears all variables set by the question context before each evaluation. Therefore it is not necessary
- * to "unset" a variable.</p>
+ *   <div class="command-signature">
+ *     <code><span class="return-type">NULL</span> setNext(<span class="params">questionId: STRING</span>)</code>
+ *   </div>
  *
- * <p>Syntax: setNext(id);</p>
- * <p>Example: setNext("q20");</p>
- * @see CommandSetHidden
+ *   <div class="command-description">
+ *     <p>This command signals the platform to display a specific question with the given <code>questionId</code> next, instead of following the default sequential flow.</p>
+ *     <p>It effectively overrides the normal navigation, allowing for conditional jumps within the questionnaire.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>questionId</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The ID of the question to navigate to next.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>NULL</code> - The return value is not meaningful.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Jumping to a specific question</h4>
+ *       <pre><code>setNext("q20");</code></pre>
+ *       <p class="example-description">When this command is executed, the user will be directed to question "q20".</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Conditional navigation</h4>
+ *       <pre><code>if(isSelected("q10oYes"), setNext("q15"), setNext("q25"));</code></pre>
+ *       <p class="example-description">Navigates to "q15" if "q10oYes" is selected, otherwise to "q25".</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>The target question (<code>questionId</code>) must be a visible question. If it's hidden, the navigation might not work as expected, or the user might encounter an inconsistent state. Ensure that you have previously made the target question visible using <code>setHidden(questionId, FALSE)</code> if necessary.</li>
+ *       <li>Variables set by <code>setNext</code> are automatically cleared by the <code>ExecutorContext</code> before each evaluation, so there's no need to explicitly "unset" them.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandNext extends Command {
 

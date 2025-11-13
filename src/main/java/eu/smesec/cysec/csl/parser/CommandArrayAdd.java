@@ -25,6 +25,87 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">arrayAdd</h2>
+ *   </div>
+ *
+ *   <div class="command-signature">
+ *     <code><span class="return-type">BOOL</span> arrayAdd(<span class="params">arrayVarName: STRING, element: STRING, [unique: BOOL = FALSE]</span>)</code>
+ *   </div>
+ *
+ *   <div class="command-description">
+ *     <p>This command adds an element to an existing array-like variable, which is stored as a comma-separated string.</p>
+ *     <p>The <code>arrayVarName</code> identifies the variable holding the array. The <code>element</code> is the string to be added. An optional <code>unique</code> boolean parameter (defaulting to <code>FALSE</code>) determines whether duplicate entries should be prevented and the resulting list sorted.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>arrayVarName</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The name of the variable (assumed to be a comma-separated string) to which the element will be added.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>element</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The string element to append to the array.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>unique</code></td>
+ *           <td><code>BOOL</code></td>
+ *           <td>No (default: <code>FALSE</code>)</td>
+ *           <td>If <code>TRUE</code>, all duplicate entries in the array will be removed, and the array will be sorted alphabetically after the addition.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>BOOL</code> - Always returns <code>TRUE</code> upon successful execution.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Adding an element to an array</h4>
+ *       <pre><code>set("myList", "a,b");
+ * arrayAdd("myList", "c"); // "myList" is now "a,b,c"</code></pre>
+ *       <p class="example-description">Adds "c" to "myList".</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Adding an element and ensuring uniqueness + sorting</h4>
+ *       <pre><code>set("myUniqueList", "b,a");
+ * arrayAdd("myUniqueList", "c", TRUE); // "myUniqueList" is now "a,b,c"
+ * arrayAdd("myUniqueList", "b", TRUE); // "myUniqueList" is still "a,b,c" (duplicate 'b' is not added, list stays sorted)</code></pre>
+ *       <p class="example-description">Adds "c" to "myUniqueList", removes duplicates, and sorts. Subsequent attempts to add existing elements are ignored if "unique" is TRUE.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>The variable specified by <code>arrayVarName</code> must exist and ideally hold a comma-separated string for proper functioning. If it doesn't exist, an <code>ExecutorException</code> will be thrown.</li>
+ *       <li>This command manipulates a string as if it were an array. The elements are assumed to be simple strings that can be delimited by commas.</li>
+ *       <li>The sorting behavior (when <code>unique</code> is <code>TRUE</code>) is lexicographical.</li>
+ *     </ul>
+ *   </div>
+ * </div>
+ */
 public class CommandArrayAdd extends CommandAbstractList {
 
     @Override

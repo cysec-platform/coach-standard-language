@@ -26,6 +26,72 @@ import eu.smesec.cysec.platform.bridge.generated.Question;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">isAnswered</h2>
+ *   </div>
+ *
+ *   <div class="command-signature">
+ *     <code><span class="return-type">BOOL</span> isAnswered(<span class="params">questionId: STRING</span>)</code>
+ *   </div>
+ *
+ *   <div class="command-description">
+ *     <p>This command checks if a specific question has received an answer from the user.</p>
+ *     <p>It takes a <code>questionId</code> and returns <code>TRUE</code> if the question has a recorded answer; otherwise, it returns <code>FALSE</code>.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>questionId</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The ID of the question to check.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>BOOL</code> - <code>TRUE</code> if the specified question has been answered, <code>FALSE</code> otherwise.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Checking if a question has been answered</h4>
+ *       <pre><code>isAnswered("q100") // TRUE if question q100 has an answer</code></pre>
+ *       <p class="example-description">Returns TRUE if question "q100" has any answer value set.</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Conditional logic based on answer status</h4>
+ *       <pre><code>if(isAnswered("q200"), set("hasProgress", TRUE));</code></pre>
+ *       <p class="example-description">Sets the "hasProgress" variable to TRUE if question "q200" has been answered.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>The <code>questionId</code> must be a string.</li>
+ *       <li>If the question corresponding to the <code>questionId</code> is currently hidden, this command will return <code>FALSE</code>, as hidden questions are considered unanswerable.</li>
+ *       <li>This command checks for the existence of *any* answer, not for a specific answer value. To check for specific selections, use <code>isSelected()</code>.</li>
+ *     </ul>
+ *   </div>
+ * </div>
+ */
 public class CommandIsAnswered extends Command {
 
     public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {

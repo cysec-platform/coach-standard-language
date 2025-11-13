@@ -20,24 +20,72 @@
 package eu.smesec.cysec.csl.parser;
 
 /**
- * This command locks the value of a certain skill to a given value.
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">capScore</h2>
+ *   </div>
  *
- * <p>The library will keep recording contributions to said skill internally but will return the capped value upon access.
- * There is no corresponding command "removeCap" because coach logic is reevaluated when a question changes. That means
- * the cap on a skill is removed, once the condition that implied the cap does not hold anymore</p>
+ *   <div class="command-signature">
+ *     <code><span class="return-type">NULL</span> capScore(<span class="params">scoreId: STRING, value: INTEGER|FLOAT</span>)</code>
+ *   </div>
  *
- * <p>Syntax: capScore("skill", "value");</p>
- * <p>Example: capScore("strength", 50);</p>
- * <p>If q10o3 is selected, knowhow will be limited to 100. Once that condition fails, the cap won't be added again.</p>
- * <pre>
- *     <code>
- *         isSelected("q10o3") : q10o3 : {
- *             capScore("knowhow", 100);
- *          };
- *     </code>
- * </pre>
+ *   <div class="command-description">
+ *     <p>This command locks the value of a specified score (skill) to a given numeric value.</p>
+ *     <p>The library will continue to record internal contributions (additions/subtractions) to the said skill, but when the score is retrieved, the capped value will be returned. There is no explicit "removeCap" command; the cap is implicitly removed when the condition that triggered it no longer holds, causing the coach logic to reevaluate.</p>
+ *   </div>
  *
- * @see CommandAddScore
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>scoreId</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The unique identifier for the score (skill) to cap.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>value</code></td>
+ *           <td><code>INTEGER</code> or <code>FLOAT</code></td>
+ *           <td>Yes</td>
+ *           <td>The maximum numeric value the score should be capped at.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>NULL</code> - The return value is not meaningful.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Capping a score conditionally</h4>
+ *       <pre><code>isSelected("q10o3") : q10o3 : {
+ *     capScore("knowhow", 100);
+ * };</code></pre>
+ *       <p class="example-description">If option "q10o3" is selected, the "knowhow" score will be capped at 100. If "q10o3" is deselected, the cap will be removed during reevaluation.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>The cap is active only as long as the condition under which `capScore` was called remains true.</li>
+ *       <li>Subsequent additions to the score beyond the cap will still be recorded internally but will not increase the visible score. If the cap is removed, the score will reflect its true accumulated value.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandCapScore extends CommandAbstractScore {
 

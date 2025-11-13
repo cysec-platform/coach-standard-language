@@ -24,12 +24,70 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Removes a Recommendation from {@link RecommendationFactory}
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">revokeRecommendation</h2>
+ *   </div>
  *
- * <p>Syntax: removeRecommendation( recommendationName );</p>
- * <p>Example: removeRecommendation( "TieUpLooseEnds" );</p>
+ *   <div class="command-signature">
+ *     <code><span class="return-type">NULL</span> revokeRecommendation(<span class="params">recommendationName: STRING</span>)</code>
+ *   </div>
  *
- * @see CommandAddRecommendation
+ *   <div class="command-description">
+ *     <p>This command removes an existing recommendation from the <code>RecommendationFactory</code>.</p>
+ *     <p>It takes the unique <code>recommendationName</code> as a parameter. If a recommendation with the given name does not exist, the command will silently do nothing (it will not throw an <code>ExecutorException</code>).</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>recommendationName</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The unique identifier of the recommendation to remove.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>NULL</code> - The return value is not meaningful.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Removing a specific recommendation</h4>
+ *       <pre><code>revokeRecommendation("TightenLooseEnds");</code></pre>
+ *       <p class="example-description">Removes the recommendation named "TightenLooseEnds".</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Conditional recommendation removal</h4>
+ *       <pre><code>if(get("allQuestionsAnswered"), revokeRecommendation("TightenLooseEnds"));</code></pre>
+ *       <p class="example-description">Removes the "TightenLooseEnds" recommendation if all questions have been answered.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>The <code>recommendationName</code> must be a string.</li>
+ *       <li>This command only removes the recommendation from the active context; it does not affect its definition in the XML.</li>
+ *       <li>See also: <code>addRecommendation</code>.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandRevokeRecommendation extends Command {
     @Override

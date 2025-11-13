@@ -24,16 +24,70 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Revokes the current badgeClass of a badge class in {@link BadgeFactory}. This method may only be executed after a Badge is awarded using {@link CommandAwardBadge}.
- * If no Badge with the given ID or class exist, Executor throws an exception.
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">revokeBadge</h2>
+ *   </div>
  *
- * <p>Syntax: revokeBadge( badgeName);</p>
- *  <p>Example: revokeBadge("ServerSavior");</p>
+ *   <div class="command-signature">
+ *     <code><span class="return-type">NULL</span> revokeBadge(<span class="params">badgeName: STRING</span>)</code>
+ *   </div>
  *
- * @see CommandAddBadge
- * @see CommandAwardBadge
- * @see CommandAddBadgeClass
+ *   <div class="command-description">
+ *     <p>This command revokes the currently awarded class (level) of a specified badge, effectively un-awarding it.</p>
+ *     <p>The badge must have been previously awarded using <code>awardBadge</code>. If no badge with the given ID exists or has been awarded, the command logs a message but does not throw an exception (i.e., it's a no-op if the badge isn't active).</p>
+ *   </div>
  *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>badgeName</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The unique identifier of the badge whose awarded class is to be revoked.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>NULL</code> - The return value is not meaningful.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Revoking a badge</h4>
+ *       <pre><code>revokeBadge("ServerSavior");</code></pre>
+ *       <p class="example-description">Revokes the currently awarded class of the "ServerSavior" badge.</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Conditional badge revocation</h4>
+ *       <pre><code>if(lowerThan(get("serverExpertise"), 50), revokeBadge("ServerSavior"));</code></pre>
+ *       <p class="example-description">Revokes the "ServerSavior" badge if the "serverExpertise" score drops below 50.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>If the <code>badgeName</code> does not correspond to an existing badge definition, an <code>ExecutorException</code> will be thrown.</li>
+ *       <li>This command only revokes the *awarded class* of a badge, not the badge definition itself. The badge and its classes remain defined and can be re-awarded later.</li>
+ *       <li>See also: <code>addBadge</code>, <code>addBadgeClass</code>, <code>awardBadge</code>.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandRevokeBadge extends Command {
     @Override

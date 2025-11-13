@@ -21,6 +21,47 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">null</h2>
+ *   </div>
+ *
+ *   <div class="command-signature">
+ *     <code><span class="return-type">STRING</span> null()</code>
+ *   </div>
+ *
+ *   <div class="command-description">
+ *     <p>This command returns an empty string. It can be useful as a placeholder or to explicitly represent an empty value where a string is expected.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <em>No Parameters</em>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>STRING</code> - An empty string ("").</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Basic Usage</h4>
+ *       <pre><code>set("myVariable", null()) // Sets "myVariable" to ""</code></pre>
+ *       <p class="example-description">Sets a variable to an empty string.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>This command always returns an empty string, not the <code>NULL</code> Atom type unless explicitly handled by the context where it's used.</li>
+ *     </ul>
+ *   </div>
+ * </div>
+ */
 public class CommandBlank extends Command {
 
     public Atom execute(List<Atom> a, CoachContext coachContext) {

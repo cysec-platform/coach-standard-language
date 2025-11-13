@@ -22,8 +22,80 @@ package eu.smesec.cysec.csl.parser;
 import java.math.BigDecimal;
 
 /**
- * Command that checks whether a number is lower or equals to another number. See {@link CommandNumberBinaryPredicate}
- * for more information.
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">lowerThanOrEq</h2>
+ *   </div>
+ *
+ *   <div class="command-signature">
+ *     <code><span class="return-type">BOOL</span> lowerThanOrEq(<span class="params">number1: INTEGER|FLOAT, number2: INTEGER|FLOAT</span>)</code>
+ *   </div>
+ *
+ *   <div class="command-description">
+ *     <p>This command checks if the first number is less than or equal to the second number.</p>
+ *     <p>It takes two numeric parameters (either INTEGER or FLOAT) and returns <code>TRUE</code> if the first number is numerically smaller than or equal to the second; otherwise, it returns <code>FALSE</code>.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>number1</code></td>
+ *           <td><code>INTEGER</code> or <code>FLOAT</code></td>
+ *           <td>Yes</td>
+ *           <td>The first number (left-hand side) for the comparison.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>number2</code></td>
+ *           <td><code>INTEGER</code> or <code>FLOAT</code></td>
+ *           <td>Yes</td>
+ *           <td>The second number (right-hand side) for the comparison.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>BOOL</code> - <code>TRUE</code> if <code>number1 <= number2</code>, <code>FALSE</code> otherwise.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Comparing integers (less)</h4>
+ *       <pre><code>lowerThanOrEq(5, 10) // TRUE</code></pre>
+ *       <p class="example-description">Returns TRUE as 5 is less than 10.</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Comparing integers (equal)</h4>
+ *       <pre><code>lowerThanOrEq(10, 10) // TRUE</code></pre>
+ *       <p class="example-description">Returns TRUE as 10 is equal to 10.</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Comparing floats</h4>
+ *       <pre><code>lowerThanOrEq(3.14, 3.141) // TRUE</code></pre>
+ *       <p class="example-description">Returns TRUE as 3.14 is less than 3.141.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>Both parameters must evaluate to a numeric type (INTEGER or FLOAT). Passing non-numeric types will result in an <code>ExecutorException</code>.</li>
+ *       <li>Floating-point comparisons are handled consistently but might be subject to standard precision limitations.</li>
+ *     </ul>
+ *   </div>
+ * </div>
  */
 public class CommandLowerThanOrEquals extends CommandNumberBinaryPredicate {
     @Override

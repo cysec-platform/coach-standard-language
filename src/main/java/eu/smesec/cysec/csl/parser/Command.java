@@ -94,6 +94,10 @@ public abstract class Command {
         return commandName == null ? null : commands.get(commandName);
     }
 
+    public static Map<String, Command> getCommands() {
+        return commands;
+    }
+
     protected int numberOfNormalizedParams = -1; /* -1 denotes "all" */
 
     public int getNumberOfNormalizedParams() {

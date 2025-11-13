@@ -21,6 +21,95 @@ package eu.smesec.cysec.csl.parser;
 
 import java.util.List;
 
+/**
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">set</h2>
+ *   </div>
+ *
+ *   <div class="command-signature">
+ *     <code><span class="return-type">NULL</span> set(<span class="params">varName: STRING, value: ANY</span>)</code><br>
+ *     <code><span class="return-type">NULL</span> set(<span class="params">varName: STRING, context: STRING|NULL, value: ANY</span>)</code>
+ *   </div>
+ *
+ *   <div class="command-description">
+ *     <p>This command sets the value of a variable within the coach's execution context.</p>
+ *     <p>It can be used with two or three parameters. If two parameters are provided, the variable is set in the context of the current question. If three parameters are provided, the second parameter specifies an explicit context ID (a string) in which the variable should be set, or <code>NULL</code> for the global context.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>varName</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The name of the variable to set. Must be a string.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>context</code></td>
+ *           <td><code>STRING</code> or <code>NULL</code></td>
+ *           <td>No (defaults to current question's context if 2 parameters used)</td>
+ *           <td>The ID of the context in which to set the variable. Use <code>NULL</code> for the global context.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>value</code></td>
+ *           <td><code>ANY</code></td>
+ *           <td>Yes</td>
+ *           <td>The value to assign to the variable. Can be a STRING, INTEGER, FLOAT, BOOL, or the result of another command.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>NULL</code> - The return value is not meaningful.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Setting a variable in the current question's context (2 params)</h4>
+ *       <pre><code>set("myScore", 100);</code></pre>
+ *       <p class="example-description">Sets the variable "myScore" to 100 in the current question's context.</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Setting a variable in the global context (3 params with NULL)</h4>
+ *       <pre><code>set("globalFlag", NULL, TRUE);</code></pre>
+ *       <p class="example-description">Sets the variable "globalFlag" to TRUE in the global context.</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Setting a variable in a specific context (3 params with STRING)</h4>
+ *       <pre><code>set("protocolType", "connectionQ", "HTTPS");</code></pre>
+ *       <p class="example-description">Sets the variable "protocolType" to "HTTPS" in the context identified by "connectionQ".</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Setting a variable with result of another command</h4>
+ *       <pre><code>set("computedValue", add(get("valA"), get("valB")));</code></pre>
+ *       <p class="example-description">Sets "computedValue" to the sum of "valA" and "valB".</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li>The <code>varName</code> must be a string. Other types for <code>varName</code> will result in an <code>ExecutorException</code>.</li>
+ *       <li>The <code>context</code> parameter, if provided, must be a string or the <code>NULL</code> Atom.</li>
+ *       <li>Variables set within a question's context are typically cleared before each re-evaluation, unless specifically designed to persist. Global variables (set with <code>NULL</code> context) usually persist for the duration of the coach session.</li>
+ *     </ul>
+ *   </div>
+ * </div>
+ */
 public class CommandSetVar extends Command {
 
     public Atom execute(List<Atom> aList, CoachContext coachContext) throws ExecutorException {

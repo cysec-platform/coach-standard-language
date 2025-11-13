@@ -23,6 +23,80 @@ import eu.smesec.cysec.csl.parser.Atom.AtomType;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * <div class="command-doc">
+ *   <div class="command-header">
+ *     <h2 class="command-name">arrayElements</h2>
+ *   </div>
+ *
+ *   <div class="command-signature">
+ *     <code><span class="return-type">BOOL</span> arrayElements(<span class="params">arrayVarName: STRING, expectedLength: INTEGER</span>)</code>
+ *   </div>
+ *
+ *   <div class="command-description">
+ *     <p>This command checks if an array-like variable (represented as a comma-separated string) has a specific number of elements.</p>
+ *     <p>It takes the <code>arrayVarName</code> and an <code>expectedLength</code> integer. It returns <code>TRUE</code> if the number of elements in the array matches the <code>expectedLength</code>, and <code>FALSE</code> otherwise.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Parameters</h3>
+ *     <table class="params-table">
+ *       <thead>
+ *         <tr>
+ *           <th>Name</th>
+ *           <th>Type</th>
+ *           <th>Required</th>
+ *           <th>Description</th>
+ *         </tr>
+ *       </thead>
+ *       <tbody>
+ *         <tr>
+ *           <td><code>arrayVarName</code></td>
+ *           <td><code>STRING</code></td>
+ *           <td>Yes</td>
+ *           <td>The name of the variable (comma-separated string) representing the array.</td>
+ *         </tr>
+ *         <tr>
+ *           <td><code>expectedLength</code></td>
+ *           <td><code>INTEGER</code></td>
+ *           <td>Yes</td>
+ *           <td>The integer value for the expected number of elements in the array.</td>
+ *         </tr>
+ *       </tbody>
+ *     </table>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Return Value</h3>
+ *     <p><code>BOOL</code> - <code>TRUE</code> if the array contains exactly <code>expectedLength</code> elements, <code>FALSE</code> otherwise.</p>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Examples</h3>
+ *     <div class="example">
+ *       <h4>Checking array size</h4>
+ *       <pre><code>set("myOptions", "opt1,opt2,opt3");
+ * arrayElements("myOptions", 3); // TRUE
+ * arrayElements("myOptions", 2); // FALSE</code></pre>
+ *       <p class="example-description">Checks if "myOptions" has 3 elements, then if it has 2.</p>
+ *     </div>
+ *     <div class="example">
+ *       <h4>Conditional logic based on array length</h4>
+ *       <pre><code>if(arrayElements(get("chosenProtocols"), 1), set("singleProtocolChosen", TRUE));</code></pre>
+ *       <p class="example-description">Sets "singleProtocolChosen" to TRUE if exactly one protocol was chosen.</p>
+ *     </div>
+ *   </div>
+ *
+ *   <div class="command-section">
+ *     <h3>Notes</h3>
+ *     <ul>
+ *       <li><code>arrayVarName</code> must be a <code>STRING</code>, and <code>expectedLength</code> must be an <code>INTEGER</code>.</li>
+ *       <li>The variable specified by <code>arrayVarName</code> must exist and ideally hold a comma-separated string. If it doesn't exist, an <code>ExecutorException</code> will be thrown (as it cannot retrieve the variable).</li>
+ *       <li>An empty string for an array variable will be treated as an array of 0 elements.</li>
+ *     </ul>
+ *   </div>
+ * </div>
+ */
 public class CommandArrayElements extends CommandAbstractList {
 
     @Override

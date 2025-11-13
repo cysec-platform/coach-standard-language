@@ -22,7 +22,7 @@ package eu.smesec.cysec.csl.parser;
 import java.util.List;
 
 /**
- *<div class="command-doc">
+ * <div class="command-doc">
  *   <div class="command-header">
  *     <h2 class="command-name">not</h2>
  *   </div>
