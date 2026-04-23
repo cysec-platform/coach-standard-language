@@ -41,6 +41,16 @@ This is how to setup the formatter in IntelliJ to automatically format when you 
   This is useful because only Java files will be formatted by the "palantir-java-format" formatter.
   All other files will be formatted using the default IntelliJ formatter which might not be what you want.
 
+## Command Documentation
+
+The Coach Standard Language is documented in a [GitHub Wiki](https://github.com/cysec-platform/coach-standard-language/wiki).
+It describes the concept of the language and the different language constructs.
+Furthermore, it describes the individual commands that are available to programmers of the CSL.
+
+The command reference is automatically pulled from the Javadoc of the respective command implementations.
+The class `ExtractJavadoc` in the package `eu.smesec.cysec.csl` contains a program that extracts the class Javadoc for all command implementations.
+It automatically writes them to a specified output directory.
+This way the documentation lives close to the implementation but can still be used for documentation pruposes without redundantly writing the documentation twice.
 
 ## License
 
